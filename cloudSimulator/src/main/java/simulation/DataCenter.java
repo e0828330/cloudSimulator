@@ -16,6 +16,8 @@ public class DataCenter {
 	private String name;
 	private List<PhysicalMachine> physicalMachines;
 	private DataCenterManagement algorithm;
+	
+	private int minute;
 
 	private ConcurrentHashMap<VirtualMachine, Long> migrationQueue = new ConcurrentHashMap<VirtualMachine, Long>();
 	
@@ -24,8 +26,9 @@ public class DataCenter {
 	 * Here VM allocation and load updating should be done
 	 */
 	public void simulate() {
+		minute++;
 		handleMigrations();
-		System.out.printf("[%s] - time is %d\n", name, System.currentTimeMillis());
+		System.out.printf("[%s] - %d simulated minutes have passed\n", name, minute);
 	}
 	
 	/**

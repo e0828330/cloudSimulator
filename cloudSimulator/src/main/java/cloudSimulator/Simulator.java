@@ -21,6 +21,9 @@ import simulation.SimulatorJob;
 @EnableAutoConfiguration
 public class Simulator implements CommandLineRunner {
 
+	private final int siumlatedMinutes = 525600; // One year
+	private final int lengthOfSimulatedMinute = 2; // ms
+	
 	public static void main(String[] args) {
 		System.out.println("Manager - Console");
 		SpringApplication.run(Simulator.class, args);
@@ -62,8 +65,8 @@ public class Simulator implements CommandLineRunner {
 	private void startDataCenter(Scheduler scheduler, DataCenter dc, Date startTime) throws SchedulerException {
 		SimpleTrigger trigger = new SimpleTrigger();
 		trigger.setStartTime(startTime);
-    	trigger.setRepeatCount(10);
-    	trigger.setRepeatInterval(5);
+    	trigger.setRepeatCount(siumlatedMinutes); // One Year
+    	trigger.setRepeatInterval(lengthOfSimulatedMinute);
     	trigger.setName("Trigger - " + dc.getName());
     	scheduler.scheduleJob(getJobDetail(dc), trigger);
 	}
