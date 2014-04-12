@@ -8,12 +8,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.Data;
 import model.PhysicalMachine;
 import model.VirtualMachine;
+import algorithms.DataCenterManagement;
 
 @Data
 public class DataCenter {
 		
 	private String name;
 	private List<PhysicalMachine> physicalMachines;
+	private DataCenterManagement algorithm;
 
 	private ConcurrentHashMap<VirtualMachine, Long> migrationQueue = new ConcurrentHashMap<VirtualMachine, Long>();
 	

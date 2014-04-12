@@ -1,8 +1,17 @@
 package simulation;
 
+import java.util.List;
+
+import algorithms.DataCenterMigration;
+import lombok.Data;
 import model.VirtualMachine;
 
+@Data
 public class ElasticityManager {
+	
+	private DataCenterMigration algorithm;
+	private List<DataCenter> dataCenters;
+	
 	/* TODO: Implement */
 	
 	/**
