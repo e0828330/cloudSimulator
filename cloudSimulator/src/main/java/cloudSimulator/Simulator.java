@@ -49,6 +49,7 @@ public class Simulator implements CommandLineRunner {
 		dc3.setName("DataCenter Tokio");
 
 		Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+		System.out.println(scheduler.getSchedulerName());
 		scheduler.start();
 
 		Date startTime = new Date(System.currentTimeMillis() + 1000);
