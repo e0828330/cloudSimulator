@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import utils.Utils;
 import lombok.Data;
 import model.PhysicalMachine;
 import model.VirtualMachine;
@@ -28,7 +29,7 @@ public class DataCenter {
 	public void simulate() {
 		minute++;
 		handleMigrations();
-		System.out.printf("[%s] - %d simulated minutes have passed\n", name, minute);
+		System.out.printf("[%s] - Simluated times is %s\n", name, Utils.getCurrentTime(minute));
 	}
 	
 	/**

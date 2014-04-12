@@ -26,7 +26,7 @@ import simulation.SimulatorJob;
 @EnableAutoConfiguration
 public class Simulator implements CommandLineRunner {
 
-	private final int siumlatedMinutes = 3600; // Should be 525600 (One year)
+	private final int siumlatedMinutes = 60 * 24 * 7; // Should be 525600 (One year)
 	private final int lengthOfSimulatedMinute = 5; // ms
 
 	public static void main(String[] args) {
