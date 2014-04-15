@@ -32,4 +32,11 @@ public class ElasticityManager {
 		
 	}
 	
+	public void simulate() {
+		//  TODO: Implement rest
+		for(DataCenter dc : dataCenters) {
+			dc.simulate();
+		}
+	}
+	
 }
