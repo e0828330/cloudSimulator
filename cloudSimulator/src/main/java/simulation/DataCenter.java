@@ -1,14 +1,14 @@
 package simulation;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-import utils.Utils;
 import lombok.Data;
 import model.PhysicalMachine;
 import model.VirtualMachine;
+import utils.Utils;
 import algorithms.DataCenterManagement;
 
 @Data
@@ -20,7 +20,7 @@ public class DataCenter {
 	
 	private int minute;
 
-	private ConcurrentHashMap<VirtualMachine, Long> migrationQueue = new ConcurrentHashMap<VirtualMachine, Long>();
+	private HashMap<VirtualMachine, Long> migrationQueue = new HashMap<VirtualMachine, Long>();
 	
 	/**
 	 * Gets called on every simulated minute.
