@@ -1,16 +1,14 @@
-<?
+<?php
 header("Content-type: text/plain");
 $m = new MongoClient();
-$db = $m->weather;
+$db = $m->weather2;
 $coll = $db->forecast;
 
 
 $time_format = "Y-m-d\TH:i:s";
 
 
-
-
-$api_key = "e712c7b161f4a8fa429fed37022412e4";
+$api_key = "4e6b74b4e111fbdaa41588b6fd28ad9c";
 $locations = array(
 	'munich' => array(
 		'lat' => 48.2403103,
@@ -35,10 +33,9 @@ $locations = array(
 	
 );
 
-//json_decode(file_get_contents())
 
 foreach($locations as $name => $loc){
-	$start = file_exists($name.".txt") ? (int)file_get_contents($name.".txt") : strtotime("2013-01-01 00:00:00");
+	$start = file_exists("new-".$name.".txt") ? (int)file_get_contents("new-".$name.".txt") : strtotime("2013-01-01 00:00:00");
 	
 	if($start > strtotime("2014-01-01 00:00:00")){
 		echo "$name is done...\n";
@@ -46,22 +43,15 @@ foreach($locations as $name => $loc){
 	}
 	
 	for($i = 0; $i < 10; $i++){
-		$url = "https://api.forecast.io/forecast/{$api_key}/{$loc['lat']},{$loc['lng']},".date($time_format, $start + ($i * 3600));
+		$url = "https://api.forecast.io/forecast/{$api_key}/{$loc['lat']},{$loc['lng']},".date($time_format, $start + ($i * 43200));
 		$json = json_decode(file_get_contents($url));
 		if($json){
 			$coll->insert($json);
 		}
 	}
 	
-	file_put_contents($name.".txt", $start + ($i * 3600));
+	file_put_contents("new-".$name.".txt", $start + ($i * 43200));
 	
 }
 
 echo "--------\n";
-
-$cursor = $coll->find();
-
-// iterate through the results
-foreach ($cursor as $document) {
-	echo $document['latitude'] . "/" . $document['longitude'] . " - " . date("Y-m-d H:i:s",$document['currently']['time']) . ' - ' . $document['currently']['summary'] ."\n";
-}

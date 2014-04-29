@@ -1,7 +1,7 @@
 <?
 header("Content-type: text/plain");
 $m = new MongoClient();
-$db = $m->weather;
+$db = $m->weather2;
 $coll = $db->forecast;
 
 $cursor = $coll->find();
