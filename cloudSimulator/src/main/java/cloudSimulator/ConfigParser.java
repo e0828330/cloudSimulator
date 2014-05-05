@@ -4,14 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import model.PhysicalMachine;
-
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
-
 import simulation.DataCenter;
+import weather.Location;
 
 public class ConfigParser {
 	
@@ -43,9 +41,11 @@ public class ConfigParser {
 		
 		for (String key : ini.get("DataCenter").keySet()) {
 			DataCenter dc = new DataCenter();
-			dc.setName(ini.get("DataCenter", key));
+      String[] name = ini.get("DataCenter", key).split(",");
+			dc.setName(name[0]);
+      dc.setLocation(new Location(Double.parseDouble(name[1]), Double.parseDouble(name[2])));
 			
-			// Phsyical Machines for DataCenter
+      // Phsyical Machines for DataCenter
 			int numPMs = (int) pmND.sample();
 			List <PhysicalMachine> pms = new ArrayList<PhysicalMachine>();
 			for (int i = 0; i < numPMs; i++) {
