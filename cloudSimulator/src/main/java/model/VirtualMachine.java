@@ -12,12 +12,12 @@ public class VirtualMachine {
 	private int size;
 	private int memory;
 	private int cpus;
-	private int bandwith;
+	private int bandwidth;
 
 	/* Used resources in percent */
 	private double usedCPUs;
 	private double usedMemory;
-	private double usedBandwith;
+	private double usedBandwidth;
 	
 	/* Whether the VM is on or down */
 	private boolean online;
@@ -38,6 +38,9 @@ public class VirtualMachine {
 	 * Updates the current load, called periodically by the simulator
 	 */
 	public void updateLoad() {
-		/* TODO: Implement */
+		// TODO: Type + OS
+		usedCPUs = 1;//Utils.getRandomValue(0, cpus) / cpus;
+		usedMemory = 1;//= Utils.getRandomValue(0, memory) / memory;
+		usedBandwidth = 1;//Utils.getRandomValue(0, bandwidth) / bandwidth;
 	}
 }

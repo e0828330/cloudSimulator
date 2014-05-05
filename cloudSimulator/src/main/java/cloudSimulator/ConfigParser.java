@@ -26,6 +26,12 @@ public class ConfigParser {
 
 	/* The ini file */
 	private Ini ini;
+	
+	/* Helper */
+	private ArrayList<PhysicalMachine> totalPMs = new ArrayList<PhysicalMachine>(64);
+	
+	private ArrayList<ServiceLevelAgreement> slaList;
+	private ArrayList<VirtualMachine> vmList;	
 
 	/* Resulting datacenters */
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
@@ -60,8 +66,8 @@ public class ConfigParser {
 			numSLAs = numVMs;
 		}
 
-		ArrayList<ServiceLevelAgreement> slaList = new ArrayList<ServiceLevelAgreement>(numSLAs);
-		ArrayList<VirtualMachine> vmList = new ArrayList<VirtualMachine>(numVMs);
+		slaList = new ArrayList<ServiceLevelAgreement>(numSLAs);
+		vmList = new ArrayList<VirtualMachine>(numVMs);
 
 		// SLAs
 
@@ -94,7 +100,7 @@ public class ConfigParser {
 				iter.remove();
 				sla.getVms().add(vm);
 				vm.setSla(sla);
-				vm.setBandwith((int) (sla.getBandwith() * INITIAL_VM_RES_MULTIPLICATOR));
+				vm.setBandwidth((int) (sla.getBandwith() * INITIAL_VM_RES_MULTIPLICATOR));
 				int initCPUS = (int) (sla.getCpus() * INITIAL_VM_RES_MULTIPLICATOR);
 				vm.setCpus(initCPUS < 1 ? 1 : initCPUS);
 				int initMemory = (int) (sla.getMemory() * INITIAL_VM_RES_MULTIPLICATOR);
@@ -114,7 +120,7 @@ public class ConfigParser {
 
 			// Phsyical Machines for DataCenter
 			int numPMs = (int) pmND.sample();
-			List<PhysicalMachine> pms = new ArrayList<PhysicalMachine>();
+			List<PhysicalMachine> pms = new ArrayList<PhysicalMachine>(numPMs);
 			for (int i = 0; i < numPMs; i++) {
 				PhysicalMachine pm = new PhysicalMachine();
 				pm.setCpus((int) cpuCoresND.sample());
@@ -129,6 +135,7 @@ public class ConfigParser {
 
 				// System.out.println(pm);
 				pms.add(pm);
+				totalPMs.add(pm);
 			}
 			dc.setPhysicalMachines(pms);
 			dataCenters.add(dc);
@@ -138,7 +145,49 @@ public class ConfigParser {
 		Utils.orderVMsByPriority(vmList);
 		
 		// Set VM -> PM
+		// Shuffle PMs
+		Collections.shuffle(totalPMs);
 		
+		Iterator<PhysicalMachine> PMiter = totalPMs.iterator();
+		Iterator<VirtualMachine> VMiter = vmList.iterator();
+		
+		VirtualMachine nextVM = null;
+		int j = 0;
+		while (PMiter.hasNext()) {
+			PhysicalMachine pm = PMiter.next();
+			j++;
+			while (nextVM != null || VMiter.hasNext()) {
+				if (nextVM == null) {
+					nextVM = VMiter.next();
+					nextVM.updateLoad();
+				}
+				if (Utils.VMfits2PM(pm, nextVM)) {
+					Utils.migrateVM2PM(pm, nextVM);
+					VMiter.remove();
+					nextVM = null;
+				}
+				else {
+					break;
+				}
+			}		
+		}
+		
+		/*
+		System.out.println(vmList.size() + " VMs not migrated to PMs");
+		for (DataCenter dc : dataCenters) {
+			int i = 1;
+			for (PhysicalMachine pm : dc.getPhysicalMachines()) {
+				System.out.println(dc.getName() + ": PM " + i + " with " + pm.getVirtualMachines().size() + " VMs");
+				System.out.println("DATA: Size = " + pm.getSize() +", Memory = " + pm.getMemory() + ", CPUS = " + pm.getCpus());
+				for (VirtualMachine v : pm.getVirtualMachines()) {
+					System.out.println("VM has size " + v.getSize() + ", cpus = " + v.getCpus() +", memory = " + v.getMemory());
+				}
+				i++;
+			}
+			
+		}
+		*/
+
 		
 	}
 }

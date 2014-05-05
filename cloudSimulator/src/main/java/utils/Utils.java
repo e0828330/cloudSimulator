@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import model.PhysicalMachine;
 import model.VirtualMachine;
 
 public class Utils {
@@ -36,4 +37,45 @@ public class Utils {
 			}
 		});		
 	}
+	
+	/**
+	 * Checks if the virtual machine @vm has place on the physical machine @pm
+	 * @param pm The physical machine running * VMs
+	 * @param vm The virtual machine which should run on the PM
+	 * @return
+	 */
+	public static boolean VMfits2PM(PhysicalMachine pm, VirtualMachine vm) {
+		double sizePM = pm.getSizeUsage() * pm.getSize();
+		double cpusPM = pm.getCPULoad() * pm.getCpus();
+		double memoryPM = pm.getMemoryUsage() * pm.getMemory();
+		double bandwidthPM = pm.getBandwithUtilization() * pm.getBandwith();
+
+		if (sizePM + (double) vm.getSize() <= pm.getSize() &&
+			cpusPM + (double) vm.getCpus() <= pm.getCpus() &&
+			memoryPM + (double) vm.getMemory() <= pm.getMemory() &&
+			bandwidthPM + (double) vm.getBandwidth() <= pm.getBandwith()) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Migrates @vm to @pm
+	 * @param pm The physical machine
+	 * @param vm The virtual machine
+	 */
+	public static void migrateVM2PM(PhysicalMachine pm, VirtualMachine vm) {
+		pm.getVirtualMachines().add(vm);
+		vm.setPm(pm);
+	}
+	
+	/**
+	 * Generates a random value betweet min and max
+	 * @return
+	 */
+	public static double getRandomValue(double min, double max) {
+		return (min + Math.random() * max - min);
+	}	
+	
+	
 }
