@@ -7,6 +7,8 @@ import lombok.Data;
 @Data
 public class PhysicalMachine {
 	
+	private boolean running;
+	
 	/* Available resources */
 	private int size;
 	private int memory;

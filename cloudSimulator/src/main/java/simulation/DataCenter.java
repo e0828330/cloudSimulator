@@ -30,7 +30,9 @@ public class DataCenter {
 		minute++;
 		handleMigrations();
 		for (PhysicalMachine pm : physicalMachines) {
-			pm.updateLoads();
+			if (pm.isRunning()) {
+				pm.updateLoads();
+			}
 		}
 		System.out.printf("[%s] - Simluated times is %s\n", name, Utils.getCurrentTime(minute));
 	}
