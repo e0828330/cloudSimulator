@@ -13,5 +13,5 @@ public class ServiceLevelAgreement {
 	private int bandwith;
 	private double maxDowntime;
 	private int priority;
-	private Set<VirtualMachine> vms = new HashSet<VirtualMachine>(32);
+	private Set<VirtualMachine> vms = new HashSet<VirtualMachine>(8);
 }

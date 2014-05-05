@@ -91,10 +91,13 @@ public class ConfigParser {
 			if (iter.hasNext()) {
 				ServiceLevelAgreement sla = iter.next();
 				iter.remove();
+				sla.getVms().add(vm);
 				vm.setSla(sla);
 				vm.setBandwith((int) (sla.getBandwith() * INITIAL_VM_RES_MULTIPLICATOR));
-				vm.setCpus((int) (sla.getCpus() * INITIAL_VM_RES_MULTIPLICATOR));
-				vm.setMemory((int) (sla.getMemory() * INITIAL_VM_RES_MULTIPLICATOR));
+				int initCPUS = (int) (sla.getCpus() * INITIAL_VM_RES_MULTIPLICATOR);
+				vm.setCpus(initCPUS < 1 ? 1 : initCPUS);
+				int initMemory = (int) (sla.getMemory() * INITIAL_VM_RES_MULTIPLICATOR);
+				vm.setMemory(initMemory < 1 ? 1 : initMemory);
 				vm.setOnline(true);
 				vm.setSize((int) (sla.getSize() * INITIAL_VM_RES_MULTIPLICATOR));
 			}
@@ -102,10 +105,7 @@ public class ConfigParser {
 				vm.setOnline(false);
 			}
 			vmList.add(vm);
-			// System.out.println(vm);
-		}		
-		
-		
+		}
 		
 		// PMS
 		for (String key : ini.get("DataCenter").keySet()) {
