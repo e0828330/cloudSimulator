@@ -8,22 +8,13 @@ package weather;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
-import utils.Utils;
-
 
 public class Forecast {
 
-  private MongoTemplate tpl;
-  private DBCollection weather;
+  final private MongoTemplate tpl;
+  final private DBCollection weather;
 
   public Forecast(MongoTemplate tpl) {
     this.tpl = tpl;
