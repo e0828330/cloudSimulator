@@ -20,6 +20,7 @@ import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 
 import simulation.DataCenter;
+import utils.Utils;
 
 public class ConfigParser {
 
@@ -134,18 +135,7 @@ public class ConfigParser {
 		}
 
 		// Order VMs by priority
-		Collections.sort(vmList, new Comparator<VirtualMachine>() {
-			public int compare(VirtualMachine vm1, VirtualMachine vm2) {
-				if (vm1.getSla() == null && vm2.getSla() == null) {
-					return 0;
-				}
-				if (vm1.getSla() != null && vm2.getSla() != null) {
-					return vm2.getSla().getPriority() - vm1.getSla().getPriority();
-				}
-				return 0;
-			}
-		});
-		
+		Utils.orderVMsByPriority(vmList);
 		
 		
 	}
