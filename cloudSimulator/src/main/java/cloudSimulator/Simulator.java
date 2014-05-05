@@ -20,7 +20,6 @@ public class Simulator implements CommandLineRunner {
 	private final int simulatedMinutes = 60 * 24 * 7; // Should be 525600 (One year)
 
 	public static void main(String[] args) {
-		System.out.println("Manager - Console");
 		SpringApplication.run(Simulator.class, args);
 	}
 
