@@ -64,7 +64,7 @@ public class Utils {
 	 * @param pm The physical machine
 	 * @param vm The virtual machine
 	 */
-	public static void migrateVM2PM(PhysicalMachine pm, VirtualMachine vm) {
+	public static void migrateVMOnPM(PhysicalMachine pm, VirtualMachine vm) {
 		pm.getVirtualMachines().add(vm);
 		vm.setPm(pm);
 	}
