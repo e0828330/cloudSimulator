@@ -29,6 +29,11 @@ public class DataCenter {
 	public void simulate() {
 		minute++;
 		handleMigrations();
+		for (PhysicalMachine pm : physicalMachines) {
+			for (VirtualMachine vm : pm.getVirtualMachines()) {
+				vm.updateLoad();
+			}
+		}
 		System.out.printf("[%s] - Simluated times is %s\n", name, Utils.getCurrentTime(minute));
 	}
 	
