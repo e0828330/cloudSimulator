@@ -15,6 +15,14 @@ public class PhysicalMachine {
 	private int cpus;
 	private int bandwith;
 	
+	/* Max energy consumption of CPU, Memory and Networkcard in watt */
+	private int cpuEnergy;
+	private int memEnergy;
+	private int networkEnergy;
+	
+	private double idleStateEnergyUtilization;
+	
+	
 	/* Allocated virtual machines */
 	private List<VirtualMachine> virtualMachines;
 	
@@ -43,7 +51,6 @@ public class PhysicalMachine {
 				usedCpus += vm.getCpus() * vm.getUsedCPUs();
 			}
 		}
-
 		return Math.min(1., usedCpus / cpus);
 	}
 	
@@ -75,6 +82,16 @@ public class PhysicalMachine {
 		}
 
 		return Math.min(1., bandwithUsed / bandwith);
+	}
+	
+	/**
+	 * Returns the total energy utilization of this physical machine
+	 * @return
+	 */
+	public double getTotalEnergyUtilization() {
+		double totalEnergyUsed = idleStateEnergyUtilization + cpuEnergy * getCPULoad()
+				+ memEnergy * getMemoryUsage() + networkEnergy * getBandwithUtilization();
+		return totalEnergyUsed;
 	}
 	
 }
