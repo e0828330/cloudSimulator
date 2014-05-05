@@ -16,9 +16,9 @@ public class PhysicalMachine {
 	private int bandwith;
 	
 	/* Max energy consumption of CPU, Memory and Networkcard in watt */
-	private int cpuEnergy;
-	private int memEnergy;
-	private int networkEnergy;
+	private int cpuPowerConsumption;
+	private int memPowerConsumption;
+	private int networkPowerConsumption;
 	
 	private double idleStateEnergyUtilization;
 	
@@ -89,8 +89,8 @@ public class PhysicalMachine {
 	 * @return
 	 */
 	public double getTotalEnergyUtilization() {
-		double totalEnergyUsed = idleStateEnergyUtilization + cpuEnergy * getCPULoad()
-				+ memEnergy * getMemoryUsage() + networkEnergy * getBandwithUtilization();
+		double totalEnergyUsed = idleStateEnergyUtilization + cpuPowerConsumption * getCPULoad()
+				+ memPowerConsumption * getMemoryUsage() + networkPowerConsumption * getBandwithUtilization();
 		return totalEnergyUsed;
 	}
 	
