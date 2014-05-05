@@ -44,7 +44,7 @@ public class Utils {
 	 * @param vm The virtual machine which should run on the PM
 	 * @return
 	 */
-	public static boolean VMfits2PM(PhysicalMachine pm, VirtualMachine vm) {
+	public static boolean VMfitsOnPM(PhysicalMachine pm, VirtualMachine vm) {
 		double sizePM = pm.getSizeUsage() * pm.getSize();
 		double cpusPM = pm.getCPULoad() * pm.getCpus();
 		double memoryPM = pm.getMemoryUsage() * pm.getMemory();
@@ -64,7 +64,7 @@ public class Utils {
 	 * @param pm The physical machine
 	 * @param vm The virtual machine
 	 */
-	public static void migrateVMOnPM(PhysicalMachine pm, VirtualMachine vm) {
+	public static void migrateVM2PM(PhysicalMachine pm, VirtualMachine vm) {
 		pm.getVirtualMachines().add(vm);
 		vm.setPm(pm);
 	}
