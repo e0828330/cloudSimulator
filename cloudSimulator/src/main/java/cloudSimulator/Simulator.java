@@ -1,5 +1,6 @@
 package cloudSimulator;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,10 @@ public class Simulator implements CommandLineRunner {
 
 		List<DataCenter> dataCenters = new ArrayList<DataCenter>();
 		
+		ConfigParser parser = new ConfigParser();
+		URL resource = Simulator.class.getResource("/config.ini");
+		parser.doParse(resource.getPath());
+		
 		/* This is just a test */
 		/* TODO: Read config file and build from there */
 		DataCenter dc1 = new DataCenter();
@@ -46,7 +51,7 @@ public class Simulator implements CommandLineRunner {
 		em.setDataCenters(dataCenters);
 		
 		for (int i = 0; i < simulatedMinutes; i++) {
-			em.simulate();
+			//em.simulate();
 		}
 
 		System.out.println("Simulation ended!");
