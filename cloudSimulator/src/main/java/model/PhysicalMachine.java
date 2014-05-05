@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
@@ -24,7 +25,7 @@ public class PhysicalMachine {
 	
 	
 	/* Allocated virtual machines */
-	private List<VirtualMachine> virtualMachines;
+	private List<VirtualMachine> virtualMachines = new ArrayList<VirtualMachine>(8);
 	
 	/**
 	 * Updates the load of the current running VMs,
@@ -55,6 +56,20 @@ public class PhysicalMachine {
 	}
 	
 	/**
+	 * Returns the current CPU used size based on the load of the running VMs
+	 * @return
+	 */
+	public double getSizeUsage() {
+		double usedSize = 0;
+		for(VirtualMachine vm : virtualMachines) {
+			if (vm.isOnline()) {
+				usedSize += vm.getSize();
+			}
+		}
+		return Math.min(1., usedSize / size);
+	}	
+	
+	/**
 	 * Returns the current memory usage based on the load of the running VMs
 	 * @return
 	 */
@@ -77,7 +92,7 @@ public class PhysicalMachine {
 		double bandwithUsed = 0;
 		for(VirtualMachine vm : virtualMachines) {
 			if (vm.isOnline()) {
-				bandwithUsed += vm.getBandwith() * vm.getUsedBandwith();
+				bandwithUsed += vm.getBandwidth() * vm.getUsedBandwidth();
 			}
 		}
 
