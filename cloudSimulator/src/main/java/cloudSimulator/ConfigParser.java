@@ -3,9 +3,15 @@ package cloudSimulator;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import model.PhysicalMachine;
+import model.ServiceLevelAgreement;
+import model.VirtualMachine;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.ini4j.Ini;
@@ -21,22 +27,89 @@ public class ConfigParser {
 	/* Resulting datacenters */
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
 	
+	private final double INITIAL_VM_RES_MULTIPLICATOR = 0.8;
+	
+	private NormalDistribution getDistribution(String key) {
+		return new NormalDistribution(Double.parseDouble(ini.get(key, "mean")), Double.parseDouble(ini.get(key, "sd")));
+	}
+
+	
 	public void doParse(String path) throws InvalidFileFormatException, IOException {
 		ini = new Ini(new File(path));
 		
-		NormalDistribution pmND = new NormalDistribution(Double.parseDouble(ini.get("PMs", "mean")), Double.parseDouble(ini.get("PMs", "sd")));
-		NormalDistribution vmND = new NormalDistribution(Double.parseDouble(ini.get("VMs", "mean")), Double.parseDouble(ini.get("VMs", "sd")));
+		NormalDistribution pmND = getDistribution("PMs");
+		NormalDistribution vmND = getDistribution("VMs");
+		NormalDistribution slaND = getDistribution("SLAs");
+		
+		NormalDistribution cpuPowerND = getDistribution("CPUPower");
+		NormalDistribution memPowerND = getDistribution("MemoryPower");
+		NormalDistribution netPowerND = getDistribution("NetworkPower");
 
-		NormalDistribution cpuPowerND = new NormalDistribution(Double.parseDouble(ini.get("CPUPower", "mean")), Double.parseDouble(ini.get("CPUPower", "sd")));
-		NormalDistribution memPowerND = new NormalDistribution(Double.parseDouble(ini.get("MemoryPower", "mean")), Double.parseDouble(ini.get("MemoryPower", "sd")));
-		NormalDistribution netPowerND = new NormalDistribution(Double.parseDouble(ini.get("NetworkPower", "mean")), Double.parseDouble(ini.get("NetworkPower", "sd")));
-
-		NormalDistribution cpuCoresND = new NormalDistribution(Double.parseDouble(ini.get("CPUCores", "mean")), Double.parseDouble(ini.get("CPUCores", "sd")));
-		NormalDistribution memoryND = new NormalDistribution(Double.parseDouble(ini.get("Memory", "mean")), Double.parseDouble(ini.get("Memory", "sd")));
-		NormalDistribution bandwithND = new NormalDistribution(Double.parseDouble(ini.get("Bandwidth", "mean")), Double.parseDouble(ini.get("Bandwidth", "sd")));
-		NormalDistribution diskspaceND = new NormalDistribution(Double.parseDouble(ini.get("Diskspace", "mean")), Double.parseDouble(ini.get("Diskspace", "sd")));
+		NormalDistribution cpuCoresND = getDistribution("CPUCores");
+		NormalDistribution memoryND = getDistribution("Memory");
+		NormalDistribution bandwithND = getDistribution("Bandwidth");
+		NormalDistribution diskspaceND = getDistribution("Diskspace");
 
 		
+		int numSLAs = (int) slaND.sample();
+		int numVMs = (int) vmND.sample();
+		
+		// If generated data generates more SLAs than VMs, set max to VMs
+		if (numSLAs > numVMs) {
+			numSLAs = numVMs;
+		}
+		
+		ArrayList<ServiceLevelAgreement> slaList = new ArrayList<ServiceLevelAgreement>(numSLAs);
+		ArrayList<VirtualMachine> vmList = new ArrayList<VirtualMachine>(numVMs);
+		
+		// SLAs
+		
+		NormalDistribution slaSize = getDistribution("SLASize");
+		NormalDistribution slaMemory = getDistribution("SLAMemory");
+		NormalDistribution slaCpus = getDistribution("SLACpus");
+		NormalDistribution slaBandwidth = getDistribution("SLABandwidth");
+		NormalDistribution slaPriority = getDistribution("SLAPriority");
+		NormalDistribution slaMaxDowntime = getDistribution("SLAMaxDowntime");
+		
+		for (int i = 0; i < numSLAs; i++) {
+			ServiceLevelAgreement sla = new ServiceLevelAgreement();
+			sla.setBandwith((int) slaBandwidth.sample());
+			sla.setCpus((int) slaCpus.sample() + 1);
+			sla.setMemory((int) slaMemory.sample());
+			sla.setSize((int) slaSize.sample() + 2);
+			sla.setMaxDowntime(slaMaxDowntime.sample());
+			sla.setPriority((int) slaPriority.sample());
+			slaList.add(sla);
+		}
+		
+		
+		// VMS
+		Iterator<ServiceLevelAgreement> iter = slaList.iterator();
+		System.out.println(slaList.size());
+		System.out.println(numVMs);
+		for (int i = 0; i < numVMs; i++) {
+			VirtualMachine vm = new VirtualMachine();
+			
+			if (iter.hasNext()) {
+				ServiceLevelAgreement sla = iter.next();
+				iter.remove();
+				vm.setSla(sla);
+				vm.setBandwith((int) (sla.getBandwith() * INITIAL_VM_RES_MULTIPLICATOR));
+				vm.setCpus((int) (sla.getCpus() * INITIAL_VM_RES_MULTIPLICATOR));
+				vm.setMemory((int) (sla.getMemory() * INITIAL_VM_RES_MULTIPLICATOR));
+				vm.setOnline(true);
+				vm.setSize((int) (sla.getSize() * INITIAL_VM_RES_MULTIPLICATOR));
+			}
+			else {
+				vm.setOnline(false);
+			}
+			System.out.println(vm);
+			vmList.add(vm);
+		}		
+		
+		
+		
+		// PMS
 		for (String key : ini.get("DataCenter").keySet()) {
 			DataCenter dc = new DataCenter();
 			dc.setName(ini.get("DataCenter", key));
@@ -56,7 +129,7 @@ public class ConfigParser {
 				pm.setNetworkPowerConsumption((int)netPowerND.sample());
 				pm.setIdleStateEnergyUtilization(0.1 * (pm.getCpuPowerConsumption() + pm.getMemPowerConsumption() + pm.getNetworkPowerConsumption()));
 
-				System.out.println(pm);
+				//System.out.println(pm);
 				pms.add(pm);
 			}
 			dc.setPhysicalMachines(pms);
