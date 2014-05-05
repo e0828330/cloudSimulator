@@ -201,7 +201,7 @@ public class ConfigParser {
 	}
 
 	/**
-	 * Assigns the virtual machines (VMs) to the physcial machines (PMs)
+	 * Assigns the virtual machines (VMs) to the physical machines (PMs)
 	 */
 	private void assignVM2PM() {
 		// Set VM -> PM
@@ -220,11 +220,11 @@ public class ConfigParser {
 					nextVM = VMiter.next();
 					nextVM.updateLoad();
 				}
-				if (Utils.VMfits2PM(pm, nextVM)) {
+				if (Utils.VMfitsOnPM(pm, nextVM)) {
 					if (pm.getVirtualMachines().size() == 0 && nextVM.isOnline()) {
 						pm.setRunning(true);
 					}
-					Utils.migrateVMOnPM(pm, nextVM);
+					Utils.migrateVM2PM(pm, nextVM);
 					VMiter.remove();
 					nextVM = null;
 				} else {
