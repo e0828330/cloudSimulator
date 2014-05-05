@@ -2,11 +2,13 @@ package cloudSimulator;
 
 import java.net.URL;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 import simulation.ElasticityManager;
 
@@ -20,6 +22,9 @@ public class Simulator implements CommandLineRunner {
 	public static void main(String[] args) {
 		SpringApplication.run(Simulator.class, args);
 	}
+	
+	@Autowired
+	MongoTemplate tpl;
 
 	public void run(String... arg0) throws Exception {
 		System.out.println("Started");
@@ -31,8 +36,10 @@ public class Simulator implements CommandLineRunner {
 		ElasticityManager em = new ElasticityManager();
 		em.setDataCenters(parser.getDataCenters());
 		
+		System.out.println(tpl);
+		
 		for (int i = 0; i < simulatedMinutes; i++) {
-			em.simulate();
+			//em.simulate();
 		}
 
 		System.out.println("Simulation ended!");
