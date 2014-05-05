@@ -85,8 +85,6 @@ public class ConfigParser {
 		
 		// VMS
 		Iterator<ServiceLevelAgreement> iter = slaList.iterator();
-		System.out.println(slaList.size());
-		System.out.println(numVMs);
 		for (int i = 0; i < numVMs; i++) {
 			VirtualMachine vm = new VirtualMachine();
 			
@@ -103,8 +101,8 @@ public class ConfigParser {
 			else {
 				vm.setOnline(false);
 			}
-			System.out.println(vm);
 			vmList.add(vm);
+			// System.out.println(vm);
 		}		
 		
 		
@@ -133,8 +131,6 @@ public class ConfigParser {
 				pms.add(pm);
 			}
 			dc.setPhysicalMachines(pms);
-			
-	
 			dataCenters.add(dc);
 		}
 	}
