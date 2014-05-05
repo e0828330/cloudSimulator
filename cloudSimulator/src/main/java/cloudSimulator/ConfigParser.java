@@ -137,6 +137,8 @@ public class ConfigParser {
 		// Order VMs by priority
 		Utils.orderVMsByPriority(vmList);
 		
+		// Set VM -> PM
+		
 		
 	}
 }

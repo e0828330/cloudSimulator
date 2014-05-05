@@ -22,6 +22,9 @@ public class VirtualMachine {
 	/* Whether the VM is on or down */
 	private boolean online;
 	
+	/* Stores the physical machine (PM) where this VM is running */
+	private PhysicalMachine pm;
+	
 	/**
 	 * Returns the page dirty rate in pages / second
 	 * @return
