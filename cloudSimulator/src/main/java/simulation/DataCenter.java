@@ -34,7 +34,7 @@ public class DataCenter {
 				pm.updateLoads();
 			}
 		}
-		System.out.printf("[%s] - Simluated times is %s\n", name, Utils.getCurrentTime(minute));
+		System.out.printf("[%s] - Simulated times is %s\n", name, Utils.getCurrentTime(minute));
 	}
 	
 	/**
