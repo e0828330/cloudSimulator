@@ -13,7 +13,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
 	
 	@Override
 	protected String getDatabaseName() {
-		return "forecast-db";
+		return "weather2";
 	}
 
 	@Override
