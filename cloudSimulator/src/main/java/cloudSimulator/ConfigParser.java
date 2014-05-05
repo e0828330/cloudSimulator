@@ -21,6 +21,10 @@ public class ConfigParser {
 	/* Resulting datacenters */
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
 	
+	public List<DataCenter> getDataCenters() {
+		return dataCenters;
+	}
+	
 	public void doParse(String path) throws InvalidFileFormatException, IOException {
 		ini = new Ini(new File(path));
 		
