@@ -10,5 +10,5 @@ public interface DataCenterMigration {
 	 * 
 	 * @param em
 	 */
-	public void manageVirtualMachines(ElasticityManager em);
+	public void manageVirtualMachines(ElasticityManager em, int minute);
 }

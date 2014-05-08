@@ -20,7 +20,10 @@ public class DataCenter {
 	private List<PhysicalMachine> physicalMachines;
 	private DataCenterManagement algorithm;
   
-    private Location location;
+  private float energyPriceDay;
+  private float energyPriceNight;
+  private int timezoneOffset;
+  private Location location;
 
 	private HashMap<VirtualMachine, Long> migrationQueue = new HashMap<VirtualMachine, Long>();
 	

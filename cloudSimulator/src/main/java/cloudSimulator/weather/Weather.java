@@ -7,6 +7,7 @@
 package cloudSimulator.weather;
 
 import java.util.Date;
+import java.util.Map;
 import lombok.Data;
 
 @Data
@@ -14,4 +15,5 @@ public class Weather {
   private Date timestamp;
   private Location locatioin;
   private float currentTemperature;
+  private float forecast = 1.0f;
 }

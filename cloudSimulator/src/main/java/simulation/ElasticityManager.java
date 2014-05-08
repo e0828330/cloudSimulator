@@ -38,7 +38,7 @@ public class ElasticityManager {
 			dc.simulate(minute);
 		}
 
-		algorithm.manageVirtualMachines(this);
+		algorithm.manageVirtualMachines(this, minute);
 	}
 	
 }

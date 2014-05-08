@@ -40,7 +40,7 @@ public class Simulator implements CommandLineRunner {
 		em.setDataCenters(parser.getDataCenters());
 
 		for (int i = 0; i < simulatedMinutes; i++) {
-			//em.simulate(i);
+			em.simulate(i);
 		}
 
 		System.out.println("Simulation ended!");

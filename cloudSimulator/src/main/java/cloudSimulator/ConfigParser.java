@@ -143,7 +143,10 @@ public class ConfigParser {
 			String[] name = ini.get("DataCenter", key).split(",");
 			dc.setName(name[0]);
 			dc.setLocation(new Location(Double.parseDouble(name[1]), Double.parseDouble(name[2])));
-			dc.setName(ini.get("DataCenter", key));
+      dc.setTimezoneOffset(Integer.parseInt(name[3]));
+      dc.setEnergyPriceDay(Float.parseFloat(name[4]));
+      dc.setEnergyPriceNight(Float.parseFloat(name[5]));
+			//dc.setName(ini.get("DataCenter", key));
 			dc.setAlgorithm(algorithm);
 
 			// Phsyical Machines for DataCenter
@@ -183,7 +186,7 @@ public class ConfigParser {
 		ini = new Ini(new File(path));
 		
 		System.out.println(appContext);
-
+    
 		// Migration algorithm
 		migrationAlgorithm = (DataCenterMigration) appContext.getBean("migration" + ini.get("Algorithms", "dataCenterMigration"));
 
