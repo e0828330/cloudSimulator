@@ -104,9 +104,26 @@ public class PhysicalMachine {
 	 * @return
 	 */
 	public double getPowerConsumption() {
+		if (!isRunning()) {
+			return 0.0;
+		}
 		double totalEnergyUsed = idleStateEnergyUtilization + cpuPowerConsumption * getCPULoad()
 				+ memPowerConsumption * getMemoryUsage() + networkPowerConsumption * getBandwithUtilization();
 		return totalEnergyUsed;
+	}
+	
+	/**
+	 * Returns a list of all VMs with state Online
+	 * @return
+	 */
+	public ArrayList<VirtualMachine> getOnlineVMs() {
+		ArrayList<VirtualMachine> tmp = new ArrayList<VirtualMachine>(virtualMachines.size());
+		for (VirtualMachine vm : virtualMachines) {
+			if (vm.isOnline()) {
+				tmp.add(vm);
+			}
+		}
+		return tmp;
 	}
 	
 }
