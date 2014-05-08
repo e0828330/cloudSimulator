@@ -12,7 +12,7 @@ import utils.Utils;
 @Service(value = "migrationBestFit")
 public class DataCenterMigrationBestFit implements DataCenterMigration {
 
-    private static Weather currentWeather;
+    private Weather currentWeather;
 
     @Autowired
     private Forecast f;
@@ -21,10 +21,10 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
         // TODO Auto-generated method stub
 
         for (DataCenter dc : em.getDataCenters()) {
-            //System.out.println(dc.getName());
+            System.out.println(dc.getName() + "$/VM/h: " + dc.getAveragePricePerVM(Utils.getCurrentTime(minute)));
             if (minute % 60 == 0) {
                 //System.out.println("Get Weather... " + minute);
-                DataCenterMigrationBestFit.currentWeather = f.getForecast(Utils.getCurrentTime(minute), dc.getLocation(), true);
+                currentWeather = f.getForecast(Utils.getCurrentTime(minute), dc.getLocation(), true);
             }
         }
 
