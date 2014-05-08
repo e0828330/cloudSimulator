@@ -1,28 +1,29 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package weather;
+package cloudSimulator.weather;
+
+import java.util.Date;
+
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Service;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import java.util.Date;
-import org.springframework.data.mongodb.core.MongoTemplate;
 
-public class Forecast {
+@Service
+public class Forecast implements InitializingBean {
 
-  final private MongoTemplate tpl;
-  final private DBCollection weather;
+  @Autowired
+  private MongoTemplate tpl;
 
-  public Forecast(MongoTemplate tpl) {
-    this.tpl = tpl;
-    this.weather = this.tpl.getCollection("forecast");
+  private DBCollection weather;
+  
+  public void afterPropertiesSet() throws Exception {
+	  this.weather = this.tpl.getCollection("forecast");
   }
 
   public Weather getForecast(Date date, Location location) {
-
     Weather tmpWeather = new Weather();
     tmpWeather.setLocatioin(location);
     tmpWeather.setTimestamp(date);
@@ -62,5 +63,7 @@ public class Forecast {
 
     return (lastTemp + (tempDiff * (timeOffset / timeDiff)));
   }
+
+
 
 }

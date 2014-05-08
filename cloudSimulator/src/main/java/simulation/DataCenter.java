@@ -1,15 +1,17 @@
 package simulation;
 
 import algorithms.DataCenterManagement;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import cloudSimulator.weather.Location;
 import lombok.Data;
 import model.PhysicalMachine;
 import model.VirtualMachine;
 import utils.Utils;
-import weather.Location;
 
 @Data
 public class DataCenter {
@@ -20,7 +22,7 @@ public class DataCenter {
 	
 	private int minute;
   
-  private Location location;
+    private Location location;
 
 	private HashMap<VirtualMachine, Long> migrationQueue = new HashMap<VirtualMachine, Long>();
 	

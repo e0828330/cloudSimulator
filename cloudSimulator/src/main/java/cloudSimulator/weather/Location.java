@@ -1,4 +1,4 @@
-package weather;
+package cloudSimulator.weather;
 
 import lombok.Data;
 

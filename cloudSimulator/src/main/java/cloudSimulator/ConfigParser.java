@@ -14,11 +14,17 @@ import model.VirtualMachine;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
 
+import algorithms.DataCenterManagement;
+import algorithms.DataCenterMigration;
+import cloudSimulator.weather.Location;
 import simulation.DataCenter;
 import utils.Utils;
-import weather.Location;
 
+@Service
 public class ConfigParser {
 
 	/* The ini file */
@@ -29,13 +35,22 @@ public class ConfigParser {
 	private ArrayList<ServiceLevelAgreement> slaList;
 	private ArrayList<VirtualMachine> vmList;
 
+	@Autowired
+	private ApplicationContext appContext;
+	
 	/* Resulting datacenters */
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
 
+	private DataCenterMigration migrationAlgorithm;
+	
 	public List<DataCenter> getDataCenters() {
 		return dataCenters;
 	}
 	
+	public DataCenterMigration getMigrationAlgorithm() {
+		return migrationAlgorithm;
+	}
+
 	private final double INITIAL_VM_RES_MULTIPLICATOR = 0.8;
 
 	/**
@@ -109,6 +124,9 @@ public class ConfigParser {
 	 * Initializes the PMs + Datacenters given by the config.ini file
 	 */
 	private void initPMs() {
+		
+		DataCenterManagement algorithm = (DataCenterManagement) appContext.getBean("management" + ini.get("Algorithms", "dataCenterManagement"));
+		
 		NormalDistribution cpuPowerND = getDistribution("CPUPower");
 		NormalDistribution memPowerND = getDistribution("MemoryPower");
 		NormalDistribution netPowerND = getDistribution("NetworkPower");
@@ -126,6 +144,7 @@ public class ConfigParser {
 			dc.setName(name[0]);
 			dc.setLocation(new Location(Double.parseDouble(name[1]), Double.parseDouble(name[2])));
 			dc.setName(ini.get("DataCenter", key));
+			dc.setAlgorithm(algorithm);
 
 			// Phsyical Machines for DataCenter
 			int numPMs = (int) pmND.sample();
@@ -162,6 +181,11 @@ public class ConfigParser {
 	 */
 	public void doParse(String path) throws InvalidFileFormatException, IOException {
 		ini = new Ini(new File(path));
+		
+		System.out.println(appContext);
+
+		// Migration algorithm
+		migrationAlgorithm = (DataCenterMigration) appContext.getBean("migration" + ini.get("Algorithms", "dataCenterMigration"));
 
 		NormalDistribution vmND = getDistribution("VMs");
 		NormalDistribution slaND = getDistribution("SLAs");

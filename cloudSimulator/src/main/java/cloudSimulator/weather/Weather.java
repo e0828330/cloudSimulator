@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package weather;
+package cloudSimulator.weather;
 
 import java.util.Date;
 import lombok.Data;
