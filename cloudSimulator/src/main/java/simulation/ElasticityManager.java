@@ -32,11 +32,13 @@ public class ElasticityManager {
 		
 	}
 	
-	public void simulate() {
+	public void simulate(int minute) {
 		//  TODO: Implement rest
 		for(DataCenter dc : dataCenters) {
-			dc.simulate();
+			dc.simulate(minute);
 		}
+
+		algorithm.manageVirtualMachines(this);
 	}
 	
 }

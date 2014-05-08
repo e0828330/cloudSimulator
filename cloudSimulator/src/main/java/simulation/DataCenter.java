@@ -19,8 +19,6 @@ public class DataCenter {
 	private String name;
 	private List<PhysicalMachine> physicalMachines;
 	private DataCenterManagement algorithm;
-	
-	private int minute;
   
     private Location location;
 
@@ -30,14 +28,14 @@ public class DataCenter {
 	 * Gets called on every simulated minute.
 	 * Here VM allocation and load updating should be done
 	 */
-	public void simulate() {
-		minute++;
+	public void simulate(int minute) {
 		handleMigrations();
 		for (PhysicalMachine pm : physicalMachines) {
 			if (pm.isRunning()) {
 				pm.updateLoads();
 			}
 		}
+		algorithm.scaleVirtualMachines(this);
 		System.out.printf("[%s] - Simulated times is %s\n", name, Utils.getCurrentTime(minute));
 	}
 	

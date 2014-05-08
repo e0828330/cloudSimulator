@@ -17,7 +17,7 @@ import cloudSimulator.weather.Forecast;
 @EnableAutoConfiguration
 public class Simulator implements CommandLineRunner {
 
-	private final int simulatedMinutes = 60 * 24 * 7; // Should be 525600 (One
+	private final int simulatedMinutes = 525600; //60 * 24 * 7; // Should be 525600 (One
 														// year)
 	public static void main(String[] args) {
 		SpringApplication.run(Simulator.class, args);
@@ -40,7 +40,7 @@ public class Simulator implements CommandLineRunner {
 		em.setDataCenters(parser.getDataCenters());
 
 		for (int i = 0; i < simulatedMinutes; i++) {
-			// em.simulate();
+			//em.simulate(i);
 		}
 
 		System.out.println("Simulation ended!");
