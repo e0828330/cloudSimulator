@@ -58,7 +58,10 @@ public class DataCenter {
 		while(iter.hasNext()) {
 			Map.Entry<VirtualMachine, Long> entry = iter.next();
 			if (entry.getValue() >= currentTime) {
-				// TODO: Do the migration
+				VirtualMachine vm = entry.getKey();
+				PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
+				pm.getVirtualMachines().add(vm);
+				vm.setOnline(true);
 				iter.remove();
 			}
 		}
