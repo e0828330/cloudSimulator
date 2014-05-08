@@ -64,4 +64,19 @@ public class DataCenter {
 		}
 	}
 	
+	/**
+	 * Returns the PowerConsumption of the data center in Watt
+	 * 
+	 * @return
+	 */
+	public double getPowerConsumption() {
+		double result = 0.;
+		for (PhysicalMachine pm : physicalMachines) {
+			if (pm.isRunning()) {
+				result += pm.getPowerConsumption();
+			}
+		}
+		return result;
+	}
+	
 }

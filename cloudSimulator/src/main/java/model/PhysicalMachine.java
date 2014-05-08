@@ -100,10 +100,10 @@ public class PhysicalMachine {
 	}
 	
 	/**
-	 * Returns the total energy utilization of this physical machine
+	 * Returns the total power consumption of this physical machine
 	 * @return
 	 */
-	public double getTotalEnergyUtilization() {
+	public double getPowerConsumption() {
 		double totalEnergyUsed = idleStateEnergyUtilization + cpuPowerConsumption * getCPULoad()
 				+ memPowerConsumption * getMemoryUsage() + networkPowerConsumption * getBandwithUtilization();
 		return totalEnergyUsed;
