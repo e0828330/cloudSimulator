@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import simulation.ElasticityManager;
+import utils.Utils;
 import cloudSimulator.weather.Forecast;
 
 @Configuration
@@ -17,7 +18,7 @@ import cloudSimulator.weather.Forecast;
 @EnableAutoConfiguration
 public class Simulator implements CommandLineRunner {
 
-	private final int simulatedMinutes = 525600; //60 * 24 * 7; // Should be 525600 (One
+	private final int simulatedMinutes = 5;//525600; //60 * 24 * 7; // Should be 525600 (One
 														// year)
 	public static void main(String[] args) {
 		SpringApplication.run(Simulator.class, args);
@@ -31,6 +32,7 @@ public class Simulator implements CommandLineRunner {
 	
 	public void run(String... arg0) throws Exception {
 		System.out.println("Started");
+
 
 		URL resource = Simulator.class.getResource("/config.ini");
 		parser.doParse(resource.getPath());

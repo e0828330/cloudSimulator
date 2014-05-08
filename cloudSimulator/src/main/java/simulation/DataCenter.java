@@ -1,17 +1,15 @@
 package simulation;
 
-import algorithms.DataCenterManagement;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import cloudSimulator.weather.Location;
 import lombok.Data;
 import model.PhysicalMachine;
 import model.VirtualMachine;
-import utils.Utils;
+import algorithms.DataCenterManagement;
+import cloudSimulator.weather.Location;
 
 @Data
 public class DataCenter {
@@ -25,21 +23,21 @@ public class DataCenter {
   private int timezoneOffset;
   private Location location;
 
-	private HashMap<VirtualMachine, Long> migrationQueue = new HashMap<VirtualMachine, Long>();
+	private HashMap<VirtualMachine, Integer> migrationQueue = new HashMap<VirtualMachine, Integer>();
 	
 	/**
 	 * Gets called on every simulated minute.
 	 * Here VM allocation and load updating should be done
 	 */
 	public void simulate(int minute) {
-		handleMigrations();
+		handleMigrations(minute);
 		for (PhysicalMachine pm : physicalMachines) {
 			if (pm.isRunning()) {
 				pm.updateLoads();
 			}
 		}
 		algorithm.scaleVirtualMachines(this);
-		System.out.printf("[%s] - Simulated times is %s\n", name, Utils.getCurrentTime(minute));
+		//System.out.printf("[%s] - Simulated times is %s\n", name, Utils.getCurrentTime(minute));
 	}
 	
 	/**
@@ -47,7 +45,7 @@ public class DataCenter {
 	 * @param vm
 	 * @param targetTime
 	 */
-	public void queueAddVirtualMachine(VirtualMachine vm, Long targetTime) {
+	public void queueAddVirtualMachine(VirtualMachine vm, int targetTime) {
 		migrationQueue.put(vm, targetTime);
 	}
 	
@@ -55,12 +53,11 @@ public class DataCenter {
 	 * Handle incoming migrations by looping over the queue and find
 	 * the ones that have arrived yet (i.e the target time is reached) 
 	 */
-	private void handleMigrations() {
-		Iterator<Map.Entry<VirtualMachine, Long>> iter = migrationQueue.entrySet().iterator();
-		Long currentTime = System.currentTimeMillis();
+	private void handleMigrations(int minute) {
+		Iterator<Map.Entry<VirtualMachine, Integer>> iter = migrationQueue.entrySet().iterator();
 		while(iter.hasNext()) {
-			Map.Entry<VirtualMachine, Long> entry = iter.next();
-			if (entry.getValue() >= currentTime) {
+			Map.Entry<VirtualMachine, Integer> entry = iter.next();
+			if (entry.getValue() >= minute) {
 				VirtualMachine vm = entry.getKey();
 				PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
 				pm.getVirtualMachines().add(vm);

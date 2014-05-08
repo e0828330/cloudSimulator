@@ -1,8 +1,11 @@
 package model;
 
+import utils.Utils;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(exclude={"pm", "sla"})
 public class VirtualMachine {
 	
 	/* SLA parameters agreed with the customer */
@@ -39,8 +42,8 @@ public class VirtualMachine {
 	 */
 	public void updateLoad() {
 		// TODO: Type + OS
-		usedCPUs = 1;//Utils.getRandomValue(0, cpus) / cpus;
-		usedMemory = 1;//= Utils.getRandomValue(0, memory) / memory;
-		usedBandwidth = 1;//Utils.getRandomValue(0, bandwidth) / bandwidth;
+		usedCPUs = Utils.getRandomValue(0, cpus) / cpus;
+		usedMemory = Utils.getRandomValue(0, memory) / memory;
+		usedBandwidth = Utils.getRandomValue(0, bandwidth) / bandwidth;
 	}
 }

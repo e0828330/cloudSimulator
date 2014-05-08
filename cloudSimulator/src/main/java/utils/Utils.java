@@ -16,12 +16,14 @@ public class Utils {
 	 * @return
 	 */
 	public static Date getCurrentTime(int minute) {
-		long start = 1356994800l; // 01.01.2013 00:00 
+		long start = 1356994800l; // 01.01.2013 00:00
 		return new Date((start + minute * 60) * 1000);
 	}
-	
+
 	/**
-	 * Sorts the given list @vmList by priority descending (Highest priority first).
+	 * Sorts the given list @vmList by priority descending (Highest priority
+	 * first).
+	 * 
 	 * @param vmList
 	 */
 	public static void orderVMsByPriority(List<VirtualMachine> vmList) {
@@ -35,13 +37,16 @@ public class Utils {
 				}
 				return 0;
 			}
-		});		
+		});
 	}
-	
+
 	/**
 	 * Checks if the virtual machine @vm has place on the physical machine @pm
-	 * @param pm The physical machine running * VMs
-	 * @param vm The virtual machine which should run on the PM
+	 * 
+	 * @param pm
+	 *            The physical machine running * VMs
+	 * @param vm
+	 *            The virtual machine which should run on the PM
 	 * @return
 	 */
 	public static boolean VMfitsOnPM(PhysicalMachine pm, VirtualMachine vm) {
@@ -50,32 +55,46 @@ public class Utils {
 		double memoryPM = pm.getMemoryUsage() * pm.getMemory();
 		double bandwidthPM = pm.getBandwithUtilization() * pm.getBandwith();
 
-		if (sizePM + (double) vm.getSize() <= pm.getSize() &&
-			cpusPM + (double) vm.getCpus() <= pm.getCpus() &&
-			memoryPM + (double) vm.getMemory() <= pm.getMemory() &&
-			bandwidthPM + (double) vm.getBandwidth() <= pm.getBandwith()) {
+		if (sizePM + (double) vm.getSize() <= pm.getSize() && cpusPM + (double) vm.getCpus() <= pm.getCpus() && memoryPM + (double) vm.getMemory() <= pm.getMemory()
+				&& bandwidthPM + (double) vm.getBandwidth() <= pm.getBandwith()) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Migrates @vm to @pm
-	 * @param pm The physical machine
-	 * @param vm The virtual machine
+	 * 
+	 * @param pm
+	 *            The physical machine
+	 * @param vm
+	 *            The virtual machine
 	 */
 	public static void migrateVM2PM(PhysicalMachine pm, VirtualMachine vm) {
 		pm.getVirtualMachines().add(vm);
-		vm.setPm(pm);
 	}
-	
+
 	/**
 	 * Generates a random value betweet min and max
+	 * 
 	 * @return
 	 */
 	public static double getRandomValue(double min, double max) {
 		return (min + Math.random() * max - min);
-	}	
-	
-	
+	}
+
+	/**
+	 * Calculates the time for transmitting a file of @size by bandwidth @availableBandwidth
+	 * 
+	 * @param bandwidth
+	 *            in Mbit/s
+	 * @param size
+	 *            in GB
+	 * @return Time for migration in minutes
+	 */
+	public static int getMigrationTime(double availableBandwidth, int size) {
+		double mbit = size * 1024 * 8;
+		return (int) Math.ceil((mbit / availableBandwidth / 60));
+	}
+
 }
