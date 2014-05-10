@@ -46,7 +46,7 @@ public class Forecast implements InitializingBean {
 		} catch (NoSuchElementException e) {
 			last = next;
 		}
-
+		
 		tmpWeather.setCurrentTemperature(interpolate(date, Float.valueOf(((BasicDBObject) last.get("currently")).get("temperature").toString()),
 				Float.valueOf(((BasicDBObject) next.get("currently")).get("temperature").toString()), Integer.valueOf(((BasicDBObject) last.get("currently")).get("time").toString()),
 				Integer.valueOf(((BasicDBObject) next.get("currently")).get("time").toString())));
