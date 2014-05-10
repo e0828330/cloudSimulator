@@ -37,8 +37,11 @@ public class ElasticityManager {
 		for(DataCenter dc : dataCenters) {
 			dc.simulate(minute);
 		}
-
-		algorithm.manageVirtualMachines(this, minute);
+		
+		/* Run the algorithm once per hour */
+		if ((minute % 60) == 0) {
+			algorithm.manageVirtualMachines(this, minute);
+		}
 	}
 	
 }

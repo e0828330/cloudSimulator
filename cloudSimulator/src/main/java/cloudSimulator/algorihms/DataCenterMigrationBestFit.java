@@ -22,10 +22,8 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
 
         for (DataCenter dc : em.getDataCenters()) {
             System.out.println(dc.getName() + "$/VM/h: " + dc.getAveragePricePerVM(Utils.getCurrentTime(minute)));
-            if (minute % 60 == 0) {
-                //System.out.println("Get Weather... " + minute);
-                currentWeather = f.getForecast(Utils.getCurrentTime(minute), dc.getLocation(), true);
-            }
+            //System.out.println("Get Weather... " + minute);
+             currentWeather = f.getForecast(Utils.getCurrentTime(minute), dc.getLocation(), true);
         }
 
     }
