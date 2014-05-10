@@ -14,7 +14,7 @@ public class PhysicalMachine {
 	private int size;
 	private int memory;
 	private int cpus;
-	private int bandwith;
+	private int bandwidth;
 	
 	/* Max energy consumption of CPU, Memory and Networkcard in watt */
 	private int cpuPowerConsumption;
@@ -85,18 +85,18 @@ public class PhysicalMachine {
 	}
 	
 	/**
-	 * Returns the current memory usage based on the load of the running VMs
+	 * Returns the current bandwidth usage based on the load of the running VMs
 	 * @return
 	 */
-	public double getBandwithUtilization() {
-		double bandwithUsed = 0;
+	public double getBandwidthUtilization() {
+		double bandwidthUsed = 0;
 		for(VirtualMachine vm : virtualMachines) {
 			if (vm.isOnline()) {
-				bandwithUsed += vm.getBandwidth() * vm.getUsedBandwidth();
+				bandwidthUsed += vm.getBandwidth() * vm.getUsedBandwidth();
 			}
 		}
 
-		return Math.min(1., bandwithUsed / bandwith);
+		return Math.min(1., bandwidthUsed / bandwidth);
 	}
 	
 	/**
@@ -108,7 +108,7 @@ public class PhysicalMachine {
 			return 0.0;
 		}
 		double totalEnergyUsed = idleStateEnergyUtilization + cpuPowerConsumption * getCPULoad()
-				+ memPowerConsumption * getMemoryUsage() + networkPowerConsumption * getBandwithUtilization();
+				+ memPowerConsumption * getMemoryUsage() + networkPowerConsumption * getBandwidthUtilization();
 		return totalEnergyUsed;
 	}
 	

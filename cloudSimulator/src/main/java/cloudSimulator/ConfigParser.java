@@ -133,7 +133,7 @@ public class ConfigParser {
 
 		NormalDistribution cpuCoresND = getDistribution("CPUCores");
 		NormalDistribution memoryND = getDistribution("Memory");
-		NormalDistribution bandwithND = getDistribution("Bandwidth");
+		NormalDistribution bandwidthND = getDistribution("Bandwidth");
 		NormalDistribution diskspaceND = getDistribution("Diskspace");
 
 		NormalDistribution pmND = getDistribution("PMs");
@@ -158,7 +158,7 @@ public class ConfigParser {
 				pm.setCpus((int) cpuCoresND.sample());
 				pm.setMemory((int) memoryND.sample());
 				pm.setSize((int) diskspaceND.sample());
-				pm.setBandwith((int) bandwithND.sample());
+				pm.setBandwidth((int) bandwidthND.sample());
 
 				pm.setCpuPowerConsumption((int) cpuPowerND.sample());
 				pm.setMemPowerConsumption((int) memPowerND.sample());
