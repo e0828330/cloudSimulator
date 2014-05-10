@@ -77,7 +77,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 
 		// System.out.println("Needed: " + usedVMBandwidth);
 
-		// more memory needed than available on PM
+		// more bandwidth needed than available on PM
 		if (usedVMBandwidth > pm.getBandwidth()) {
 			for (VirtualMachine vm : onlineVMs) {
 
