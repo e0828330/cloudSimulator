@@ -10,7 +10,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import simulation.ElasticityManager;
-import utils.Utils;
 import cloudSimulator.weather.Forecast;
 
 @Configuration
