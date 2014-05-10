@@ -79,29 +79,15 @@ public class DataCenter {
 		return hour >= 8 && hour < 20 ? this.energyPriceDay : this.energyPriceNight;
 	}
 
+	/**
+	 * Returns the averange prive per 
+	 * @param date
+	 * @return
+	 */
 	public double getAveragePricePerVM(Date date) {
 		return this.getPowerConsumption() / (double) this.getPhysicalMachines().size() * this.getCurrentEneryPrice(date);
 	}
-
-	/**
-	 * Handle incoming migrations by looping over the queue and find the ones
-	 * that have arrived yet (i.e the target time is reached)
-	 */
-	private void handleMigrations() {
-		Iterator<Map.Entry<VirtualMachine, Integer>> iter = migrationQueue.entrySet().iterator();
-		Long currentTime = System.currentTimeMillis();
-		while (iter.hasNext()) {
-			Map.Entry<VirtualMachine, Integer> entry = iter.next();
-			if (entry.getValue() >= currentTime) {
-				VirtualMachine vm = entry.getKey();
-				PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
-				pm.getVirtualMachines().add(vm);
-				vm.setOnline(true);
-				iter.remove();
-			}
-		}
-	}
-
+	
 	/**
 	 * Returns the PowerConsumption of the data center in Watt
 	 * 
