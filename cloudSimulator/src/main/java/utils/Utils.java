@@ -106,7 +106,7 @@ public class Utils {
 	 * @param temp
 	 * @return
 	 */
-	public static double getCoolingEngrryFactor(double temp) {
+	public static double getCoolingEnergyFactor(double temp) {
 		return 7.1705 * Math.pow(10., -5) * Math.pow(temp, 2) + 0.0041 * temp + 1.0743;
 	}
 
