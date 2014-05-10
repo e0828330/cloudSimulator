@@ -37,16 +37,16 @@ public class ConfigParser {
 
 	@Autowired
 	private ApplicationContext appContext;
-	
+
 	/* Resulting datacenters */
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
 
 	private DataCenterMigration migrationAlgorithm;
-	
+
 	public List<DataCenter> getDataCenters() {
 		return dataCenters;
 	}
-	
+
 	public DataCenterMigration getMigrationAlgorithm() {
 		return migrationAlgorithm;
 	}
@@ -124,9 +124,9 @@ public class ConfigParser {
 	 * Initializes the PMs + Datacenters given by the config.ini file
 	 */
 	private void initPMs() {
-		
+
 		DataCenterManagement algorithm = (DataCenterManagement) appContext.getBean("management" + ini.get("Algorithms", "dataCenterManagement"));
-		
+
 		NormalDistribution cpuPowerND = getDistribution("CPUPower");
 		NormalDistribution memPowerND = getDistribution("MemoryPower");
 		NormalDistribution netPowerND = getDistribution("NetworkPower");
@@ -143,10 +143,9 @@ public class ConfigParser {
 			String[] name = ini.get("DataCenter", key).split(",");
 			dc.setName(name[0]);
 			dc.setLocation(new Location(Double.parseDouble(name[1]), Double.parseDouble(name[2])));
-      dc.setTimezoneOffset(Integer.parseInt(name[3]));
-      dc.setEnergyPriceDay(Float.parseFloat(name[4]));
-      dc.setEnergyPriceNight(Float.parseFloat(name[5]));
-			//dc.setName(ini.get("DataCenter", key));
+			dc.setTimezoneOffset(Integer.parseInt(name[3]));
+			dc.setEnergyPriceDay(Float.parseFloat(name[4]));
+			dc.setEnergyPriceNight(Float.parseFloat(name[5]));
 			dc.setAlgorithm(algorithm);
 
 			// Phsyical Machines for DataCenter
@@ -184,9 +183,9 @@ public class ConfigParser {
 	 */
 	public void doParse(String path) throws InvalidFileFormatException, IOException {
 		ini = new Ini(new File(path));
-		
+
 		System.out.println(appContext);
-    
+
 		// Migration algorithm
 		migrationAlgorithm = (DataCenterMigration) appContext.getBean("migration" + ini.get("Algorithms", "dataCenterMigration"));
 
@@ -224,7 +223,7 @@ public class ConfigParser {
 			vm.setOnline(false);
 		}
 
-		//printInitialAllocation();
+		// printInitialAllocation();
 	}
 
 	/**
@@ -279,4 +278,3 @@ public class ConfigParser {
 		}
 	}
 }
-
