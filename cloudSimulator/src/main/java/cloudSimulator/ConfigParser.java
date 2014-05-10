@@ -158,7 +158,7 @@ public class ConfigParser {
 				pm.setCpus((int) cpuCoresND.sample());
 				pm.setMemory((int) memoryND.sample());
 				pm.setSize((int) diskspaceND.sample());
-				pm.setBandwith((int) bandwithND.sample());
+				pm.setBandwidth((int) bandwithND.sample());
 
 				pm.setCpuPowerConsumption((int) cpuPowerND.sample());
 				pm.setMemPowerConsumption((int) memPowerND.sample());

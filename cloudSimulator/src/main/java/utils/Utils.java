@@ -53,10 +53,10 @@ public class Utils {
 		double sizePM = pm.getSizeUsage() * pm.getSize();
 		double cpusPM = pm.getCPULoad() * pm.getCpus();
 		double memoryPM = pm.getMemoryUsage() * pm.getMemory();
-		double bandwidthPM = pm.getBandwithUtilization() * pm.getBandwith();
+		double bandwidthPM = pm.getBandwidthUtilization() * pm.getBandwidth();
 
 		if (sizePM + (double) vm.getSize() <= pm.getSize() && cpusPM + (double) vm.getCpus() <= pm.getCpus() && memoryPM + (double) vm.getMemory() <= pm.getMemory()
-				&& bandwidthPM + (double) vm.getBandwidth() <= pm.getBandwith()) {
+				&& bandwidthPM + (double) vm.getBandwidth() <= pm.getBandwidth()) {
 			return true;
 		}
 		return false;
