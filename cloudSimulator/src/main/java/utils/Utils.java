@@ -97,4 +97,17 @@ public class Utils {
 		return (int) Math.ceil((mbit / availableBandwidth / 60));
 	}
 
+	/**
+	 * Returns the current factor for cooling efficiency as per
+	 * "H. Xu, C. Feng, B. Li. Temperature aware workload management in geo-distributed datacenters"
+	 * 
+	 * Temperature input is in Celsius
+	 * 
+	 * @param temp
+	 * @return
+	 */
+	public static double getCoolingEngrryFactor(double temp) {
+		return 7.1705 * Math.pow(10., -5) * Math.pow(temp, 2) + 0.0041 * temp + 1.0743;
+	}
+
 }
