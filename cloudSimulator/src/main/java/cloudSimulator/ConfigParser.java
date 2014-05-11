@@ -153,6 +153,7 @@ public class ConfigParser {
 			List<PhysicalMachine> pms = new ArrayList<PhysicalMachine>(numPMs);
 			for (int i = 0; i < numPMs; i++) {
 				PhysicalMachine pm = new PhysicalMachine();
+                pm.setDataCenter(dc);
 				pm.setRunning(false);
 				pm.setCpus((int) cpuCoresND.sample());
 				pm.setMemory((int) memoryND.sample());

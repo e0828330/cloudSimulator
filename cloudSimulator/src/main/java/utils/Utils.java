@@ -92,7 +92,7 @@ public class Utils {
 	 *            in GB
 	 * @return Time for migration in minutes
 	 */
-	public static int getMigrationTime(double availableBandwidth, int size) {
+	public static int getMigrationTime(double availableBandwidth, double size) {
 		double mbit = size * 1024 * 8;
 		return (int) Math.ceil((mbit / availableBandwidth / 60));
 	}

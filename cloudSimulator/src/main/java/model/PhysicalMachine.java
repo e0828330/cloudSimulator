@@ -2,8 +2,8 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.Data;
+import simulation.DataCenter;
 
 @Data
 public class PhysicalMachine {
@@ -22,8 +22,10 @@ public class PhysicalMachine {
 	private int networkPowerConsumption;
 	
 	private double idleStateEnergyUtilization;
-	
-	
+    
+    /* Stores the DataCenter (DC) where this PM belongs to */
+    private DataCenter dataCenter;
+
 	/* Allocated virtual machines */
 	private List<VirtualMachine> virtualMachines = new ArrayList<VirtualMachine>(8);
 	
