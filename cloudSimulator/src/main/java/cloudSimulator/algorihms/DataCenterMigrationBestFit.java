@@ -34,7 +34,7 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
         VirtualMachine vm = findVMToMigrate(currentEnergyPrices);
         if (null != vm) {
              DataCenter dc = findDataCenterToMigrateTo(currentEnergyPrices, vm);
-             if(null != dc && !dc.equals(vm.getPm().getDataCenter()) && isMigrationValuable(vm, dc)){
+             if(null != dc && !dc.equals(vm.getPm().getDataCenter()) && isMigrationValuable(vm, dc, minute)){
                 System.out.print("From DC: " + vm.getPm().getDataCenter().getName());
                 System.out.println(" To DC: " + dc.getName());
                  em.migrate(vm, vm.getPm().getDataCenter(), dc);
@@ -95,9 +95,15 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
      * @param targetDC
      * @return 
      */
-    public boolean isMigrationValuable(VirtualMachine sourceVM, DataCenter targetDC){
+    public boolean isMigrationValuable(VirtualMachine sourceVM, DataCenter targetDC, int minute){
         // TODO look at forecast
-        return true;
+        Weather sourceWeather = f.getForecast(Utils.getCurrentTime(minute), sourceVM.getPm().getDataCenter().getLocation(), true);
+        Weather targetWeather = f.getForecast(Utils.getCurrentTime(minute), targetDC.getLocation(), true);
+        DataCenter sourceDC = sourceVM.getPm().getDataCenter();
+        double targetForecastPrice = targetDC.getCurrentEneryPrice(Utils.getCurrentTime(minute)) * Utils.getCoolingEnergyFactor(targetWeather.getForecast() * targetWeather.getCurrentTemperature());
+        double sourceForecastPrice = sourceDC.getCurrentEneryPrice(Utils.getCurrentTime(minute)) * Utils.getCoolingEnergyFactor(sourceWeather.getForecast() * sourceWeather.getCurrentTemperature());
+        //System.out.println(targetForecastPrice + " < " + sourceForecastPrice);
+        return targetForecastPrice < sourceForecastPrice;
     }
     
     
