@@ -118,11 +118,11 @@ public class Utils {
      * @param temp
      * @return 
      */
-    public static double getPartialPowerUsageEffectivness(PhysicalMachine pm, double temp){
+    public static double getPartialPowerUsageEffectivness(PhysicalMachine pm, double temp){ // pPUE
         return pm.getPowerConsumption() > 0 ? (pm.getPowerConsumption() * getCoolingEnergyFactor(temp)) / pm.getPowerConsumption() : .0;
     }
     
-    public static double getPartialPowerUsageEffectivness(DataCenter dc, double temp){
+    public static double getPartialPowerUsageEffectivness(DataCenter dc, double temp){ // pPUE
         double pPUE = 0;
         for(PhysicalMachine pm : dc.getPhysicalMachines()){
             pPUE = getPartialPowerUsageEffectivness(pm, temp);
@@ -130,7 +130,7 @@ public class Utils {
         return dc.getPhysicalMachines().size() > 0 ? pPUE / dc.getPhysicalMachines().size() : 0;
     }
     
-    public static double getTotalDataCenterEnergyByWorkload(DataCenter dc, double workload, double temp){
+    public static double getTotalDataCenterEnergyByWorkload(DataCenter dc, double workload, double temp){ // Ej(Wj)
         double cp = 0;
         double pp = 0;
         for(PhysicalMachine pm : dc.getPhysicalMachines()){
@@ -145,5 +145,12 @@ public class Utils {
     public static double getTotalEnergyCost(DataCenter dc, double workload, double temp, float currentEnergyPrice){
         return currentEnergyPrice * getTotalDataCenterEnergyByWorkload(dc, workload, temp);
     }
+    
+    public static double getCapacityAllocationUtilityLoss(DataCenter dc){ // Vj(betaj)
+        double r  = 1.0; // utility price that converts the loss to monetary terms.
+        return r * (Math.log(dc.getPhysicalMachines().size()) - Math.log(dc.getOnlinePMs().size()));
+    }
+    
+    
 
 }

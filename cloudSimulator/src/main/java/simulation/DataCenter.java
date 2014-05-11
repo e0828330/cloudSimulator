@@ -12,6 +12,7 @@ import model.PhysicalMachine;
 import model.VirtualMachine;
 import algorithms.DataCenterManagement;
 import cloudSimulator.weather.Location;
+import java.util.ArrayList;
 
 @Data
 public class DataCenter {
@@ -124,4 +125,17 @@ public class DataCenter {
         return mem;
     }
 
+    /**
+	 * Returns a list of all PMs with state Online
+	 * @return
+	 */
+	public ArrayList<PhysicalMachine> getOnlinePMs() {
+		ArrayList<PhysicalMachine> tmp = new ArrayList<PhysicalMachine>(physicalMachines.size());
+		for (PhysicalMachine pm : physicalMachines) {
+			if (pm.isRunning()) {
+				tmp.add(pm);
+			}
+		}
+		return tmp;
+	}
 }
