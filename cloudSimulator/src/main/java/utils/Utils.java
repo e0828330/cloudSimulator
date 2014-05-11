@@ -71,6 +71,7 @@ public class Utils {
 	 *            The virtual machine
 	 */
 	public static void migrateVM2PM(PhysicalMachine pm, VirtualMachine vm) {
+        vm.setPm(pm);
 		pm.getVirtualMachines().add(vm);
 	}
 

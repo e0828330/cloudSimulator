@@ -113,5 +113,15 @@ public class DataCenter {
         }
         return result;
     }
+    
+    public double getHighestAvailableFreeMemory(){
+        double mem = 0;
+        for(PhysicalMachine pm :  getPhysicalMachines()){
+            if((pm.getMemory() * (1- pm.getMemoryUsage())) > mem){
+                mem = pm.getMemory() * (1- pm.getMemoryUsage());
+            }
+        }
+        return mem;
+    }
 
 }

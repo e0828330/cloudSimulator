@@ -1,10 +1,10 @@
 package simulation;
 
-import java.util.List;
-
 import algorithms.DataCenterMigration;
+import java.util.List;
 import lombok.Data;
 import model.VirtualMachine;
+import utils.Utils;
 
 @Data
 public class ElasticityManager {
@@ -29,7 +29,14 @@ public class ElasticityManager {
 	 * @param target
 	 */
 	public void migrate(VirtualMachine vm, DataCenter source, DataCenter target) {
-		
+		vm.setOnline(false);                                                    // 1)
+        vm.getPm().getVirtualMachines().remove(vm);                                // 2)
+        int targetTime = Utils.getMigrationTime(vm.getPm().getBandwidth() * 
+                (1-vm.getPm().getBandwidthUtilization()), 
+                vm.getMemory()*vm.getUsedMemory());                             // 3)
+        
+        target.queueAddVirtualMachine(vm, targetTime);                          // 4)
+        
 	}
 	
 	public void simulate(int minute) {
