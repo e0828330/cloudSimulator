@@ -26,7 +26,7 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
         currentEnergyPrices = new TreeMap<Double, DataCenter>();
         for (DataCenter dc : em.getDataCenters()) {
             Weather currentWeather = f.getForecast(Utils.getCurrentTime(minute), dc.getLocation(), true);
-            Double cPrice = dc.getCurrentEneryPrice(Utils.getCurrentTime(minute)) * (Utils.getCoolingEnergyFactor(currentWeather.getCurrentTemperature()) * dc.getCurrentEneryPrice(Utils.getCurrentTime(minute)));
+            Double cPrice = Utils.getCoolingEnergyFactor(currentWeather.getCurrentTemperature()) * dc.getCurrentEneryPrice(Utils.getCurrentTime(minute));
             currentEnergyPrices.put(cPrice, dc);
 
         }
@@ -42,6 +42,12 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
         }
     }
 
+    /**
+     * Gets the VM with the lowest migration time on the most expensive DC
+     * 
+     * @param map
+     * @return VirtualMachine
+     */
     public VirtualMachine findVMToMigrate(TreeMap<Double, DataCenter> map) {
         VirtualMachine vmMin = null;
         DataCenter dc = null;
@@ -62,18 +68,33 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
         return vmMin;
     }
     
+    /**
+     * Finds the cheapest DC with available Memory for the VM
+     * 
+     * @param map
+     * @param vm
+     * @return DataCenter
+     */
     public DataCenter findDataCenterToMigrateTo(TreeMap<Double, DataCenter> map, VirtualMachine vm){
         DataCenter dc = null;
         
         for (Map.Entry<Double, DataCenter> entry : map.entrySet()) {
             if(entry.getValue().getHighestAvailableFreeMemory() > vm.getMemory() * vm.getUsedMemory() && (dc == null || entry.getValue().getHighestAvailableFreeMemory() < dc.getHighestAvailableFreeMemory())){
                 dc = entry.getValue();
+                break;
             }
         }
         
         return dc;
     }
     
+    /**
+     * Decides wether a migration is valuable
+     * 
+     * @param sourceVM
+     * @param targetDC
+     * @return 
+     */
     public boolean isMigrationValuable(VirtualMachine sourceVM, DataCenter targetDC){
         // TODO look at forecast
         return true;
