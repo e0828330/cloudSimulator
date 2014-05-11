@@ -31,18 +31,21 @@ public class DataCentertBestFit implements DataCenterManagement {
 			// if Memory usage of PM is 100%
 
 			if (pm.getMemoryUsage() >= 1.) {
+				System.out.println("Memory Usage > 100% in DC " + dc.getName());
 				this.migrationByMemoryUsage(pm, dc);
 			}
 
 			// if CPU load of PM is 100%
 
 			if (pm.getCPULoad() >= 1.) {
+				System.out.println("CPU Load > 100% in DC " + dc.getName());
 				this.migrationByCPULoad(pm, dc);
 			}
 
 			// if Bandwidth load of PM is 100%
 
 			if (pm.getBandwidthUtilization() >= 1.) {
+				System.out.println("Bandwidth > 100% in DC " + dc.getName());
 				this.migrationByBandwidthUsage(pm, dc);
 			}
 			// System.out.println("###");
@@ -76,6 +79,8 @@ public class DataCentertBestFit implements DataCenterManagement {
 		}
 
 		// System.out.println("Needed: " + usedVMBandwidth);
+		
+		 System.out.println("Needed Bandwidth: " + usedVMBandwidth + " but available " + pm.getBandwidth());
 
 		// more bandwidth needed than available on PM
 		if (usedVMBandwidth > pm.getBandwidth()) {
@@ -107,6 +112,8 @@ public class DataCentertBestFit implements DataCenterManagement {
 		 * pm.getBandwidth()); System.out.println("Migrated VMs = " +
 		 * migrationList.size());
 		 */
+		
+		System.out.println("Migrated VMs = " + migrationList.size());
 
 	}
 
@@ -133,6 +140,8 @@ public class DataCentertBestFit implements DataCenterManagement {
 		}
 
 		// System.out.println("Needed: " + usedVMMemory);
+		
+		System.out.println("Needed Memory: " + usedVMMemory + " but available " + pm.getMemory());
 
 		// more memory needed than available on PM
 		if (usedVMMemory > pm.getMemory()) {
@@ -164,6 +173,8 @@ public class DataCentertBestFit implements DataCenterManagement {
 		 * pm.getMemory()); System.out.println("Migrated VMs = " +
 		 * migrationList.size());
 		 */
+		
+		System.out.println("Migrated VMs = " + migrationList.size());
 
 	}
 
@@ -188,7 +199,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 			 * vm.getUsedCPUs() + ", NrCpus= " + vm.getCpus());
 			 */
 		}
-		// System.out.println("Needed: " + usedVMCPUs);
+		 System.out.println("Needed CPUs: " + usedVMCPUs + " but available " + pm.getCpus());
 
 		// more cpus needed than available on PM
 		if (usedVMCPUs > pm.getCpus()) {
@@ -220,6 +231,8 @@ public class DataCentertBestFit implements DataCenterManagement {
 		 * pm.getCpus()); System.out.println("Migrated VMs = " +
 		 * migrationList.size());
 		 */
+		
+		System.out.println("Migrated VMs = " + migrationList.size());
 	}
 
 	/**
