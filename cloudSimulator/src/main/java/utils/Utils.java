@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-
 import model.PhysicalMachine;
 import model.VirtualMachine;
+import simulation.DataCenter;
 
 public class Utils {
 	/**
@@ -110,5 +110,40 @@ public class Utils {
 	public static double getCoolingEnergyFactor(double temp) {
 		return 7.1705 * Math.pow(10., -5) * Math.pow(temp, 2) + 0.0041 * temp + 1.0743;
 	}
+    
+    /**
+     * Gets the pPUE of a PM. A smaller value indicates a more energy efficient system.
+     * 
+     * @param pm
+     * @param temp
+     * @return 
+     */
+    public static double getPartialPowerUsageEffectivness(PhysicalMachine pm, double temp){
+        return pm.getPowerConsumption() > 0 ? (pm.getPowerConsumption() * getCoolingEnergyFactor(temp)) / pm.getPowerConsumption() : .0;
+    }
+    
+    public static double getPartialPowerUsageEffectivness(DataCenter dc, double temp){
+        double pPUE = 0;
+        for(PhysicalMachine pm : dc.getPhysicalMachines()){
+            pPUE = getPartialPowerUsageEffectivness(pm, temp);
+        }
+        return dc.getPhysicalMachines().size() > 0 ? pPUE / dc.getPhysicalMachines().size() : 0;
+    }
+    
+    public static double getTotalDataCenterEnergyByWorkload(DataCenter dc, double workload, double temp){
+        double cp = 0;
+        double pp = 0;
+        for(PhysicalMachine pm : dc.getPhysicalMachines()){
+            cp += pm.getCpuPowerConsumption() * pm.getIdleStateEnergyUtilization();
+            pp += pm.getCpuPowerConsumption() - (pm.getCpuPowerConsumption() * pm.getIdleStateEnergyUtilization());
+        }
+        pp = pp / dc.getPhysicalMachines().size();
+        
+        return (cp+pp*workload)*getPartialPowerUsageEffectivness(dc, temp);
+    }
+    
+    public static double getTotalEnergyCost(DataCenter dc, double workload, double temp, float currentEnergyPrice){
+        return currentEnergyPrice * getTotalDataCenterEnergyByWorkload(dc, workload, temp);
+    }
 
 }
