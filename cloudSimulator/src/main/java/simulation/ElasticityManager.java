@@ -35,7 +35,7 @@ public class ElasticityManager {
         vm.getPm().getVirtualMachines().remove(vm);                                // 2)
         int targetTime = Utils.getMigrationTime(vm.getPm().getBandwidth() * 
                 (1-vm.getPm().getBandwidthUtilization()), 
-                vm.getMemory()*vm.getUsedMemory());                             // 3)
+                vm.getMemory()*vm.getUsedMemory() + vm.getSize());                             // 3)
         
         target.queueAddVirtualMachine(vm, targetTime);                          // 4)
         

@@ -102,7 +102,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 						Utils.getMigrationTime(
 								pm.getBandwidth()
 										* (1. - pm.getBandwidthUtilization()),
-								migVM.getSize()));
+								migVM.getSize() + migVM.getMemory() * migVM.getUsedMemory()));
 			}
 
 		}
@@ -163,7 +163,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 						Utils.getMigrationTime(
 								pm.getBandwidth()
 										* (1. - pm.getBandwidthUtilization()),
-								migVM.getSize()));
+								migVM.getSize() + migVM.getMemory() * migVM.getUsedMemory()));
 			}
 
 		}
@@ -221,7 +221,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 						Utils.getMigrationTime(
 								pm.getBandwidth()
 										* (1. - pm.getBandwidthUtilization()),
-								migVM.getSize()));
+								migVM.getSize() + migVM.getMemory() * migVM.getUsedMemory()));
 			}
 
 		}
