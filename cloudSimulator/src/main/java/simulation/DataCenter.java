@@ -27,7 +27,7 @@ public class DataCenter {
     private Location location;
 
     private HashMap<VirtualMachine, Integer> migrationQueue = new HashMap<VirtualMachine, Integer>();
-
+    
     /**
      * Gets called on every simulated minute. Here VM allocation and load
      * updating should be done
@@ -67,12 +67,14 @@ public class DataCenter {
             if (entry.getValue() >= minute) {
                 VirtualMachine vm = entry.getKey();
                 PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
-                if (pm.isRunning() == false) {
-                	pm.setRunning(true);
+                if (pm != null) {
+	                if (pm.isRunning() == false) {
+	                	pm.setRunning(true);
+	                }
+	                pm.getVirtualMachines().add(vm);
+	                vm.setOnline(true);
+	                iter.remove();
                 }
-                pm.getVirtualMachines().add(vm);
-                vm.setOnline(true);
-                iter.remove();
             }
         }
     }

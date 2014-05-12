@@ -64,7 +64,6 @@ public class DataCentertBestFit implements DataCenterManagement {
 		// more bandwidth needed than available on PM
 		if (usedVMBandwidth > pm.getBandwidth()) {
 			for (VirtualMachine vm : onlineVMs) {
-
 				usedVMBandwidth -= vm.getUsedBandwidth() * vm.getBandwidth();
 				migrationList.add(vm);
 				if (usedVMBandwidth <= pm.getBandwidth()) {
@@ -194,7 +193,6 @@ public class DataCentertBestFit implements DataCenterManagement {
 	 */
 	public PhysicalMachine findPMForMigration(DataCenter dc, VirtualMachine vm) {
 		PhysicalMachine result = null;
-
 		for (PhysicalMachine pm : dc.getPhysicalMachines()) {
 			if (result == null && Utils.VMfitsOnPM(pm, vm)) {
 				result = pm;
@@ -207,11 +205,10 @@ public class DataCentertBestFit implements DataCenterManagement {
 				}
 			}
 		}
-
 		if (result == null) {
 			// TODO: Shut down one VM with lower prio
+			return null;
 		}
-
 		return result;
 	}
 }
