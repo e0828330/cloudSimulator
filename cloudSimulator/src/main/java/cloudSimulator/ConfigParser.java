@@ -247,7 +247,7 @@ public class ConfigParser {
 	 * Rebuilds the datacenter list from the database
 	 */
 	private void loadFromDB() {
-		System.out.println("FROM DB");
+		System.out.println("Loading data from database!");
 		DataCenterManagement algorithm = (DataCenterManagement) appContext.getBean("management" + ini.get("Algorithms", "dataCenterManagement"));
 		dataCenters = repo.findAll();
 		for(DataCenter dc : dataCenters) {
@@ -273,6 +273,7 @@ public class ConfigParser {
 		for (DataCenter dc : dataCenters) {
 			repo.save(dc);
 		}
+		System.out.println("Saving data to database.");
 	}
 	
 	/**
