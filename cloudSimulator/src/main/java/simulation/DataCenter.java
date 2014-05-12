@@ -1,5 +1,6 @@
 package simulation;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,13 +13,27 @@ import model.PhysicalMachine;
 import model.VirtualMachine;
 import algorithms.DataCenterManagement;
 import cloudSimulator.weather.Location;
+
 import java.util.ArrayList;
 
-@Data
-public class DataCenter {
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
-    private String name;
+@Data
+public class DataCenter implements Serializable {
+
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7769086177008294418L;
+
+	@Id
+	private String id;
+	
+	private String name;
     private List<PhysicalMachine> physicalMachines;
+    
+    @Transient
     private DataCenterManagement algorithm;
 
     private float energyPriceDay;
@@ -26,6 +41,7 @@ public class DataCenter {
     private int timezoneOffset;
     private Location location;
 
+    @Transient
     private HashMap<VirtualMachine, Integer> migrationQueue = new HashMap<VirtualMachine, Integer>();
 
     /**
@@ -36,7 +52,7 @@ public class DataCenter {
         handleMigrations(minute);
         for (PhysicalMachine pm : physicalMachines) {
             if (pm.isRunning()) {
-                pm.updateLoads();
+                pm.updateLoads(minute);
             }
         }
         algorithm.scaleVirtualMachines(this);

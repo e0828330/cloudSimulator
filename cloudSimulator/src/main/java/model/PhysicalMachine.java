@@ -1,12 +1,25 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+
 import lombok.Data;
 import simulation.DataCenter;
 
 @Data
-public class PhysicalMachine {
+public class PhysicalMachine implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2692450316461386079L;
+
+	@Id
+	private String id;
 	
 	private boolean running;
 	
@@ -24,6 +37,7 @@ public class PhysicalMachine {
 	private double idleStateEnergyUtilization;
     
     /* Stores the DataCenter (DC) where this PM belongs to */
+	@Transient
     private DataCenter dataCenter;
 
 	/* Allocated virtual machines */
@@ -33,10 +47,10 @@ public class PhysicalMachine {
 	 * Updates the load of the current running VMs,
 	 * called periodically by the simulator
 	 */
-	public void updateLoads() {
+	public void updateLoads(int minute) {
 		for(VirtualMachine vm : virtualMachines) {
 			if (vm.isOnline()) {
-				vm.updateLoad();
+				vm.updateLoad(minute);
 			}
 		}
 	}
