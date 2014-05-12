@@ -52,7 +52,7 @@ public class DataCenter implements Serializable {
         handleMigrations(minute);
         for (PhysicalMachine pm : physicalMachines) {
             if (pm.isRunning()) {
-                pm.updateLoads();
+                pm.updateLoads(minute);
             }
         }
         algorithm.scaleVirtualMachines(this);

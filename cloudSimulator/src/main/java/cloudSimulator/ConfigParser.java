@@ -125,6 +125,7 @@ public class ConfigParser {
 			} else {
 				vm.setOnline(false);
 			}
+			vm.buildLoadMaps();
 			vmList.add(vm);
 		}
 	}
@@ -173,6 +174,7 @@ public class ConfigParser {
 				pm.setMemPowerConsumption((int) memPowerND.sample());
 				pm.setNetworkPowerConsumption((int) netPowerND.sample());
 				pm.setIdleStateEnergyUtilization(0.1 * (pm.getCpuPowerConsumption() + pm.getMemPowerConsumption() + pm.getNetworkPowerConsumption()));
+				pm.setVirtualMachines(new ArrayList<VirtualMachine>());
 
 				// System.out.println(pm);
 				pms.add(pm);
@@ -254,7 +256,9 @@ public class ConfigParser {
 				pm.setDataCenter(dc);
 				for (VirtualMachine vm : pm.getVirtualMachines()) {
 					vm.setPm(pm);
-					vm.getSla().getVms().add(vm);
+					if (vm.getSla() != null) {
+						vm.getSla().getVms().add(vm);
+					}
 				}
 			}
 		}
@@ -289,7 +293,6 @@ public class ConfigParser {
 			while (nextVM != null || VMiter.hasNext()) {
 				if (nextVM == null) {
 					nextVM = VMiter.next();
-					nextVM.updateLoad();
 				}
 				if (Utils.VMfitsOnPM(pm, nextVM)) {
 					if (pm.getVirtualMachines().size() == 0 && nextVM.isOnline()) {

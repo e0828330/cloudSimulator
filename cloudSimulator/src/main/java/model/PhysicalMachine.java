@@ -47,10 +47,10 @@ public class PhysicalMachine implements Serializable {
 	 * Updates the load of the current running VMs,
 	 * called periodically by the simulator
 	 */
-	public void updateLoads() {
+	public void updateLoads(int minute) {
 		for(VirtualMachine vm : virtualMachines) {
 			if (vm.isOnline()) {
-				vm.updateLoad();
+				vm.updateLoad(minute);
 			}
 		}
 	}
