@@ -16,6 +16,9 @@ import cloudSimulator.weather.Location;
 
 import java.util.ArrayList;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+
 @Data
 public class DataCenter implements Serializable {
 
@@ -24,8 +27,13 @@ public class DataCenter implements Serializable {
 	 */
 	private static final long serialVersionUID = -7769086177008294418L;
 
+	@Id
+	private String id;
+	
 	private String name;
     private List<PhysicalMachine> physicalMachines;
+    
+    @Transient
     private DataCenterManagement algorithm;
 
     private float energyPriceDay;
@@ -33,6 +41,7 @@ public class DataCenter implements Serializable {
     private int timezoneOffset;
     private Location location;
 
+    @Transient
     private HashMap<VirtualMachine, Integer> migrationQueue = new HashMap<VirtualMachine, Integer>();
 
     /**

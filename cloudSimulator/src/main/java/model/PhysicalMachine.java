@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+
 import lombok.Data;
 import simulation.DataCenter;
 
@@ -15,6 +18,9 @@ public class PhysicalMachine implements Serializable {
 	 */
 	private static final long serialVersionUID = 2692450316461386079L;
 
+	@Id
+	private String id;
+	
 	private boolean running;
 	
 	/* Available resources */
@@ -31,6 +37,7 @@ public class PhysicalMachine implements Serializable {
 	private double idleStateEnergyUtilization;
     
     /* Stores the DataCenter (DC) where this PM belongs to */
+	@Transient
     private DataCenter dataCenter;
 
 	/* Allocated virtual machines */

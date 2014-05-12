@@ -7,8 +7,8 @@ public class Location {
   private double longitude;
   private double latitude;
   
-  public Location(double lat, double lng){
-    this.setLatitude(lat);
-    this.setLongitude(lng);
+  public Location(double latitude, double longitude){
+    this.setLatitude(latitude);
+    this.setLongitude(longitude);
   }
 }

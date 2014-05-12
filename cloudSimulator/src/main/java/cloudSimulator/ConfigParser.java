@@ -16,13 +16,16 @@ import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import algorithms.DataCenterManagement;
-import algorithms.DataCenterMigration;
-import cloudSimulator.weather.Location;
 import simulation.DataCenter;
 import utils.Utils;
+import algorithms.DataCenterManagement;
+import algorithms.DataCenterMigration;
+import cloudSimulator.repo.DataCenterRepository;
+import cloudSimulator.weather.Location;
 
 @Service
 public class ConfigParser {
@@ -38,6 +41,12 @@ public class ConfigParser {
 	@Autowired
 	private ApplicationContext appContext;
 
+	@Autowired
+	private DataCenterRepository repo;
+	
+	@Autowired
+	private MongoTemplate mongoTemplate;
+	
 	/* Resulting datacenters */
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
 
@@ -185,11 +194,14 @@ public class ConfigParser {
 	public void doParse(String path) throws InvalidFileFormatException, IOException {
 		ini = new Ini(new File(path));
 
-		System.out.println(appContext);
-
 		// Migration algorithm
 		migrationAlgorithm = (DataCenterMigration) appContext.getBean("migration" + ini.get("Algorithms", "dataCenterMigration"));
 
+		if  (ini.get("DataSource", "useDatabase").equals("1")) {
+			loadFromDB();
+			return;
+		}
+		
 		NormalDistribution vmND = getDistribution("VMs");
 		NormalDistribution slaND = getDistribution("SLAs");
 
@@ -223,10 +235,42 @@ public class ConfigParser {
 		for (VirtualMachine vm : vmList) {
 			vm.setOnline(false);
 		}
-
+		
+		saveToDB();
+		
 		// printInitialAllocation();
 	}
+	
+	/**
+	 * Rebuilds the datacenter list from the database
+	 */
+	private void loadFromDB() {
+		System.out.println("FROM DB");
+		DataCenterManagement algorithm = (DataCenterManagement) appContext.getBean("management" + ini.get("Algorithms", "dataCenterManagement"));
+		dataCenters = repo.findAll();
+		for(DataCenter dc : dataCenters) {
+			dc.setAlgorithm(algorithm);
+			for (PhysicalMachine pm : dc.getPhysicalMachines()) {
+				pm.setDataCenter(dc);
+				for (VirtualMachine vm : pm.getVirtualMachines()) {
+					vm.setPm(pm);
+					vm.getSla().getVms().add(vm);
+				}
+			}
+		}
+		
+	}
 
+	/**
+	 * Saves the datacenter list to the database
+	 */
+	private void saveToDB() {
+		mongoTemplate.remove(new Query(), "dataCenter");
+		for (DataCenter dc : dataCenters) {
+			repo.save(dc);
+		}
+	}
+	
 	/**
 	 * Assigns the virtual machines (VMs) to the physical machines (PMs)
 	 */

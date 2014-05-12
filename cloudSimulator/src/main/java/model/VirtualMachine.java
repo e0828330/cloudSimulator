@@ -2,6 +2,9 @@ package model;
 
 import java.io.Serializable;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+
 import utils.Utils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,6 +18,9 @@ public class VirtualMachine implements Serializable {
 	 */
 	private static final long serialVersionUID = 828356080039466875L;
 
+	@Id
+	private String id;
+	
 	/* SLA parameters agreed with the customer */
 	private ServiceLevelAgreement sla;
 	
@@ -33,6 +39,7 @@ public class VirtualMachine implements Serializable {
 	private boolean online;
 	
 	/* Stores the physical machine (PM) where this VM is running */
+	@Transient
 	private PhysicalMachine pm;
 	
 	/**
