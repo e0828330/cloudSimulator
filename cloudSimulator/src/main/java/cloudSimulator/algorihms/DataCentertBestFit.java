@@ -19,39 +19,25 @@ public class DataCentertBestFit implements DataCenterManagement {
 	public void scaleVirtualMachines(DataCenter dc) {
 
 		for (PhysicalMachine pm : dc.getPhysicalMachines()) {
-			/*
-			 * System.out.println(dc.getName());
-			 * System.out.println("Bandwidth = " + pm.getBandwidthUtilization()
-			 * 100); System.out.println("CPU = " + pm.getCPULoad() * 100);
-			 * System.out.println("Memory = " + pm.getMemoryUsage() * 100);
-			 * System.out.println("Number of CPUS = " + pm.getCpus());
-			 */
-
 			// First migrate by Memory, because swapping is painful
 			// if Memory usage of PM is 100%
-
 			if (pm.getMemoryUsage() >= 1.) {
 				System.out.println("Memory Usage > 100% in DC " + dc.getName());
 				this.migrationByMemoryUsage(pm, dc);
 			}
 
 			// if CPU load of PM is 100%
-
 			if (pm.getCPULoad() >= 1.) {
 				System.out.println("CPU Load > 100% in DC " + dc.getName());
 				this.migrationByCPULoad(pm, dc);
 			}
 
 			// if Bandwidth load of PM is 100%
-
 			if (pm.getBandwidthUtilization() >= 1.) {
 				System.out.println("Bandwidth > 100% in DC " + dc.getName());
 				this.migrationByBandwidthUsage(pm, dc);
 			}
-			// System.out.println("###");
-
 		}
-		// System.out.println("______________________________________\n");
 	}
 
 	private void migrationByBandwidthUsage(PhysicalMachine pm, DataCenter dc) {
@@ -70,17 +56,10 @@ public class DataCentertBestFit implements DataCenterManagement {
 		double usedVMBandwidth = 0.;
 		for (VirtualMachine vm : onlineVMs) {
 			usedVMBandwidth += vm.getUsedBandwidth() * vm.getBandwidth();
-
-			/*
-			 * System.out.println("VM Nr. " + (i++) + " usedBandwidth = " +
-			 * vm.getUsedBandwidth() + ", Bandwidth-Total= " +
-			 * vm.getBandwidth());
-			 */
 		}
 
-		// System.out.println("Needed: " + usedVMBandwidth);
-		
-		 System.out.println("Needed Bandwidth: " + usedVMBandwidth + " but available " + pm.getBandwidth());
+		System.out.println("Needed Bandwidth: " + usedVMBandwidth
+				+ " but available " + pm.getBandwidth());
 
 		// more bandwidth needed than available on PM
 		if (usedVMBandwidth > pm.getBandwidth()) {
@@ -102,17 +81,12 @@ public class DataCentertBestFit implements DataCenterManagement {
 						Utils.getMigrationTime(
 								pm.getBandwidth()
 										* (1. - pm.getBandwidthUtilization()),
-								migVM.getSize() + migVM.getMemory() * migVM.getUsedMemory()));
+								migVM.getSize() + migVM.getMemory()
+										* migVM.getUsedMemory()));
 			}
 
 		}
 
-		/*
-		 * System.out.println("New needed = " + usedVMBandwidth + " / " +
-		 * pm.getBandwidth()); System.out.println("Migrated VMs = " +
-		 * migrationList.size());
-		 */
-		
 		System.out.println("Migrated VMs = " + migrationList.size());
 
 	}
@@ -133,15 +107,10 @@ public class DataCentertBestFit implements DataCenterManagement {
 		double usedVMMemory = 0.;
 		for (VirtualMachine vm : onlineVMs) {
 			usedVMMemory += vm.getUsedMemory() * vm.getMemory();
-			/*
-			 * System.out.println("VM Nr. " + (i++) + " usedMemory = " +
-			 * vm.getUsedMemory() + ", Memory-Total= " + vm.getMemory());
-			 */
 		}
 
-		// System.out.println("Needed: " + usedVMMemory);
-		
-		System.out.println("Needed Memory: " + usedVMMemory + " but available " + pm.getMemory());
+		System.out.println("Needed Memory: " + usedVMMemory + " but available "
+				+ pm.getMemory());
 
 		// more memory needed than available on PM
 		if (usedVMMemory > pm.getMemory()) {
@@ -163,19 +132,12 @@ public class DataCentertBestFit implements DataCenterManagement {
 						Utils.getMigrationTime(
 								pm.getBandwidth()
 										* (1. - pm.getBandwidthUtilization()),
-								migVM.getSize() + migVM.getMemory() * migVM.getUsedMemory()));
+								migVM.getSize() + migVM.getMemory()
+										* migVM.getUsedMemory()));
 			}
 
 		}
-
-		/*
-		 * System.out.println("New needed = " + usedVMMemory + " / " +
-		 * pm.getMemory()); System.out.println("Migrated VMs = " +
-		 * migrationList.size());
-		 */
-		
 		System.out.println("Migrated VMs = " + migrationList.size());
-
 	}
 
 	private void migrationByCPULoad(PhysicalMachine pm, DataCenter dc) {
@@ -194,12 +156,9 @@ public class DataCentertBestFit implements DataCenterManagement {
 		double usedVMCPUs = 0.;
 		for (VirtualMachine vm : onlineVMs) {
 			usedVMCPUs += vm.getUsedCPUs() * vm.getCpus();
-			/*
-			 * System.out.println("VM Nr. " + (i++) + " usedCPUS = " +
-			 * vm.getUsedCPUs() + ", NrCpus= " + vm.getCpus());
-			 */
 		}
-		 System.out.println("Needed CPUs: " + usedVMCPUs + " but available " + pm.getCpus());
+		System.out.println("Needed CPUs: " + usedVMCPUs + " but available "
+				+ pm.getCpus());
 
 		// more cpus needed than available on PM
 		if (usedVMCPUs > pm.getCpus()) {
@@ -221,17 +180,11 @@ public class DataCentertBestFit implements DataCenterManagement {
 						Utils.getMigrationTime(
 								pm.getBandwidth()
 										* (1. - pm.getBandwidthUtilization()),
-								migVM.getSize() + migVM.getMemory() * migVM.getUsedMemory()));
+								migVM.getSize() + migVM.getMemory()
+										* migVM.getUsedMemory()));
 			}
 
 		}
-
-		/*
-		 * System.out.println("New needed = " + usedVMCPUs + " / " +
-		 * pm.getCpus()); System.out.println("Migrated VMs = " +
-		 * migrationList.size());
-		 */
-		
 		System.out.println("Migrated VMs = " + migrationList.size());
 	}
 
@@ -247,9 +200,11 @@ public class DataCentertBestFit implements DataCenterManagement {
 				result = pm;
 				continue;
 			}
-			if (Utils.VMfitsOnPM(pm, vm)
-					&& pm.getPowerConsumption() < result.getPowerConsumption()) {
-				result = pm;
+			if (Utils.VMfitsOnPM(pm, vm)) {				
+				if (Utils.getFutureEnergyConsumption(pm, vm) < Utils.getFutureEnergyConsumption(result, vm)) {
+					result = pm;
+					continue;
+				}
 			}
 		}
 
@@ -259,5 +214,4 @@ public class DataCentertBestFit implements DataCenterManagement {
 
 		return result;
 	}
-
 }

@@ -67,6 +67,9 @@ public class DataCenter {
             if (entry.getValue() >= minute) {
                 VirtualMachine vm = entry.getKey();
                 PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
+                if (pm.isRunning() == false) {
+                	pm.setRunning(true);
+                }
                 pm.getVirtualMachines().add(vm);
                 vm.setOnline(true);
                 iter.remove();

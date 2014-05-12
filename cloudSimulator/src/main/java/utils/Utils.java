@@ -83,6 +83,28 @@ public class Utils {
 	public static double getRandomValue(double min, double max) {
 		return (min + Math.random() * max - min);
 	}
+	
+	/**
+	 * Adds the consumption of @vm to the current one of @pm and returns the used
+	 * energy, if the vm would be added to this physical machine
+	 * @param pm The current physical machine
+	 * @param vm The virtual machine, which would be added
+	 * @return
+	 */
+	public static double getFutureEnergyConsumption(PhysicalMachine pm, VirtualMachine vm) {
+		double currentCPUsUsed = pm.getCPULoad() * pm.getCpus();
+		double currentMemoryUsed = pm.getMemoryUsage() * pm.getMemory();
+		double currentBandwidthUsed = pm.getBandwidthUtilization() * pm.getBandwidth();
+		
+		double futureCPULoad = currentCPUsUsed + vm.getCpus() * vm.getUsedCPUs();
+		double futureMemoryUsage = currentMemoryUsed + vm.getMemory() * vm.getUsedMemory();
+		double futureBandwidthUtilization = currentBandwidthUsed + vm.getBandwidth() * vm.getUsedBandwidth();
+		
+		double futureEnergyUsed = pm.getIdleStateEnergyUtilization() + pm.getCpuPowerConsumption() * futureCPULoad
+				+ pm.getMemPowerConsumption() * futureMemoryUsage + pm.getNetworkPowerConsumption() * futureBandwidthUtilization;
+		
+		return futureEnergyUsed;
+	}
 
 	/**
 	 * Calculates the time for transmitting a file of @size by bandwidth @availableBandwidth
