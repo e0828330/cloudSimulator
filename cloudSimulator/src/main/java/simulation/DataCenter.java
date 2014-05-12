@@ -1,5 +1,6 @@
 package simulation;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,12 +13,18 @@ import model.PhysicalMachine;
 import model.VirtualMachine;
 import algorithms.DataCenterManagement;
 import cloudSimulator.weather.Location;
+
 import java.util.ArrayList;
 
 @Data
-public class DataCenter {
+public class DataCenter implements Serializable {
 
-    private String name;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7769086177008294418L;
+
+	private String name;
     private List<PhysicalMachine> physicalMachines;
     private DataCenterManagement algorithm;
 

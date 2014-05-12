@@ -1,13 +1,20 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.Data;
 import simulation.DataCenter;
 
 @Data
-public class PhysicalMachine {
+public class PhysicalMachine implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2692450316461386079L;
+
 	private boolean running;
 	
 	/* Available resources */

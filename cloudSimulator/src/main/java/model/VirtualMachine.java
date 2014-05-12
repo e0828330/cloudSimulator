@@ -1,13 +1,20 @@
 package model;
 
+import java.io.Serializable;
+
 import utils.Utils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(exclude={"pm", "sla"})
-public class VirtualMachine {
+public class VirtualMachine implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 828356080039466875L;
+
 	/* SLA parameters agreed with the customer */
 	private ServiceLevelAgreement sla;
 	
