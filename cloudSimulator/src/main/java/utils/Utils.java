@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+
 import model.PhysicalMachine;
 import model.VirtualMachine;
 import simulation.DataCenter;
@@ -59,6 +60,21 @@ public class Utils {
 				&& bandwidthPM + (double) vm.getBandwidth() <= pm.getBandwidth()) {
 			return true;
 		}
+		return false;
+	}
+	
+	/**
+	 * Checks if the datacenter is available to take the vm
+	 * @param dc The datacenter where the virtual machine should be migrated to
+	 * @param vm The virtual machine for migration
+	 * @return
+	 */
+	public static boolean VMisTransferable(DataCenter dc, VirtualMachine vm) {
+		for (PhysicalMachine pm : dc.getPhysicalMachines()) {
+			if (Utils.VMfitsOnPM(pm, vm)) {
+				return true;
+			}
+		}		
 		return false;
 	}
 
