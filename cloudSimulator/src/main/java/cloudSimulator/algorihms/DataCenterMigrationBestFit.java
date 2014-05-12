@@ -34,7 +34,7 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
         VirtualMachine vm = findVMToMigrate(currentEnergyPrices);
         if (null != vm) {
              DataCenter dc = findDataCenterToMigrateTo(currentEnergyPrices, vm);
-             if(null != dc && !dc.equals(vm.getPm().getDataCenter()) && isMigrationValuable(vm, dc, minute)){
+             if(null != dc && isMigrationValuable(vm, dc, minute)){
                 System.out.print("From DC: " + vm.getPm().getDataCenter().getName());
                 System.out.println(" To DC: " + dc.getName());
                  em.migrate(vm, vm.getPm().getDataCenter(), dc);
@@ -81,7 +81,7 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
         DataCenter dc = null;
         
         for (Map.Entry<Double, DataCenter> entry : map.entrySet()) {
-            if(entry.getValue().getHighestAvailableFreeMemory() > vm.getMemory() * vm.getUsedMemory() && (dc == null || entry.getValue().getHighestAvailableFreeMemory() < dc.getHighestAvailableFreeMemory())){
+            if(!entry.getValue().equals(vm.getPm().getDataCenter()) &&  entry.getValue().getHighestAvailableFreeMemory() > vm.getMemory() * vm.getUsedMemory() && (dc == null || entry.getValue().getHighestAvailableFreeMemory() < dc.getHighestAvailableFreeMemory())){
                 dc = entry.getValue();
                 break;
             }
