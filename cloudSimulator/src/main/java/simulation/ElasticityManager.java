@@ -15,6 +15,8 @@ public class ElasticityManager {
 	/* TODO: Implement */
 	
 	/**
+     * TODO: LIVE VM Migration?
+     * 
 	 * Migrates a VM from the dataCenter source to target
 	 * This works as follows:
 	 * 1) VM is set to off line

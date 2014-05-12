@@ -57,6 +57,8 @@ public class DataCenter {
     /**
      * Handle incoming migrations by looping over the queue and find the ones
      * that have arrived yet (i.e the target time is reached)
+     * 
+     * TODO: LIVE VM Migration?
      */
     private void handleMigrations(int minute) {
         Iterator<Map.Entry<VirtualMachine, Integer>> iter = migrationQueue.entrySet().iterator();
