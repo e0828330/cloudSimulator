@@ -40,7 +40,7 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
             costs += cPrice;
         }
         
-        System.out.println("Total Costs: " + costs);
+        //System.out.println("Total Costs: " + costs);
         
         VirtualMachine vm = findVMToMigrate(currentEnergyPrices);
         if (null != vm) {
