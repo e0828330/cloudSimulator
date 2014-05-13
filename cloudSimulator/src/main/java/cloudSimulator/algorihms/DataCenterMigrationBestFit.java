@@ -58,7 +58,7 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
         double currentMigrationSize = 0.;
         for (Map.Entry<Double, DataCenter> entry : map.descendingMap().entrySet()) {
             dc = entry.getValue();
-            for (PhysicalMachine pm : entry.getValue().getPhysicalMachines()) {
+            for (PhysicalMachine pm : dc.getPhysicalMachines()) {
                 for (VirtualMachine vm : pm.getOnlineVMs()) {
                     double bandwidth = pm.getBandwidth() * (1 - pm.getBandwidthUtilization());
                     if (vmMin == null || Utils.getMigrationTime(bandwidth, (vm.getMemory()) * vm.getUsedMemory() + vm.getSize()) < Utils.getMigrationTime(bandwidth, currentMigrationSize)) {
