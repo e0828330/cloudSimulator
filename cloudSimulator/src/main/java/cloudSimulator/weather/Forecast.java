@@ -28,25 +28,31 @@ public class Forecast implements InitializingBean {
 		Weather tmpWeather = new Weather();
 		tmpWeather.setLocatioin(location);
 		tmpWeather.setTimestamp(date);
+		
+		/* We are only interested in those fields so use a projection */
+		DBObject projection = new BasicDBObject();
+		projection.put("currently.time", 1);
+		projection.put("currently.temperature", 1);
 
 		DBObject criteriaNext = new BasicDBObject();
 		criteriaNext.put("currently.time", new BasicDBObject("$gt", (int) (date.getTime() / 1000)));
 		criteriaNext.put("latitude", location.getLatitude());
 		criteriaNext.put("longitude", location.getLongitude());
 
-		DBObject next = weather.findOne(criteriaNext);
-
+		DBObject next = weather.findOne(criteriaNext, projection);
+		
 		DBObject criteriaLast = new BasicDBObject();
 		criteriaLast.put("currently.time", new BasicDBObject("$lt", (int) (date.getTime() / 1000)));
 		criteriaLast.put("latitude", location.getLatitude());
 		criteriaLast.put("longitude", location.getLongitude());
+		
 		DBObject last;
 		try {
-			last = weather.find(criteriaLast).sort(new BasicDBObject("currently.time", -1)).next();
+			last = weather.find(criteriaLast, projection).sort(new BasicDBObject("currently.time", -1)).limit(1).next();
 		} catch (NoSuchElementException e) {
 			last = next;
-		}
-		
+		}		
+
 		tmpWeather.setCurrentTemperature(interpolate(date, Float.valueOf(((BasicDBObject) last.get("currently")).get("temperature").toString()),
 				Float.valueOf(((BasicDBObject) next.get("currently")).get("temperature").toString()), Integer.valueOf(((BasicDBObject) last.get("currently")).get("time").toString()),
 				Integer.valueOf(((BasicDBObject) next.get("currently")).get("time").toString())));
