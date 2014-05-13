@@ -60,8 +60,6 @@ public class ConfigParser {
 		return migrationAlgorithm;
 	}
 
-	private final double INITIAL_VM_RES_MULTIPLICATOR = 0.8;
-
 	/**
 	 * Returns the NormalDistribution of the mean and sd values given by @key in
 	 * the config.ini file
@@ -115,13 +113,13 @@ public class ConfigParser {
 				iter.remove();
 				sla.getVms().add(vm);
 				vm.setSla(sla);
-				vm.setBandwidth((int) (sla.getBandwith() * INITIAL_VM_RES_MULTIPLICATOR));
-				int initCPUS = (int) (sla.getCpus() * INITIAL_VM_RES_MULTIPLICATOR);
+				vm.setBandwidth((int) (sla.getBandwith()));
+				int initCPUS = (int) (sla.getCpus());
 				vm.setCpus(initCPUS < 1 ? 1 : initCPUS);
-				int initMemory = (int) (sla.getMemory() * INITIAL_VM_RES_MULTIPLICATOR);
+				int initMemory = (int) (sla.getMemory());
 				vm.setMemory(initMemory < 1 ? 1 : initMemory);
 				vm.setOnline(true);
-				vm.setSize((int) (sla.getSize() * INITIAL_VM_RES_MULTIPLICATOR));
+				vm.setSize((int) (sla.getSize()));
 			} else {
 				vm.setOnline(false);
 			}
@@ -240,7 +238,7 @@ public class ConfigParser {
 		
 		saveToDB();
 		
-		// printInitialAllocation();
+		//printInitialAllocation();
 	}
 	
 	/**
@@ -299,7 +297,8 @@ public class ConfigParser {
 					if (pm.getVirtualMachines().size() == 0 && nextVM.isOnline()) {
 						pm.setRunning(true);
 					}
-					Utils.migrateVM2PM(pm, nextVM);
+					nextVM.setPm(pm);
+					pm.getVirtualMachines().add(nextVM);
 					VMiter.remove();
 					nextVM = null;
 				} else {

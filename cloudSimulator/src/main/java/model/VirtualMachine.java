@@ -52,7 +52,6 @@ public class VirtualMachine implements Serializable {
 	 * 
 	 */
 	public void buildLoadMaps() {
-		
 		cpuLoadMap = new HashMap<Integer, Double>();
 		memLoadMap = new HashMap<Integer, Double>();
 		bwLoadMap = new HashMap<Integer, Double>();
@@ -63,6 +62,8 @@ public class VirtualMachine implements Serializable {
 			memLoadMap.put(i, Utils.getRandomValue(0, memory) / memory);
 			bwLoadMap.put(i, Utils.getRandomValue(0, bandwidth) / bandwidth);
 		}
+
+		updateLoad(0);
 	}
 	
 	/**

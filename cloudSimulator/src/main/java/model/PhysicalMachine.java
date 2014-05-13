@@ -4,13 +4,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
-import lombok.Data;
 import simulation.DataCenter;
 
 @Data
+@EqualsAndHashCode(exclude={"dataCenter", "virtualMachines"})
 public class PhysicalMachine implements Serializable {
 	
 	/**
