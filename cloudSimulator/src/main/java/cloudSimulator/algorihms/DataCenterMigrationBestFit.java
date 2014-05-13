@@ -3,12 +3,17 @@ package cloudSimulator.algorihms;
 import algorithms.DataCenterMigration;
 import cloudSimulator.weather.Forecast;
 import cloudSimulator.weather.Weather;
+
+import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
+
 import model.PhysicalMachine;
 import model.VirtualMachine;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import simulation.DataCenter;
 import simulation.ElasticityManager;
 import utils.Utils;
@@ -24,25 +29,34 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
     public void manageVirtualMachines(ElasticityManager em, int minute) {
         // TODO Auto-generated method stub
         currentEnergyPrices = new TreeMap<Double, DataCenter>();
+        Date currentTime = Utils.getCurrentTime(minute);
+        double costs = 0.;
+        System.out.println("--- " + currentTime + " ----");
         for (DataCenter dc : em.getDataCenters()) {
-            Weather currentWeather = f.getForecast(Utils.getCurrentTime(minute), dc.getLocation(), true);
+            Weather currentWeather = f.getForecast(currentTime, dc.getLocation(), true);
             Double cPrice = Utils.getCoolingEnergyFactor(currentWeather.getCurrentTemperature()) * dc.getCurrentEneryPrice(Utils.getCurrentTime(minute));
             currentEnergyPrices.put(cPrice, dc);
-
+            //System.out.println("Costs at " + dc.getName() + " = " + cPrice);
+            costs += cPrice;
         }
+        
+        System.out.println("Total Costs: " + costs);
         
         VirtualMachine vm = findVMToMigrate(currentEnergyPrices);
         if (null != vm) {
              DataCenter dc = findDataCenterToMigrateTo(currentEnergyPrices, vm);
              if(null != dc && !dc.equals(vm.getPm().getDataCenter()) && isMigrationValuable(vm, dc, minute)){
-            	System.out.print("Time - " + Utils.getCurrentTime(minute) + " - ");
+            	System.out.print("Time - " + currentTime + " - ");
                 System.out.print("from DC: " + vm.getPm().getDataCenter().getName());
                 System.out.println(" to DC: " + dc.getName());
                 em.migrate(vm, vm.getPm().getDataCenter(), dc);
              }
+             else {
+             	//System.out.println("No target dc found for vm on " + vm.getPm().getDataCenter().getName());
+             }
         }
         else {
-        	System.out.println("Time - " + Utils.getCurrentTime(minute) + " -  no migration.");
+        	System.out.println("Time - " + currentTime + " -  no migration.");
         }
     }
 
