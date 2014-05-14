@@ -232,7 +232,7 @@ public class DataCenter {
 			return null;
 		}
 		
-		// Iterate through our list and get the PM with best utility
+		// Iterate through our list and get the PM with the lowest power consumption
 		PhysicalMachine bestUtilityPM = null;
 		double bestPMtotalEnergyUsed = 0.;
 		for (Entry<PhysicalMachine, ArrayList<VirtualMachine>> entry : tmpList.entrySet()) {
