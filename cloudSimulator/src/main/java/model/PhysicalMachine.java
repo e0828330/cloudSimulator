@@ -2,8 +2,10 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.Data;
 import simulation.DataCenter;
+import utils.Utils;
 
 @Data
 public class PhysicalMachine {
@@ -48,27 +50,15 @@ public class PhysicalMachine {
 	 * @return
 	 */
 	public double getCPULoad() {
-		double usedCpus = 0;
-		for(VirtualMachine vm : virtualMachines) {
-			if (vm.isOnline()) {
-				usedCpus += vm.getCpus() * vm.getUsedCPUs();
-			}
-		}
-		return Math.min(1., usedCpus / cpus);
+		return Math.min(1., Utils.getVMsCPULoad(virtualMachines) / cpus);
 	}
 	
 	/**
-	 * Returns the current CPU used size based on the load of the running VMs
+	 * Returns the size based on the load of the running VMs
 	 * @return
 	 */
 	public double getSizeUsage() {
-		double usedSize = 0;
-		for(VirtualMachine vm : virtualMachines) {
-			if (vm.isOnline()) {
-				usedSize += vm.getSize();
-			}
-		}
-		return Math.min(1., usedSize / size);
+		return Math.min(1., Utils.getVMsSize(virtualMachines) / size);
 	}	
 	
 	/**
@@ -76,14 +66,7 @@ public class PhysicalMachine {
 	 * @return
 	 */
 	public double getMemoryUsage() {
-		double memoryUsed = 0;
-		for(VirtualMachine vm : virtualMachines) {
-			if (vm.isOnline()) {
-				memoryUsed += vm.getMemory() * vm.getUsedMemory();
-			}
-		}
-
-		return Math.min(1., memoryUsed / memory);
+		return Math.min(1., Utils.getVMsMemory(virtualMachines) / memory);
 	}
 	
 	/**
@@ -91,14 +74,7 @@ public class PhysicalMachine {
 	 * @return
 	 */
 	public double getBandwidthUtilization() {
-		double bandwidthUsed = 0;
-		for(VirtualMachine vm : virtualMachines) {
-			if (vm.isOnline()) {
-				bandwidthUsed += vm.getBandwidth() * vm.getUsedBandwidth();
-			}
-		}
-
-		return Math.min(1., bandwidthUsed / bandwidth);
+		return Math.min(1., Utils.getVMsBandwidth(virtualMachines) / bandwidth);
 	}
 	
 	/**
