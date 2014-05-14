@@ -6,143 +6,279 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import lombok.Data;
 import model.PhysicalMachine;
 import model.VirtualMachine;
 import algorithms.DataCenterManagement;
 import cloudSimulator.weather.Location;
+
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+
+import utils.Utils;
 
 @Data
 public class DataCenter {
 
-    private String name;
-    private List<PhysicalMachine> physicalMachines;
-    private DataCenterManagement algorithm;
+	private String name;
+	private List<PhysicalMachine> physicalMachines;
+	private DataCenterManagement algorithm;
 
-    private float energyPriceDay;
-    private float energyPriceNight;
-    private int timezoneOffset;
-    private Location location;
+	private float energyPriceDay;
+	private float energyPriceNight;
+	private int timezoneOffset;
+	private Location location;
 
-    private HashMap<VirtualMachine, Integer> migrationQueue = new HashMap<VirtualMachine, Integer>();
-    
-    /**
-     * Gets called on every simulated minute. Here VM allocation and load
-     * updating should be done
-     */
-    public void simulate(int minute) {
-        handleMigrations(minute);
-        for (PhysicalMachine pm : physicalMachines) {
-            if (pm.isRunning()) {
-                pm.updateLoads();
-            }
-        }
-        algorithm.scaleVirtualMachines(this);
+	private HashMap<VirtualMachine, Integer> migrationQueue = new HashMap<VirtualMachine, Integer>();
+
+	/**
+	 * Gets called on every simulated minute. Here VM allocation and load
+	 * updating should be done
+	 */
+	public void simulate(int minute) {
+		handleMigrations(minute);
+		for (PhysicalMachine pm : physicalMachines) {
+			if (pm.isRunning()) {
+				pm.updateLoads();
+			}
+		}
+		algorithm.scaleVirtualMachines(this);
 		// System.out.printf("[%s] - Simulated times is %s\n", name,
-        // Utils.getCurrentTime(minute));
-    }
+		// Utils.getCurrentTime(minute));
+	}
 
-    /**
-     * Called when a VM gets migrated to this dataCenter
-     *
-     * @param vm
-     * @param targetTime
-     */
-    public void queueAddVirtualMachine(VirtualMachine vm, int targetTime) {
-        migrationQueue.put(vm, targetTime);
-    }
+	/**
+	 * Called when a VM gets migrated to this dataCenter
+	 * 
+	 * @param vm
+	 * @param targetTime
+	 */
+	public void queueAddVirtualMachine(VirtualMachine vm, int targetTime) {
+		migrationQueue.put(vm, targetTime);
+	}
 
-    /**
-     * Handle incoming migrations by looping over the queue and find the ones
-     * that have arrived yet (i.e the target time is reached)
-     * 
-     * TODO: LIVE VM Migration?
-     */
-    private void handleMigrations(int minute) {
-        Iterator<Map.Entry<VirtualMachine, Integer>> iter = migrationQueue.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<VirtualMachine, Integer> entry = iter.next();
-            if (entry.getValue() >= minute) {
-                VirtualMachine vm = entry.getKey();
-                PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
-                if (pm != null) {
-	                if (pm.isRunning() == false) {
-	                	pm.setRunning(true);
-	                }
-	                pm.getVirtualMachines().add(vm);
-	                vm.setOnline(true);
-	                iter.remove();
-                }
-            }
-        }
-    }
+	/**
+	 * Handle incoming migrations by looping over the queue and find the ones
+	 * that have arrived yet (i.e the target time is reached)
+	 * 
+	 * TODO: LIVE VM Migration?
+	 */
+	private void handleMigrations(int minute) {
+		Iterator<Map.Entry<VirtualMachine, Integer>> iter = migrationQueue
+				.entrySet().iterator();
+		while (iter.hasNext()) {
+			Map.Entry<VirtualMachine, Integer> entry = iter.next();
+			if (entry.getValue() >= minute) {
+				VirtualMachine vm = entry.getKey();
+				PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
+				if (pm != null) {
+					if (pm.isRunning() == false) {
+						pm.setRunning(true);
+					}
+					pm.getVirtualMachines().add(vm);
+					vm.setOnline(true);
+					iter.remove();
+				}
+			}
+		}
+	}
 
-    public float getCurrentEneryPrice(Date date) {
-        Calendar cal = Calendar.getInstance(); // creates calendar
-        cal.setTime(new Date()); // sets calendar time/date
-        cal.add(Calendar.HOUR_OF_DAY, this.timezoneOffset); // adds one hour
-        int hour = cal.get(Calendar.HOUR_OF_DAY);
-        return hour >= 8 && hour < 20 ? this.energyPriceDay : this.energyPriceNight;
-    }
+	public float getCurrentEneryPrice(Date date) {
+		Calendar cal = Calendar.getInstance(); // creates calendar
+		cal.setTime(new Date()); // sets calendar time/date
+		cal.add(Calendar.HOUR_OF_DAY, this.timezoneOffset); // adds one hour
+		int hour = cal.get(Calendar.HOUR_OF_DAY);
+		return hour >= 8 && hour < 20 ? this.energyPriceDay
+				: this.energyPriceNight;
+	}
 
-    /**
-     * Returns the averange prive per
-     *
-     * @param date
-     * @return
-     */
-    public double getAveragePricePerVM(Date date) {
-        if(this.getVirtualMachineCount() == 0)
-            return .0;
-        return this.getPowerConsumption() / (double) this.getVirtualMachineCount() * this.getCurrentEneryPrice(date);
-    }
+	/**
+	 * Returns the averange prive per
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public double getAveragePricePerVM(Date date) {
+		if (this.getVirtualMachineCount() == 0)
+			return .0;
+		return this.getPowerConsumption()
+				/ (double) this.getVirtualMachineCount()
+				* this.getCurrentEneryPrice(date);
+	}
 
-    public int getVirtualMachineCount() {
-        int i = 0;
-        for (PhysicalMachine pm : this.getPhysicalMachines()) {
-            i += pm.getVirtualMachines().size();
-        }
-        return i;
-    }
+	public int getVirtualMachineCount() {
+		int i = 0;
+		for (PhysicalMachine pm : this.getPhysicalMachines()) {
+			i += pm.getVirtualMachines().size();
+		}
+		return i;
+	}
 
-    /**
-     * Returns the PowerConsumption of the data center in Watt
-     *
-     * @return
-     */
-    public double getPowerConsumption() {
-        double result = 0.;
-        for (PhysicalMachine pm : this.getPhysicalMachines()) {
-            if (pm.isRunning()) {
-                result += pm.getPowerConsumption();
-            }
-        }
-        return result;
-    }
-    
-    public double getHighestAvailableFreeMemory(){
-        double mem = 0;
-        for(PhysicalMachine pm :  getPhysicalMachines()){
-            if((pm.getMemory() * (1- pm.getMemoryUsage())) > mem){
-                mem = pm.getMemory() * (1- pm.getMemoryUsage());
-            }
-        }
-        return mem;
-    }
+	/**
+	 * Returns the PowerConsumption of the data center in Watt
+	 * 
+	 * @return
+	 */
+	public double getPowerConsumption() {
+		double result = 0.;
+		for (PhysicalMachine pm : this.getPhysicalMachines()) {
+			if (pm.isRunning()) {
+				result += pm.getPowerConsumption();
+			}
+		}
+		return result;
+	}
 
-    /**
+	public double getHighestAvailableFreeMemory() {
+		double mem = 0;
+		for (PhysicalMachine pm : getPhysicalMachines()) {
+			if ((pm.getMemory() * (1 - pm.getMemoryUsage())) > mem) {
+				mem = pm.getMemory() * (1 - pm.getMemoryUsage());
+			}
+		}
+		return mem;
+	}
+
+	/**
 	 * Returns a list of all PMs with state Online
+	 * 
 	 * @return
 	 */
 	public ArrayList<PhysicalMachine> getOnlinePMs() {
-		ArrayList<PhysicalMachine> tmp = new ArrayList<PhysicalMachine>(physicalMachines.size());
+		ArrayList<PhysicalMachine> tmp = new ArrayList<PhysicalMachine>(
+				physicalMachines.size());
 		for (PhysicalMachine pm : physicalMachines) {
 			if (pm.isRunning()) {
 				tmp.add(pm);
 			}
 		}
 		return tmp;
+	}
+
+	/**
+	 * This function should be called, if no resources in the dc are available,
+	 * but a higher priority vm needs to run in the datacenter @dc
+	 * This algorithm iterates through all physical machines, and looks for the
+	 * PM which has the best power consumption after shutting down low priority
+	 * VMs and adding the new VM @vm
+	 * @param dc The datacenter
+	 * @param vm The new VM which should run in the datacenter
+	 * @return Returns a Map with the PM as key and the VMs with lower priority which
+	 * 		   should be shut down, so that the new virtual machine (@vm) with higher priority has place
+	 */
+	public ConcurrentHashMap<PhysicalMachine, ArrayList<VirtualMachine>> getPMWithLowerPriorityVMList(DataCenter dc, VirtualMachine vm) {
+		ConcurrentHashMap<PhysicalMachine, ArrayList<VirtualMachine>> tmpList = new ConcurrentHashMap<PhysicalMachine, ArrayList<VirtualMachine>>();
+		ConcurrentHashMap<PhysicalMachine, ArrayList<VirtualMachine>> result = new ConcurrentHashMap<PhysicalMachine, ArrayList<VirtualMachine>>(1);
+		
+		for (PhysicalMachine pm : dc.getPhysicalMachines()) {
+			
+			// First check if vm already has place
+			// First fit PM is returned where we can add our higher priority
+			// PM
+			if (Utils.VMfitsOnPM(pm, vm)) {
+				result.put(pm, new ArrayList<VirtualMachine>());
+				return result;
+			}
+			
+			// Get copy of vms running
+			ArrayList<VirtualMachine> vms = new ArrayList<VirtualMachine>(pm.getOnlineVMs());
+			Utils.orderVMsByPriority(vms);
+			
+			// get resources of current VMs running on PM
+			double currentMemory = Utils.getVMsMemory(vms);
+			double currentSize = Utils.getVMsSize(vms); 
+			double currentCPUs = Utils.getVMsCPULoad(vms);
+			double currentBandwidth = Utils.getVMsBandwidth(vms);
+			
+			Iterator<VirtualMachine> it = vms.iterator();
+			while(it.hasNext()) {
+			    VirtualMachine tmp = it.next();
+			    if (tmp.getSla().getPriority() < vm.getSla().getPriority()) {
+			    	if (!tmpList.containsKey(pm)) {
+			    		tmpList.put(pm, new ArrayList<VirtualMachine>());
+			    	}
+			    	tmpList.get(pm).add(tmp);
+			    	
+			    	// Reduce resources if current VM would be shut down
+			    	currentMemory -= tmp.getMemory();
+			    	//currentSize -= tmp.getSize(); // TODO?
+			    	currentCPUs -= tmp.getCpus();
+			    	currentBandwidth -= tmp.getBandwidth();
+			    	
+			    	
+			    	// Check if higher prio vm has now place
+			    	if (currentMemory + vm.getMemory() <= pm.getMemory() &&
+			    			currentSize + vm.getSize() <= pm.getSize() &&
+			    			currentCPUs + vm.getCpus() <= pm.getCpus() &&
+			    			currentBandwidth + vm.getBandwidth() <= pm.getBandwidth()) {
+			    		// Leave vm iteration
+			    		break;
+			    	}
+			    	else {
+			    		// If we reached the end of the vm-list, and we have still no place
+			    		// on this pm, remove the complete entry from the tmplist
+			    		if (it.hasNext() == false) {
+			    			tmpList.remove(pm);
+			    		}
+			    	}
+			    }
+			}
+		}
+		
+		// No PMs are in the list where we can shut down lower priority VMs
+		if (tmpList.size() == 0) {
+			return null;
+		}
+		
+		// Iterate through our list and get the PM with best utility
+		PhysicalMachine bestUtilityPM = null;
+		double bestPMtotalEnergyUsed = 0.;
+		for (Entry<PhysicalMachine, ArrayList<VirtualMachine>> entry : tmpList.entrySet()) {
+			
+			// Make copy of current running VMS and remove the low priority vms of the current tmpList
+			// related to the PM.
+			// Then add the VM with higher priority and caluclate Utility
+			ArrayList<VirtualMachine> newVMOnlineList = new ArrayList<VirtualMachine>(entry.getKey().getOnlineVMs());
+			newVMOnlineList.removeAll(entry.getValue());
+			newVMOnlineList.add(vm);
+			
+			if (bestUtilityPM == null) {
+				bestUtilityPM = entry.getKey();
+				double bestUtilityPM_currentBandwidth = Utils.getVMsBandwidth(newVMOnlineList) / entry.getKey().getBandwidth();
+				double bestUtilityPM_currentCPUs = Utils.getVMsCPULoad(newVMOnlineList) / entry.getKey().getCpus();
+				double bestUtilityPM_currentMemory = Utils.getVMsMemory(newVMOnlineList) / entry.getKey().getMemory();
+				
+				bestPMtotalEnergyUsed = entry.getKey().getIdleStateEnergyUtilization() + 
+						entry.getKey().getCpuPowerConsumption() * bestUtilityPM_currentCPUs +
+						entry.getKey().getMemPowerConsumption() * bestUtilityPM_currentMemory + 
+						entry.getKey().getNetworkPowerConsumption() * bestUtilityPM_currentBandwidth;
+				continue;
+			}
+			
+			// Take the pm with best power consumption
+			double nextPM_currentBandwidth = Utils.getVMsBandwidth(newVMOnlineList) / entry.getKey().getBandwidth();
+			double nextPM_currentCPUs = Utils.getVMsCPULoad(newVMOnlineList) / entry.getKey().getCpus();
+			double nextPM_currentMemory = Utils.getVMsMemory(newVMOnlineList) / entry.getKey().getMemory();
+			
+			double nexttotalEnergyUsed = entry.getKey().getIdleStateEnergyUtilization() + 
+					entry.getKey().getCpuPowerConsumption() * nextPM_currentCPUs +
+					entry.getKey().getMemPowerConsumption() * nextPM_currentMemory + 
+					entry.getKey().getNetworkPowerConsumption() * nextPM_currentBandwidth;
+			
+			if (nexttotalEnergyUsed < bestPMtotalEnergyUsed) {
+				bestUtilityPM = entry.getKey();
+				bestPMtotalEnergyUsed = nexttotalEnergyUsed;
+			}
+			
+		}
+		
+		if (bestUtilityPM!= null) {
+			result.put(bestUtilityPM, tmpList.get(bestUtilityPM));
+			return result;
+		}
+				
+		return null;
 	}
 }

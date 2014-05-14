@@ -146,9 +146,9 @@ public class Utils {
 	public static double getVMsSize(List<VirtualMachine> vms) {
 		double usedSize = 0;
 		for(VirtualMachine vm : vms) {
-			if (vm.isOnline()) {
+			//if (vm.isOnline()) {
 				usedSize += vm.getSize();
-			}
+			//}
 		}
 		return usedSize;
 	}

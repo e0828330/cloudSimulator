@@ -3,6 +3,8 @@ package cloudSimulator.algorihms;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import model.PhysicalMachine;
 import model.VirtualMachine;
@@ -207,7 +209,20 @@ public class DataCentertBestFit implements DataCenterManagement {
 		}
 		if (result == null) {
 			// TODO: Shut down one VM with lower prio
-			return null;
+			ConcurrentHashMap<PhysicalMachine, ArrayList<VirtualMachine>> map = dc.getPMWithLowerPriorityVMList(dc, vm);
+			if (map == null) {
+				return null;
+			}
+			else {
+				// should only have 1 iteration
+				// set all lower priority vms offline and then return pm
+				for (Entry<PhysicalMachine, ArrayList<VirtualMachine>> entry : map.entrySet()) {
+					for (VirtualMachine tmpVM : entry.getValue()) {
+						tmpVM.setOnline(false);
+					}
+					return entry.getKey();
+				}
+			}
 		}
 		return result;
 	}
