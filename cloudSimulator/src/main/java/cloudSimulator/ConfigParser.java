@@ -86,7 +86,7 @@ public class ConfigParser {
 
 		for (int i = 0; i < numSLAs; i++) {
 			ServiceLevelAgreement sla = new ServiceLevelAgreement();
-			sla.setBandwith((int) slaBandwidth.sample());
+			sla.setBandwidth((int) slaBandwidth.sample());
 			sla.setCpus((int) slaCpus.sample() + 1);
 			sla.setMemory((int) slaMemory.sample());
 			sla.setSize((int) slaSize.sample() + 2);
@@ -113,7 +113,7 @@ public class ConfigParser {
 				iter.remove();
 				sla.getVms().add(vm);
 				vm.setSla(sla);
-				vm.setBandwidth((int) (sla.getBandwith()));
+				vm.setBandwidth((int) (sla.getBandwidth()));
 				int initCPUS = (int) (sla.getCpus());
 				vm.setCpus(initCPUS < 1 ? 1 : initCPUS);
 				int initMemory = (int) (sla.getMemory());

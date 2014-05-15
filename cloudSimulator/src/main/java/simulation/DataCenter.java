@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import lombok.Data;
 import model.PhysicalMachine;
+import model.ServiceLevelAgreement;
 import model.VirtualMachine;
 import algorithms.DataCenterManagement;
 import cloudSimulator.weather.Location;
@@ -35,7 +36,7 @@ public class DataCenter implements Serializable {
 	private String id;
 	
 	private String name;
-    private List<PhysicalMachine> physicalMachines;
+    private List<PhysicalMachine> physicalMachines = new ArrayList<PhysicalMachine>();
     
     @Transient
     private DataCenterManagement algorithm;
@@ -60,6 +61,22 @@ public class DataCenter implements Serializable {
             }
         }
         algorithm.scaleVirtualMachines(this);
+        
+        // Check if a sla is down
+        ArrayList<ServiceLevelAgreement> slaList = getSLAs();
+     
+        for (ServiceLevelAgreement sla : slaList) {
+        	boolean isDown = false;
+        	
+        	for (VirtualMachine vm : sla.getVms()) {
+        		isDown |= vm.isOnline();
+        	}
+ 
+        	if (!isDown) {
+        		sla.incrementDowntime();
+        	}
+        }
+        
 		// System.out.printf("[%s] - Simulated times is %s\n", name,
 		// Utils.getCurrentTime(minute));
 	}
@@ -296,4 +313,17 @@ public class DataCenter implements Serializable {
 				
 		return null;
 	}
+	
+	public ArrayList<ServiceLevelAgreement> getSLAs() {
+		ArrayList<ServiceLevelAgreement> slaList = new ArrayList<ServiceLevelAgreement>(
+				32);
+		for (PhysicalMachine pm : physicalMachines) {
+			for (VirtualMachine vm : pm.getVirtualMachines()) {
+				slaList.add(vm.getSla());
+			}
+		}
+		return slaList;
+	}
+	
+	
 }

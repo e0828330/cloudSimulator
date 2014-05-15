@@ -14,9 +14,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(exclude={"pm", "sla"})
 public class VirtualMachine implements Serializable {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 828356080039466875L;
 
 	@Id
@@ -38,6 +35,8 @@ public class VirtualMachine implements Serializable {
 	
 	/* Whether the VM is on or down */
 	private boolean online;
+	
+	private int down = 0;
 	
 	/* Stores the physical machine (PM) where this VM is running */
 	@Transient
@@ -83,5 +82,17 @@ public class VirtualMachine implements Serializable {
 		usedCPUs = cpuLoadMap.get(minute % 1440);
 		usedMemory = memLoadMap.get(minute % 1440);
 		usedBandwidth = bwLoadMap.get(minute % 1440);
+	}
+	
+	public void incrementDownTimeCounter() {
+		this.down++;
+	}
+	
+	/**
+	 * Returns the downtime in percent / year
+	 * @return
+	 */
+	public double getDownTimeInPercent(int minute) {
+		return Math.min(1., (this.down / (double) minute));
 	}
 }
