@@ -1,9 +1,11 @@
 package utils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+
 import model.PhysicalMachine;
 import model.VirtualMachine;
 import simulation.DataCenter;
@@ -61,6 +63,21 @@ public class Utils {
 		}
 		return false;
 	}
+	
+	/**
+	 * Checks if the datacenter is available to take the vm
+	 * @param dc The datacenter where the virtual machine should be migrated to
+	 * @param vm The virtual machine for migration
+	 * @return
+	 */
+	public static boolean VMisTransferable(DataCenter dc, VirtualMachine vm) {
+		for (PhysicalMachine pm : dc.getPhysicalMachines()) {
+			if (Utils.VMfitsOnPM(pm, vm)) {
+				return true;
+			}
+		}		
+		return false;
+	}
 
 	/**
 	 * Migrates @vm to @pm
@@ -83,6 +100,88 @@ public class Utils {
 	public static double getRandomValue(double min, double max) {
 		return (min + Math.random() * max - min);
 	}
+	
+	/**
+	 * Adds the consumption of @vm to the current one of @pm and returns the used
+	 * energy, if the vm would be added to this physical machine
+	 * @param pm The current physical machine
+	 * @param vm The virtual machine, which would be added
+	 * @return
+	 */
+	public static double getFutureEnergyConsumption(PhysicalMachine pm, VirtualMachine vm) {
+		double currentCPUsUsed = pm.getCPULoad() * pm.getCpus();
+		double currentMemoryUsed = pm.getMemoryUsage() * pm.getMemory();
+		double currentBandwidthUsed = pm.getBandwidthUtilization() * pm.getBandwidth();
+		
+		double futureCPULoad = currentCPUsUsed + vm.getCpus() * vm.getUsedCPUs();
+		double futureMemoryUsage = currentMemoryUsed + vm.getMemory() * vm.getUsedMemory();
+		double futureBandwidthUtilization = currentBandwidthUsed + vm.getBandwidth() * vm.getUsedBandwidth();
+		
+		double futureEnergyUsed = pm.getIdleStateEnergyUtilization() + pm.getCpuPowerConsumption() * futureCPULoad
+				+ pm.getMemPowerConsumption() * futureMemoryUsage + pm.getNetworkPowerConsumption() * futureBandwidthUtilization;
+		
+		return futureEnergyUsed;
+	}
+	
+	/**
+	 * Calculates the used CPUs of all VMs in the list
+	 * @param vms
+	 * @return
+	 */
+	public static double getVMsCPULoad(List<VirtualMachine> vms) {
+		double usedCpus = 0;
+		for(VirtualMachine vm : vms) {
+			if (vm.isOnline()) {
+				usedCpus += vm.getCpus() * vm.getUsedCPUs();
+			}
+		}
+		return usedCpus;
+	}
+	
+	/**
+	 * Calculates the used size of all VMs in the list
+	 * @param vms
+	 * @return
+	 */	
+	public static double getVMsSize(List<VirtualMachine> vms) {
+		double usedSize = 0;
+		for(VirtualMachine vm : vms) {
+			//if (vm.isOnline()) {
+				usedSize += vm.getSize();
+			//}
+		}
+		return usedSize;
+	}
+	
+	/**
+	 * Calculates the used memory of all VMs in the list
+	 * @param vms
+	 * @return
+	 */		
+	public static double getVMsMemory(List<VirtualMachine> vms) {
+		double memoryUsed = 0;
+		for(VirtualMachine vm : vms) {
+			if (vm.isOnline()) {
+				memoryUsed += vm.getMemory() * vm.getUsedMemory();
+			}
+		}
+		return memoryUsed;
+	}
+	
+	/**
+	 * Calculates the used bandwidth of all VMs in the list
+	 * @param vms
+	 * @return
+	 */		
+	public static double getVMsBandwidth(List<VirtualMachine> vms) {
+		double bandwidthUsed = 0;
+		for(VirtualMachine vm : vms) {
+			if (vm.isOnline()) {
+				bandwidthUsed += vm.getBandwidth() * vm.getUsedBandwidth();
+			}
+		}
+		return bandwidthUsed;
+	}	
 
 	/**
 	 * Calculates the time for transmitting a file of @size by bandwidth @availableBandwidth
