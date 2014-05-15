@@ -54,7 +54,6 @@ public class DataCentertBestFit implements DataCenterManagement {
 			}
 		});
 
-		int i = 1;
 		double usedVMBandwidth = 0.;
 		for (VirtualMachine vm : onlineVMs) {
 			usedVMBandwidth += vm.getUsedBandwidth() * vm.getBandwidth();
@@ -104,7 +103,6 @@ public class DataCentertBestFit implements DataCenterManagement {
 			}
 		});
 
-		int i = 1;
 		double usedVMMemory = 0.;
 		for (VirtualMachine vm : onlineVMs) {
 			usedVMMemory += vm.getUsedMemory() * vm.getMemory();
@@ -153,7 +151,6 @@ public class DataCentertBestFit implements DataCenterManagement {
 			}
 		});
 
-		int i = 1;
 		double usedVMCPUs = 0.;
 		for (VirtualMachine vm : onlineVMs) {
 			usedVMCPUs += vm.getUsedCPUs() * vm.getCpus();
