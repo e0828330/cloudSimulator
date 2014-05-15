@@ -70,16 +70,12 @@ public class ElasticityManager {
 			slaList = dc.getSLAs();
 		}
 		
-		System.out.println("SLAList = " + slaList.size());
-		
 		for (ServiceLevelAgreement sla : slaList) {
 			int cpus = 0;
 			int bandwidth = 0;
 			int memory = 0;
 			int size = 0;
 			double downtime = sla.getDownTimeInPercent(minute);
-			
-			System.out.println("VMS SIZE = " + sla.getVms().size());
 			
 			// Get all VMs for each SLA
 			for (VirtualMachine vm : sla.getVms()) {
@@ -90,11 +86,6 @@ public class ElasticityManager {
 					size += vm.getSize();
 				}
 			}
-			System.out.println(downtime + " > " + sla.getMaxDowntime());
-			System.out.println(cpus + " < " + sla.getCpus());
-			System.out.println(bandwidth + " < " + sla.getBandwidth());
-			System.out.println(memory + " < " + sla.getMemory());
-			System.out.println(size + " < " + sla.getSize());
 			
 			if (downtime > sla.getMaxDowntime() ||
 				cpus < sla.getCpus() ||

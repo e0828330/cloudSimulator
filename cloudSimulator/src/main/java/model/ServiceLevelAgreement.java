@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ public class ServiceLevelAgreement implements Serializable {
 	private int downtime = 0;
 
 	@Transient
-	private Set<VirtualMachine> vms = new HashSet<VirtualMachine>(8);
+	private ArrayList<VirtualMachine> vms = new ArrayList<VirtualMachine>(8);
 	
 	public void incrementDowntime() {
 		downtime++;
