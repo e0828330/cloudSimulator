@@ -57,7 +57,6 @@ public class ElasticityManager {
 	}
 
 	/**
-	 * TODO: Downtime??
 	 * Returns the current SLA violations for this PM
 	 * 
 	 * @return
