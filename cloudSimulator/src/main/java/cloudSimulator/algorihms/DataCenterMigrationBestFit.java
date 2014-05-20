@@ -67,7 +67,7 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
      */
     public VirtualMachine findVMToMigrate(TreeMap<Double, DataCenter> map) {
         VirtualMachine vmMin = null;
-        DataCenter dc = null;
+        DataCenter dc;
         double currentMigrationSize = 0.;
         for (Map.Entry<Double, DataCenter> entry : map.descendingMap().entrySet()) {
             dc = entry.getValue();
@@ -112,6 +112,7 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
      * 
      * @param sourceVM
      * @param targetDC
+     * @param minute
      * @return 
      */
     public boolean isMigrationValuable(VirtualMachine sourceVM, DataCenter targetDC, int minute){
