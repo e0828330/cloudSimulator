@@ -33,16 +33,15 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
         currentEnergyPrices = new TreeMap<Double, DataCenter>();
         Date currentTime = Utils.getCurrentTime(minute);
         double costs = 0.;
-        logger.debug("--- " + currentTime + " ----");
+        logger.trace("--- " + currentTime + " ----");
         for (DataCenter dc : em.getDataCenters()) {
             Weather currentWeather = forecastService.getForecast(currentTime, dc.getLocation(), true);
             Double cPrice = Utils.getCoolingEnergyFactor(currentWeather.getCurrentTemperature()) * dc.getCurrentEneryPrice(Utils.getCurrentTime(minute));
             currentEnergyPrices.put(cPrice, dc);
-            logger.trace("Costs at " + dc.getName() + " = " + cPrice);
             costs += cPrice;
         }
         
-        logger.debug("Total energy costs: " + costs);
+        logger.trace("Total energy costs: " + costs);
         
         VirtualMachine vm = findVMToMigrate(currentEnergyPrices);
         if (null != vm) {

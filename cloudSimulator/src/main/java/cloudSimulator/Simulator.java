@@ -12,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import simulation.ElasticityManager;
+import utils.Utils;
 import cloudSimulator.weather.Forecast;
 
 @Configuration
@@ -34,7 +35,7 @@ public class Simulator implements CommandLineRunner {
 	private Forecast forecastService;
 	
 	public void run(String... arg0) throws Exception {
-		System.out.println("Started");
+		logger.info("Simulator started");
 
 		URL resource = Simulator.class.getResource("/config.ini");
 		parser.doParse(resource.getPath());
@@ -46,12 +47,15 @@ public class Simulator implements CommandLineRunner {
 		Long start = System.currentTimeMillis();
 		
 		for (int i = 0; i < simulatedMinutes; i++) {
+			if ((i % 43200) == 0) {
+				logger.info("Current time is " + Utils.getCurrentTime(i));
+			}
 			em.simulate(i);
 		}
 		
 		logger.debug("Took : " + (System.currentTimeMillis() - start) / 1000 + " seconds" );
 
-		System.out.println("Simulation ended!");
+		logger.info("Simulation ended!");
 	}
 
 }

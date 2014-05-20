@@ -7,7 +7,7 @@
     </layout>
   </appender>
    
-  <logger name="cloudSimulator" level="INFO"/>
+  <logger name="cloudSimulator" level="info"/>
    
   <root level="info">
     <appender-ref ref="STDOUT" />
