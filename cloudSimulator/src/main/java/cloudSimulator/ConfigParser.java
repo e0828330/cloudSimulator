@@ -14,6 +14,8 @@ import model.VirtualMachine;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -30,6 +32,8 @@ import cloudSimulator.weather.Location;
 @Service
 public class ConfigParser {
 
+	static Logger logger = LoggerFactory.getLogger(ConfigParser.class);
+	
 	/* The ini file */
 	private Ini ini;
 
@@ -201,6 +205,9 @@ public class ConfigParser {
 			loadFromDB();
 			return;
 		}
+		else {
+			logger.info("Generating new random config");
+		}
 		
 		NormalDistribution vmND = getDistribution("VMs");
 		NormalDistribution slaND = getDistribution("SLAs");
@@ -244,8 +251,7 @@ public class ConfigParser {
 	/**
 	 * Rebuilds the datacenter list from the database
 	 */
-	private void loadFromDB() {
-		System.out.println("Loading data from database!");
+	private void loadFromDB() {	
 		DataCenterManagement algorithm = (DataCenterManagement) appContext.getBean("management" + ini.get("Algorithms", "dataCenterManagement"));
 		dataCenters = repo.findAll();
 		for(DataCenter dc : dataCenters) {
@@ -261,6 +267,7 @@ public class ConfigParser {
 			}
 		}
 		
+		logger.info("Loaded data to database.");
 	}
 
 	/**
@@ -271,7 +278,7 @@ public class ConfigParser {
 		for (DataCenter dc : dataCenters) {
 			repo.save(dc);
 		}
-		System.out.println("Saving data to database.");
+		logger.info("Saved data to database.");
 	}
 	
 	/**

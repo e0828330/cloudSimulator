@@ -1,9 +1,5 @@
 package cloudSimulator.algorihms;
 
-import algorithms.DataCenterMigration;
-import cloudSimulator.weather.Forecast;
-import cloudSimulator.weather.Weather;
-
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,52 +7,56 @@ import java.util.TreeMap;
 import model.PhysicalMachine;
 import model.VirtualMachine;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import simulation.DataCenter;
 import simulation.ElasticityManager;
 import utils.Utils;
+import algorithms.DataCenterMigration;
+import cloudSimulator.weather.Forecast;
+import cloudSimulator.weather.Weather;
 
 @Service(value = "migrationBestFit")
 public class DataCenterMigrationBestFit implements DataCenterMigration {
 
+	static Logger logger = LoggerFactory.getLogger(DataCenterMigrationBestFit.class);
+	
     private TreeMap<Double, DataCenter> currentEnergyPrices;
 
     @Autowired
-    private Forecast f;
+    private Forecast forecastService;
 
     public void manageVirtualMachines(ElasticityManager em, int minute) {
-        // TODO Auto-generated method stub
         currentEnergyPrices = new TreeMap<Double, DataCenter>();
         Date currentTime = Utils.getCurrentTime(minute);
         double costs = 0.;
-        System.out.println("--- " + currentTime + " ----");
+        logger.debug("--- " + currentTime + " ----");
         for (DataCenter dc : em.getDataCenters()) {
-            Weather currentWeather = f.getForecast(currentTime, dc.getLocation(), true);
+            Weather currentWeather = forecastService.getForecast(currentTime, dc.getLocation(), true);
             Double cPrice = Utils.getCoolingEnergyFactor(currentWeather.getCurrentTemperature()) * dc.getCurrentEneryPrice(Utils.getCurrentTime(minute));
             currentEnergyPrices.put(cPrice, dc);
-            //System.out.println("Costs at " + dc.getName() + " = " + cPrice);
+            logger.trace("Costs at " + dc.getName() + " = " + cPrice);
             costs += cPrice;
         }
         
-        //System.out.println("Total Costs: " + costs);
+        logger.debug("Total energy costs: " + costs);
         
         VirtualMachine vm = findVMToMigrate(currentEnergyPrices);
         if (null != vm) {
              DataCenter dc = findDataCenterToMigrateTo(currentEnergyPrices, vm);
              if(null != dc && !dc.equals(vm.getPm().getDataCenter()) && isMigrationValuable(vm, dc, minute)){
-            	System.out.print("Time - " + currentTime + " - ");
-                System.out.print("from DC: " + vm.getPm().getDataCenter().getName());
-                System.out.println(" to DC: " + dc.getName());
+            	 logger.trace("From DC: " + vm.getPm().getDataCenter().getName() + " to DC: " + dc.getName());
                 em.migrate(vm, vm.getPm().getDataCenter(), dc);
              }
              else {
-             	//System.out.println("No target dc found for vm on " + vm.getPm().getDataCenter().getName());
+            	 logger.trace("No target dc found for vm on " + vm.getPm().getDataCenter().getName());
              }
         }
         else {
-        	System.out.println("Time - " + currentTime + " -  no migration.");
+        	logger.trace("Time - " + currentTime + " -  no migration.");
         }
     }
 
@@ -116,13 +116,11 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
      * @return 
      */
     public boolean isMigrationValuable(VirtualMachine sourceVM, DataCenter targetDC, int minute){
-        // TODO look at forecast
-        Weather sourceWeather = f.getForecast(Utils.getCurrentTime(minute), sourceVM.getPm().getDataCenter().getLocation(), true);
-        Weather targetWeather = f.getForecast(Utils.getCurrentTime(minute), targetDC.getLocation(), true);
+        Weather sourceWeather = forecastService.getForecast(Utils.getCurrentTime(minute), sourceVM.getPm().getDataCenter().getLocation(), true);
+        Weather targetWeather = forecastService.getForecast(Utils.getCurrentTime(minute), targetDC.getLocation(), true);
         DataCenter sourceDC = sourceVM.getPm().getDataCenter();
         double targetForecastPrice = targetDC.getCurrentEneryPrice(Utils.getCurrentTime(minute)) * Utils.getCoolingEnergyFactor(targetWeather.getForecast() * targetWeather.getCurrentTemperature());
         double sourceForecastPrice = sourceDC.getCurrentEneryPrice(Utils.getCurrentTime(minute)) * Utils.getCoolingEnergyFactor(sourceWeather.getForecast() * sourceWeather.getCurrentTemperature());
-        //System.out.println(targetForecastPrice + " < " + sourceForecastPrice);
         return targetForecastPrice < sourceForecastPrice;
     }
     

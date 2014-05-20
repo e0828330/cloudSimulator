@@ -2,6 +2,8 @@ package cloudSimulator;
 
 import java.net.URL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -17,6 +19,8 @@ import cloudSimulator.weather.Forecast;
 @EnableAutoConfiguration
 public class Simulator implements CommandLineRunner {
 
+	static Logger logger = LoggerFactory.getLogger(Simulator.class);
+	
 	private final int simulatedMinutes = 524880;
 
 	public static void main(String[] args) {
@@ -45,7 +49,7 @@ public class Simulator implements CommandLineRunner {
 			em.simulate(i);
 		}
 		
-		System.out.println("Took : " + (System.currentTimeMillis() - start) / 1000 + " seconds" );
+		logger.debug("Took : " + (System.currentTimeMillis() - start) / 1000 + " seconds" );
 
 		System.out.println("Simulation ended!");
 	}
