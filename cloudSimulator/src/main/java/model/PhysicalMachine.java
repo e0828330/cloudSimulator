@@ -56,8 +56,21 @@ public class PhysicalMachine implements Serializable {
 			if (vm.isOnline()) {
 				vm.updateLoad(minute);
 			}
+			else {
+				vm.incrementDownTimeCounter();
+			}
 		}
 	}
+	
+	public void setRunning(boolean value) {
+		if (value == false) {
+			for (VirtualMachine vm : virtualMachines) {
+				vm.setOnline(false);
+			}
+		}
+		this.running = value;
+	}
+	
 	
 	/* Used resources */
 
@@ -118,6 +131,5 @@ public class PhysicalMachine implements Serializable {
 			}
 		}
 		return tmp;
-	}
-	
+	}	
 }
