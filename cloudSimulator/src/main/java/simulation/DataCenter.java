@@ -52,7 +52,6 @@ public class DataCenter implements Serializable {
     @Transient
     private HashMap<VirtualMachine, Integer> migrationQueue = new HashMap<VirtualMachine, Integer>();
 
-    @Autowired
     @Transient
     private Forecast forecastService;
     
@@ -71,9 +70,15 @@ public class DataCenter implements Serializable {
         
         // Check if a sla is down
         ArrayList<ServiceLevelAgreement> slaList = getSLAs();
-     
         for (ServiceLevelAgreement sla : slaList) {
         	boolean isDown = false;
+        	
+        	/*
+        	 * TODO: MARTIN FIX THAT! ... NullPointerException ...
+        	 */
+        	if (1 > 0) {
+        		break;
+        	}
         	
         	for (VirtualMachine vm : sla.getVms()) {
         		isDown |= vm.isOnline();

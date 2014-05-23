@@ -27,6 +27,7 @@ import utils.Utils;
 import algorithms.DataCenterManagement;
 import algorithms.DataCenterMigration;
 import cloudSimulator.repo.DataCenterRepository;
+import cloudSimulator.weather.Forecast;
 import cloudSimulator.weather.Location;
 
 @Service
@@ -50,6 +51,10 @@ public class ConfigParser {
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
+	
+	
+	@Autowired
+	private Forecast forecastService;
 	
 	/* Resulting datacenters */
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
@@ -183,6 +188,7 @@ public class ConfigParser {
 				totalPMs.add(pm);
 			}
 			dc.setPhysicalMachines(pms);
+			dc.setForecastService(forecastService);
 			dataCenters.add(dc);
 		}
 	}

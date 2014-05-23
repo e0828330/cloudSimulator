@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import model.DataPoint;
 import model.ServiceLevelAgreement;
 import model.VirtualMachine;
 
@@ -22,7 +23,13 @@ public class ElasticityManager {
 	
 	private DataCenterMigration algorithm;
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
+	
+	/* TODO: Move to config */
+	private final int costsPerViolation = 10;
 
+	private ArrayList<DataPoint> energyCostList = new ArrayList<DataPoint>(8760);
+	private ArrayList<DataPoint> slaCostList = new ArrayList<DataPoint>(8760);;
+	
 	/**
 	 * 
 	 * Migrates a VM from the dataCenter source to target This works as follows:
@@ -55,6 +62,12 @@ public class ElasticityManager {
 		/* Run the algorithm once per hour */
 		if ((minute % 60) == 0) {
 			algorithm.manageVirtualMachines(this, minute);
+			double energyCosts = 0.;
+			for (DataCenter dc : dataCenters) {
+				energyCosts += dc.getCurrentEnergyCosts(minute);
+			}
+			energyCostList.add(new DataPoint(minute, energyCosts));
+			slaCostList.add(new DataPoint(minute, getCurrentSLAViolsations(minute) * costsPerViolation));
 		}
 	}
 
@@ -72,7 +85,7 @@ public class ElasticityManager {
 			slaList = dc.getSLAs();
 		}
 		
-		System.out.println("SLAList = " + slaList.size());
+		logger.trace("SLAList = " + slaList.size());
 		
 		for (ServiceLevelAgreement sla : slaList) {
 			int cpus = 0;
@@ -81,7 +94,7 @@ public class ElasticityManager {
 			int size = 0;
 			double downtime = sla.getDownTimeInPercent(minute);
 			
-			System.out.println("VMS SIZE = " + sla.getVms().size());
+			logger.trace("VMS SIZE = " + sla.getVms().size());
 			
 			// Get all VMs for each SLA
 			for (VirtualMachine vm : sla.getVms()) {
@@ -92,11 +105,12 @@ public class ElasticityManager {
 					size += vm.getSize();
 				}
 			}
-			System.out.println(downtime + " > " + sla.getMaxDowntime());
-			System.out.println(cpus + " < " + sla.getCpus());
-			System.out.println(bandwidth + " < " + sla.getBandwidth());
-			System.out.println(memory + " < " + sla.getMemory());
-			System.out.println(size + " < " + sla.getSize());
+
+			logger.trace(downtime + " > " + sla.getMaxDowntime());
+			logger.trace(cpus + " < " + sla.getCpus());
+			logger.trace(bandwidth + " < " + sla.getBandwidth());
+			logger.trace(memory + " < " + sla.getMemory());
+			logger.trace(size + " < " + sla.getSize());
 			
 			if (downtime > sla.getMaxDowntime() ||
 				cpus < sla.getCpus() ||
