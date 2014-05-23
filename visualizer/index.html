@@ -4,7 +4,7 @@
     <title>Simulation Data Visualizer</title>
     <script type="text/javascript" src="canvasjs.min.js"></script>
 <body>
-<h1>Simulation Data Visualizer</h1>
+<h1>Simulation Data Visualizer</h1><br />
 <div style="margin: auto; width: 600px; border: 2px solid darkgrey; text-align:center">
     <form>
         <p>Please select the result files and click <strong>Visualize</strong></p>
@@ -13,8 +13,10 @@
         <label>Total Costs Data Fiile <input type="file" id="totalData" name="totalData"/></label> <br />
         <br />
         <input type="button" onclick="render()" value="Visualize" />
+        <br /><br />
     </form>
 </div>
+<br />
 <div id="chartContainer" style="height: 100%; width: 98%; margin: auto"></div>
 <script type="text/javascript">
 function Renderer() {
@@ -71,6 +73,7 @@ Renderer.prototype.render = function () {
             data: [{
                 type: "line",
                 lineThickness: 1,
+                markerSize: 0,
                 axisYType: "secondary",
                 showInLegend: true,
                 name: "Energy Costs",
@@ -78,6 +81,7 @@ Renderer.prototype.render = function () {
             }, {
                 type: "line",
                 lineThickness: 1,
+                markerSize: 0,
                 showInLegend: true,
                 name: "SLA Costs",
                 axisYType: "secondary",
@@ -85,22 +89,12 @@ Renderer.prototype.render = function () {
             }, {
                 type: "line",
                 lineThickness: 1,
+                markerSize: 0,
                 showInLegend: true,
                 name: "Total Costs",
                 axisYType: "secondary",
                 dataPoints: this._totalData
-            }],
-            legend: {
-                cursor: "pointer",
-                itemclick: function (e) {
-                    if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-                        e.dataSeries.visible = false;
-                    } else {
-                        e.dataSeries.visible = true;
-                    }
-                    chart.render();
-                }
-            }
+            }]
         });
 
         chart.render();
