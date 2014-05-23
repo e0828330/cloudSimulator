@@ -78,6 +78,14 @@ public class Simulator implements CommandLineRunner {
 		bw.write(gson.toJson(elasticityManager.getSlaCostList()));
 		bw.close();
 		System.out.println("Wrote sla-costs data to " + temp.getAbsolutePath());
+
+		/* Dump total cost json to temp file */
+		temp = File.createTempFile("total-costs", ".json");
+		fw = new FileWriter(temp.getAbsoluteFile());
+		bw = new BufferedWriter(fw);
+		bw.write(gson.toJson(elasticityManager.getTotalCostList()));
+		bw.close();
+		System.out.println("Wrote total-costs data to " + temp.getAbsolutePath());
 		logger.info("Simulation ended!");
 	}
 

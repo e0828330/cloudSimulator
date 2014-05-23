@@ -28,7 +28,8 @@ public class ElasticityManager {
 	private final int costsPerViolation = 10;
 
 	private ArrayList<DataPoint> energyCostList = new ArrayList<DataPoint>(8760);
-	private ArrayList<DataPoint> slaCostList = new ArrayList<DataPoint>(8760);;
+	private ArrayList<DataPoint> slaCostList = new ArrayList<DataPoint>(8760);
+	private ArrayList<DataPoint> totalCostList = new ArrayList<DataPoint>(8760);
 	
 	private int hour = 0;
 
@@ -68,8 +69,10 @@ public class ElasticityManager {
 			for (DataCenter dc : dataCenters) {
 				energyCosts += dc.getCurrentEnergyCosts(minute);
 			}
+			double slaCosts = getCurrentSLAViolsations(minute) * costsPerViolation;
 			energyCostList.add(new DataPoint(hour, energyCosts));
-			slaCostList.add(new DataPoint(hour, getCurrentSLAViolsations(minute) * costsPerViolation));
+			slaCostList.add(new DataPoint(hour, slaCosts));
+			totalCostList.add(new DataPoint(hour, energyCosts + slaCosts));
 			hour++;
 		}
 	}
