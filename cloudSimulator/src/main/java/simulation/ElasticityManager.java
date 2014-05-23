@@ -30,6 +30,8 @@ public class ElasticityManager {
 	private ArrayList<DataPoint> energyCostList = new ArrayList<DataPoint>(8760);
 	private ArrayList<DataPoint> slaCostList = new ArrayList<DataPoint>(8760);;
 	
+	private int hour = 0;
+
 	/**
 	 * 
 	 * Migrates a VM from the dataCenter source to target This works as follows:
@@ -66,8 +68,9 @@ public class ElasticityManager {
 			for (DataCenter dc : dataCenters) {
 				energyCosts += dc.getCurrentEnergyCosts(minute);
 			}
-			energyCostList.add(new DataPoint(minute, energyCosts));
-			slaCostList.add(new DataPoint(minute, getCurrentSLAViolsations(minute) * costsPerViolation));
+			energyCostList.add(new DataPoint(hour, energyCosts));
+			slaCostList.add(new DataPoint(hour, getCurrentSLAViolsations(minute) * costsPerViolation));
+			hour++;
 		}
 	}
 
