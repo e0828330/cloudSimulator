@@ -16,7 +16,7 @@ import utils.Utils;
 import cloudSimulator.weather.Forecast;
 
 @Configuration
-@ComponentScan
+@ComponentScan({"cloudSimulator", "simulation"})
 @EnableAutoConfiguration
 public class Simulator implements CommandLineRunner {
 
@@ -34,15 +34,17 @@ public class Simulator implements CommandLineRunner {
 	@Autowired
 	private Forecast forecastService;
 	
+	@Autowired
+	private ElasticityManager elasticityManager;
+	
 	public void run(String... arg0) throws Exception {
 		logger.info("Simulator started");
 
 		URL resource = Simulator.class.getResource("/config.ini");
 		parser.doParse(resource.getPath());
 
-		ElasticityManager em = new ElasticityManager();
-		em.setAlgorithm(parser.getMigrationAlgorithm());
-		em.setDataCenters(parser.getDataCenters());
+		elasticityManager.setAlgorithm(parser.getMigrationAlgorithm());
+		elasticityManager.setDataCenters(parser.getDataCenters());
 
 		Long start = System.currentTimeMillis();
 		
@@ -50,7 +52,7 @@ public class Simulator implements CommandLineRunner {
 			if ((i % 43200) == 0) {
 				logger.info("Current time is " + Utils.getCurrentTime(i));
 			}
-			em.simulate(i);
+			elasticityManager.simulate(i);
 		}
 		
 		logger.debug("Took : " + (System.currentTimeMillis() - start) / 1000 + " seconds" );

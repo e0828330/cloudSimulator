@@ -6,12 +6,20 @@ import java.util.List;
 import lombok.Data;
 import model.ServiceLevelAgreement;
 import model.VirtualMachine;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import utils.Utils;
 import algorithms.DataCenterMigration;
 
 @Data
+@Service
 public class ElasticityManager {
 
+	static Logger logger = LoggerFactory.getLogger(ElasticityManager.class);
+	
 	private DataCenterMigration algorithm;
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
 
