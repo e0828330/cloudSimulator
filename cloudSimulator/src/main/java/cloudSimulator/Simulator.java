@@ -1,5 +1,8 @@
 package cloudSimulator;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.net.URL;
 
 import org.slf4j.Logger;
@@ -10,6 +13,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+
+import com.google.gson.Gson;
 
 import simulation.ElasticityManager;
 import utils.Utils;
@@ -57,6 +62,22 @@ public class Simulator implements CommandLineRunner {
 		
 		logger.debug("Took : " + (System.currentTimeMillis() - start) / 1000 + " seconds" );
 
+		Gson gson = new Gson();
+		/* Dump energy cost json to temp file */
+		File temp = File.createTempFile("energy-costs", ".json");
+		FileWriter fw = new FileWriter(temp.getAbsoluteFile());
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write(gson.toJson(elasticityManager.getEnergyCostList()));
+		bw.close();
+		System.out.println("Wrote energy-costs data to " + temp.getAbsolutePath());
+
+		/* Dump sla cost json to temp file */
+		temp = File.createTempFile("sla-costs", ".json");
+		fw = new FileWriter(temp.getAbsoluteFile());
+		bw = new BufferedWriter(fw);
+		bw.write(gson.toJson(elasticityManager.getSlaCostList()));
+		bw.close();
+		System.out.println("Wrote sla-costs data to " + temp.getAbsolutePath());
 		logger.info("Simulation ended!");
 	}
 
