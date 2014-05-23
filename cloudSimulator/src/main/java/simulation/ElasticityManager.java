@@ -1,15 +1,13 @@
 package simulation;
 
-import algorithms.DataCenterMigration;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
-import model.PhysicalMachine;
 import model.ServiceLevelAgreement;
 import model.VirtualMachine;
 import utils.Utils;
+import algorithms.DataCenterMigration;
 
 @Data
 public class ElasticityManager {
@@ -17,10 +15,7 @@ public class ElasticityManager {
 	private DataCenterMigration algorithm;
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
 
-	/* TODO: Implement */
-
 	/**
-	 * TODO: LIVE VM Migration?
 	 * 
 	 * Migrates a VM from the dataCenter source to target This works as follows:
 	 * 1) VM is set to off line 2) VM gets removed from source dataCenter 3) VM
@@ -45,7 +40,6 @@ public class ElasticityManager {
 	}
 
 	public void simulate(int minute) {
-		// TODO: Implement rest
 		for (DataCenter dc : dataCenters) {
 			dc.simulate(minute);
 		}
