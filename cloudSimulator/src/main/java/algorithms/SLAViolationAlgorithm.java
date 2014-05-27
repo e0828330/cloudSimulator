@@ -18,6 +18,7 @@ public class SLAViolationAlgorithm {
 	 * @return Returns the number of total SLA violations in all datacenters given by @datacenterList
 	 * 		   If > 0, we have violations
 	 */
+	// TODO: Add 3rd parameter, threshold for setting violations before the limit of 100% is reached
 	public int getCurrentSLAViolsations(int minute, ArrayList<DataCenter> datacenterList) {
 		int violations = 0;
 		// Stores if a PM has violations
