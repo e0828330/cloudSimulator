@@ -12,9 +12,11 @@ import utils.Utils;
 public class SLAViolationAlgorithm {
 
 	/**
-	 * Returns the current SLA violations for this all datacenters
-	 * 
-	 * @return
+	 * Returns the current SLA violations
+	 * If this function is called with only 1 datacenter in @datacenterList and we have violations,
+	 * an action like migrations of VMs should be done
+	 * @return Returns the number of total SLA violations in all datacenters given by @datacenterList
+	 * 		   If > 0, we have violations
 	 */
 	public int getCurrentSLAViolsations(int minute, ArrayList<DataCenter> datacenterList) {
 		int violations = 0;
