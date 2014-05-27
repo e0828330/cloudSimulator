@@ -3,6 +3,8 @@ package simulation;
 import algorithms.DataCenterMigration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import lombok.Data;
@@ -63,35 +65,66 @@ public class ElasticityManager {
 	 */
 	public int getCurrentSLAViolsations(int minute) {
 		int violations = 0;
+		// Stores if a PM has violations
+		HashMap<PhysicalMachine, Boolean> violationMapMemory = new HashMap<PhysicalMachine, Boolean>();
+		HashMap<PhysicalMachine, Boolean> violationMapCPUs = new HashMap<PhysicalMachine, Boolean>();
+		HashMap<PhysicalMachine, Boolean> violationMapNetwork = new HashMap<PhysicalMachine, Boolean>();
+		
 		ArrayList<ServiceLevelAgreement> slaList = new ArrayList<ServiceLevelAgreement>();
-		// Get all slas in our system
+		
+		// Get all slas in our system and store if pms are violated
 		for (DataCenter dc : dataCenters) {
 			slaList = dc.getSLAs();
+			for (PhysicalMachine pm : dc.getPhysicalMachines()) {
+				if (!violationMapMemory.containsKey(pm)) {
+					violationMapMemory.put(pm, Utils.PMMemoryIsViolated(pm));
+				}
+				if (!violationMapCPUs.containsKey(pm)) {
+					violationMapCPUs.put(pm, Utils.PMCPUsIsViolated(pm));
+				}
+				if (!violationMapNetwork.containsKey(pm)) {
+					violationMapNetwork.put(pm, Utils.PMBandwidthIsViolated(pm));
+				}				
+			}
 		}
 		
 		for (ServiceLevelAgreement sla : slaList) {
-			int cpus = 0;
-			int bandwidth = 0;
-			int memory = 0;
-			int size = 0;
 			double downtime = sla.getDownTimeInPercent(minute);
 			
-			// Get all VMs for each SLA
-			for (VirtualMachine vm : sla.getVms()) {
-				if (vm.isOnline()) {
-					cpus += vm.getCpus();
-					bandwidth += vm.getBandwidth();
-					memory += vm.getMemory();
-					size += vm.getSize();
-				}
-			}
-			
-			if (downtime > sla.getMaxDowntime() ||
-				cpus < sla.getCpus() ||
-				bandwidth < sla.getBandwidth() || 
-				memory < sla.getMemory() ||
-				size < sla.getSize()) {
+			// Downtime is violated
+			if (downtime > sla.getMaxDowntime()) {
 				violations++;
+				continue;
+			}
+
+			// Now iterate through the SLAs and check if they are violated
+			
+			// Memory
+			int slaMemory = sla.getMemory();	
+			double assignedUsedMemory = 0.;
+
+			boolean allVMsHaveFullMemoryLoad = false;
+			for (VirtualMachine vm : sla.getVms()) {
+				if (vm.isOnline() == false) continue;
+				assignedUsedMemory += vm.getUsedMemory() * vm.getMemory();
+				allVMsHaveFullMemoryLoad = allVMsHaveFullMemoryLoad && (vm.getUsedMemory() >= 1.); // if this vm has full memory load
+			}
+	
+			if (allVMsHaveFullMemoryLoad && assignedUsedMemory < slaMemory) {
+				// Memory of sla is violated because the load of all vms is 100% and the memory of the vms assigned < SLA
+				violations++;
+			}
+			else if (allVMsHaveFullMemoryLoad) {
+				// All vms of this sla have full load, but the SLA is not yet violated.
+				// Now check if one PM where the vms are running is overloaded, if yes, we have a violation (swapping)
+				boolean isViolated = false;
+				for (VirtualMachine vm : sla.getVms()) {
+					isViolated |= violationMapMemory.get(vm.getPm());
+				}
+				// This SLA is violated in memory
+				if (isViolated) {
+					violations++;
+				}
 			}
 		}
 		return violations;
