@@ -213,12 +213,12 @@ public class SLAViolationsTest {
 		vm1.setUsedCPUs(1.);
 		vm2.setUsedCPUs(1.);
 
-		//em.simulate(1);
-		//assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		em.simulate(1);
+		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
 		
-		//sla1.setCpus(vm1.getCpus() + vm2.getCpus());
-		//em.simulate(2);
-		//assertEquals(0, algorithm.getCurrentSLAViolsations(2, tmp));
+		sla1.setCpus(vm1.getCpus() + vm2.getCpus());
+		em.simulate(2);
+		assertEquals(0, algorithm.getCurrentSLAViolsations(2, tmp));
 		
 
 		
