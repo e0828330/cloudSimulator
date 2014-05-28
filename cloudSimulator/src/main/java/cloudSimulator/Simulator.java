@@ -21,7 +21,7 @@ import utils.Utils;
 import cloudSimulator.weather.Forecast;
 
 @Configuration
-@ComponentScan({"cloudSimulator", "simulation"})
+@ComponentScan({"cloudSimulator", "simulation", "algorithms"})
 @EnableAutoConfiguration
 public class Simulator implements CommandLineRunner {
 

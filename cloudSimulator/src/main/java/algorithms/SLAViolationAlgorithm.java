@@ -3,12 +3,15 @@ package algorithms;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.springframework.stereotype.Service;
+
 import model.PhysicalMachine;
 import model.ServiceLevelAgreement;
 import model.VirtualMachine;
 import simulation.DataCenter;
 import utils.Utils;
 
+@Service
 public class SLAViolationAlgorithm {
 
 	/**

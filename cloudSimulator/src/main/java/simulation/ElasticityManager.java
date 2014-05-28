@@ -1,21 +1,20 @@
 package simulation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import lombok.Data;
 import model.DataPoint;
-import model.ServiceLevelAgreement;
 import model.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import utils.Utils;
 import algorithms.DataCenterMigration;
+import algorithms.SLAViolationAlgorithm;
 
 @Data
 @Service
@@ -33,6 +32,9 @@ public class ElasticityManager {
 	private ArrayList<DataPoint> slaCostList = new ArrayList<DataPoint>(8760);
 	
 	private int hour = 0;
+	
+	@Autowired
+	private SLAViolationAlgorithm slaViolations;
 
 	/**
 	 * 
@@ -70,7 +72,7 @@ public class ElasticityManager {
 			for (DataCenter dc : dataCenters) {
 				energyCosts += dc.getCurrentEnergyCosts(minute);
 			}
-			double slaCosts = getCurrentSLAViolsations(minute) * costsPerViolation;
+			double slaCosts = slaViolations.getCurrentSLAViolsations(minute, (ArrayList<DataCenter>) dataCenters) * costsPerViolation;
 			energyCostList.add(new DataPoint(hour, energyCosts));
 			slaCostList.add(new DataPoint(hour, slaCosts));
 			hour++;
