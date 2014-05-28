@@ -251,5 +251,57 @@ public class Utils {
     }
     
     
+    
+    /**
+     * Checks if the physical machine @pm has less memory than used by the vms running on it
+     * @param pm
+     * @return
+     */
+    public static boolean PMMemoryIsViolated(PhysicalMachine pm) {
+    	ArrayList<VirtualMachine> onlineVMs = pm.getOnlineVMs();
+		double usedVMMemory = 0.;
+		for (VirtualMachine vm : onlineVMs) {
+			usedVMMemory += vm.getUsedMemory() * vm.getMemory();
+		}
+		if (usedVMMemory > pm.getMemory()) {
+			return true;
+		}
+    	return false;
+    }
+    
+    /**
+     * Checks if the physical machine @pm has less cpus than used by the vms running on it
+     * @param pm
+     * @return
+     */    
+    public static boolean PMCPUsIsViolated(PhysicalMachine pm) {
+    	ArrayList<VirtualMachine> onlineVMs = pm.getOnlineVMs();
+		double usedVMCPUs = 0.;
+		for (VirtualMachine vm : onlineVMs) {
+			usedVMCPUs += vm.getUsedCPUs() * vm.getCpus();
+		}
+		if (usedVMCPUs > pm.getCpus()) {
+			return true;
+		}
+    	return false;
+    } 
+    
+    /**
+     * Checks if the physical machine @pm has less bandwidth than used by the vms running on it
+     * @param pm
+     * @return
+     */    
+    public static boolean PMBandwidthIsViolated(PhysicalMachine pm) {
+    	ArrayList<VirtualMachine> onlineVMs = pm.getOnlineVMs();
+		double usedVMBandwidth = 0.;
+		for (VirtualMachine vm : onlineVMs) {
+			usedVMBandwidth += vm.getUsedBandwidth() * vm.getBandwidth();
+		}
+		if (usedVMBandwidth > pm.getBandwidth()) {
+			return true;
+		}
+    	return false;
+    }     
+    
 
 }

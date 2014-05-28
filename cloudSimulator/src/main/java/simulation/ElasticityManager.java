@@ -1,6 +1,8 @@
 package simulation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import lombok.Data;
@@ -74,57 +76,4 @@ public class ElasticityManager {
 			hour++;
 		}
 	}
-
-	/**
-	 * TODO: Downtime??
-	 * Returns the current SLA violations for this PM
-	 * 
-	 * @return
-	 */
-	public int getCurrentSLAViolsations(int minute) {
-		int violations = 0;
-		ArrayList<ServiceLevelAgreement> slaList = new ArrayList<ServiceLevelAgreement>();
-		// Get all slas in our system
-		for (DataCenter dc : dataCenters) {
-			slaList = dc.getSLAs();
-		}
-		
-		logger.trace("SLAList = " + slaList.size());
-		
-		for (ServiceLevelAgreement sla : slaList) {
-			int cpus = 0;
-			int bandwidth = 0;
-			int memory = 0;
-			int size = 0;
-			double downtime = sla.getDownTimeInPercent(minute);
-			
-			logger.trace("VMS SIZE = " + sla.getVms().size());
-			
-			// Get all VMs for each SLA
-			for (VirtualMachine vm : sla.getVms()) {
-				if (vm.isOnline()) {
-					cpus += vm.getCpus();
-					bandwidth += vm.getBandwidth();
-					memory += vm.getMemory();
-					size += vm.getSize();
-				}
-			}
-
-			logger.trace(downtime + " > " + sla.getMaxDowntime());
-			logger.trace(cpus + " < " + sla.getCpus());
-			logger.trace(bandwidth + " < " + sla.getBandwidth());
-			logger.trace(memory + " < " + sla.getMemory());
-			logger.trace(size + " < " + sla.getSize());
-			
-			if (downtime > sla.getMaxDowntime() ||
-				cpus < sla.getCpus() ||
-				bandwidth < sla.getBandwidth() || 
-				memory < sla.getMemory() ||
-				size < sla.getSize()) {
-				violations++;
-			}
-		}
-		return violations;
-	}
-
 }
