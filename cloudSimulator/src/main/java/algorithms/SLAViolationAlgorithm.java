@@ -57,7 +57,7 @@ public class SLAViolationAlgorithm {
 			
 			// Memory	
 			double assignedUsedMemory = 0.;
-			boolean allVMsHaveFullMemoryLoad = false;
+			boolean allVMsHaveFullMemoryLoad = true;
 			
 			for (VirtualMachine vm : sla.getVms()) {
 				if (vm.isOnline() == false) continue;
@@ -85,7 +85,7 @@ public class SLAViolationAlgorithm {
 			
 			// CPUs
 			double assignedUsedCPUs = 0.;
-			boolean allVMsHaveFullCPULoad = false;
+			boolean allVMsHaveFullCPULoad = true;
 			
 			for (VirtualMachine vm : sla.getVms()) {
 				if (vm.isOnline() == false) continue;
@@ -112,7 +112,7 @@ public class SLAViolationAlgorithm {
 			
 			// Bandwidth
 			double assignedUsedBandwidth = 0.;
-			boolean allVMsHaveFullBandwidthLoad = false;
+			boolean allVMsHaveFullBandwidthLoad = true;
 			
 			for (VirtualMachine vm : sla.getVms()) {
 				if (vm.isOnline() == false) continue;
@@ -137,6 +137,7 @@ public class SLAViolationAlgorithm {
 				}
 			}			
 		}
+
 		return violations;
 	}
 }
