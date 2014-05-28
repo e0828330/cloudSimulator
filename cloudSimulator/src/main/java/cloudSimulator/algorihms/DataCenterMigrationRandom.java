@@ -1,6 +1,7 @@
 package cloudSimulator.algorihms;
 
 import algorithms.DataCenterMigration;
+import cloudSimulator.ConfigParser;
 import cloudSimulator.weather.Forecast;
 import cloudSimulator.weather.Weather;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 import model.PhysicalMachine;
 import model.VirtualMachine;
@@ -28,8 +30,15 @@ public class DataCenterMigrationRandom implements DataCenterMigration {
 
   @Autowired
   private Forecast forecastService;
+  
+  @Autowired
+  private ConfigParser cp;
+  
+  private Random generator;
 
   public void manageVirtualMachines(ElasticityManager em, int minute) {
+    generator = new Random(cp.getRandomSeed());
+    
     currentEnergyPrices = new TreeMap<Double, DataCenter>();
     Date currentTime = Utils.getCurrentTime(minute);
     double costs = 0.;
@@ -69,11 +78,11 @@ public class DataCenterMigrationRandom implements DataCenterMigration {
     for (Map.Entry<Double, DataCenter> entry : map.descendingMap().entrySet()) {
       dc = entry.getValue();
       if (dc.getPhysicalMachines().size() > 0) {
-        int randomPM = 0 + (int) (Math.random() * (dc.getPhysicalMachines().size() - 1));
-        PhysicalMachine pm = dc.getPhysicalMachines().get(randomPM);
+        int randomPM = generator.nextInt(dc.getPhysicalMachines().size())-1;
+        PhysicalMachine pm = dc.getPhysicalMachines().get(randomPM >= 0 ? randomPM : 0);
         if (pm.getVirtualMachines().size() > 0) {
-          int randomVM = 0 + (int) (Math.random() * (pm.getVirtualMachines().size() - 1));
-          vmRand = pm.getVirtualMachines().get(randomVM);
+          int randomVM = generator.nextInt(pm.getVirtualMachines().size())-1;
+          vmRand = pm.getVirtualMachines().get(randomVM >= 0 ? randomVM : 0);
           break;
         }
 
@@ -92,7 +101,7 @@ public class DataCenterMigrationRandom implements DataCenterMigration {
   public DataCenter findDataCenterToMigrateTo(TreeMap<Double, DataCenter> map, VirtualMachine vm) {
     DataCenter dc = null;
     List<Double> keys = new ArrayList<Double>(map.keySet());
-    Collections.shuffle(keys);
+    Collections.shuffle(keys, generator);
     
     
     for (Double o : keys) {

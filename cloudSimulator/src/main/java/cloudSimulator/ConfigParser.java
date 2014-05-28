@@ -63,6 +63,8 @@ public class ConfigParser {
 	public DataCenterMigration getMigrationAlgorithm() {
 		return migrationAlgorithm;
 	}
+  
+  private Long randomSeed; 
 
 	/**
 	 * Returns the NormalDistribution of the mean and sd values given by @key in
@@ -187,6 +189,10 @@ public class ConfigParser {
 		}
 	}
 
+  public Long getRandomSeed(){
+    return randomSeed;
+  }
+  
 	/**
 	 * Parses the config file to setup the cloud
 	 * 
@@ -208,6 +214,12 @@ public class ConfigParser {
 		else {
 			logger.info("Generating new random config");
 		}
+    
+    if(Long.parseLong(ini.get("Random", "seed")) > 0){
+      randomSeed = Long.parseLong(ini.get("Random", "seed"));
+    }else{
+      randomSeed = System.currentTimeMillis();
+    }
 		
 		NormalDistribution vmND = getDistribution("VMs");
 		NormalDistribution slaND = getDistribution("SLAs");
