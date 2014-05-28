@@ -10,7 +10,6 @@
         <p>Please select the result files and click <strong>Visualize</strong></p>
         <label>Energy Costs Data File <input type="file" id="energyData" name="energyData" /></label><br />
         <label>SLA Costs Data File <input type="file" id="slaData" name="slaData" /></label> <br />
-        <label>Total Costs Data Fiile <input type="file" id="totalData" name="totalData"/></label> <br />
         <br />
         <input type="button" onclick="render()" value="Visualize" />
         <br /><br />
@@ -25,7 +24,7 @@ function Renderer() {
 
 Renderer.prototype.init = function () {
     /* The reference counter is needed to handle the async file loading */
-    this._refcount = 3;
+    this._refcount = 2;
     this._totalData = [];
     this._energyData = [];
     this._slaData = [];
@@ -41,13 +40,14 @@ Renderer.prototype.setSlaData = function (str) {
     this._refcount--;
 };
 
-Renderer.prototype.setTotalData = function (str) {
-    this._totalData = JSON.parse(str);
-    this._refcount--;
-};
-
 Renderer.prototype.render = function () {
     if (this._refcount == 0) {
+
+        var totalData = [];
+        for (var i = 0; i < this._energyData.length; i++) {
+            totalData.push({ x: i, y: this._energyData[i].y + this._slaData[i].y});
+        }
+
         var chart = new CanvasJS.Chart("chartContainer", {
             zoomEnabled: true,
             title: {
@@ -93,7 +93,7 @@ Renderer.prototype.render = function () {
                 showInLegend: true,
                 name: "Total Costs",
                 axisYType: "secondary",
-                dataPoints: this._totalData
+                dataPoints: totalData
             }]
         });
 
@@ -103,21 +103,13 @@ Renderer.prototype.render = function () {
 
 function render() {
     var renderer = new Renderer();
-    var totalDataFile = document.getElementById("totalData").files[0];
     var energyDataFile = document.getElementById("energyData").files[0];
     var slaDataFile = document.getElementById("slaData").files[0];
 
-    if (!slaDataFile || !energyDataFile || !totalDataFile) {
-        alert("Please select all 3 files!");
+    if (!slaDataFile || !energyDataFile) {
+        alert("Please select all two files!");
         return;
     }
-
-    var readerTotal = new FileReader();
-    readerTotal.onload = function (e) {
-        renderer.setTotalData(readerTotal.result);
-        renderer.render();
-    }
-    readerTotal.readAsText(totalDataFile);
 
     var readerEnergy = new FileReader();
     readerEnergy.onload = function (e) {
