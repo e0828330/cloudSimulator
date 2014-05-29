@@ -105,9 +105,8 @@ public class SLAViolationsTest {
 		
 		vm1.setPm(pm1);
 		vm2.setPm(pm1);
-		
-
 	}
+
 	
 	@Test
 	public void testDownTimeViolation() {
@@ -282,5 +281,18 @@ public class SLAViolationsTest {
 		em.simulate(2);
 		assertEquals(2, algorithm.getCurrentSLAViolsations(2, tmp));
 	}	
+	
+	@Test
+	public void testViolationPMOverloadedCPUs() {
+		vm1.setOnline(true);
+		vm2.setOnline(true);
+		int diff = 10;
+		vm1.setUsedCPUs(1.);
+		vm2.setUsedCPUs(1.);
+		vm1.setCpus(pm1.getCpus() - diff);
+		vm2.setCpus(diff + 1);
+		em.simulate(1);
+		assertEquals(2, algorithm.getCurrentSLAViolsations(1, tmp));
+	}
 
 }
