@@ -172,6 +172,7 @@ public class ConfigParser {
 
 			// Phsyical Machines for DataCenter
 			int numPMs = (int) pmND.sample();
+			if (numPMs < 1) numPMs = 1;
 			List<PhysicalMachine> pms = new ArrayList<PhysicalMachine>(numPMs);
 			for (int i = 0; i < numPMs; i++) {
 				PhysicalMachine pm = new PhysicalMachine();
@@ -225,6 +226,8 @@ public class ConfigParser {
 
 		int numSLAs = (int) slaND.sample();
 		int numVMs = (int) vmND.sample();
+		
+		//System.out.println("NUM VMS: " + numVMs);
 
 		// If generated data generates more SLAs than VMs, set max to VMs
 		if (numSLAs > numVMs) {
@@ -298,6 +301,9 @@ public class ConfigParser {
 	private void assignVM2PM() {
 		// Set VM -> PM
 		// Shuffle PMs to avoid clustered allocation
+		
+		System.out.println("NR PMS " + totalPMs.size());
+		System.out.println("NR VMs " + vmList.size());
 		Collections.shuffle(totalPMs);
 
 		Iterator<PhysicalMachine> PMiter = totalPMs.iterator();
@@ -311,7 +317,7 @@ public class ConfigParser {
 				if (nextVM == null) {
 					nextVM = VMiter.next();
 				}
-				if (Utils.VMfitsOnPM(pm, nextVM)) {
+				//if (Utils.VMfitsOnPM(pm, nextVM)) {
 					if (pm.getVirtualMachines().size() == 0 && nextVM.isOnline()) {
 						pm.setRunning(true);
 					}
@@ -319,9 +325,9 @@ public class ConfigParser {
 					pm.getVirtualMachines().add(nextVM);
 					VMiter.remove();
 					nextVM = null;
-				} else {
-					break;
-				}
+				//} else {
+				//	break;
+				//}
 			}
 		}
 	}

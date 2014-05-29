@@ -103,6 +103,7 @@ public class DataCenter implements Serializable {
 	 * TODO: LIVE VM Migration?
 	 */
 	private void handleMigrations(int minute) {
+		System.out.println("MIGRATION QUEUE SIZE = " + migrationQueue.size());
 		Iterator<Map.Entry<VirtualMachine, Integer>> iter = migrationQueue
 				.entrySet().iterator();
 		while (iter.hasNext()) {
@@ -117,6 +118,9 @@ public class DataCenter implements Serializable {
 					pm.getVirtualMachines().add(vm);
 					vm.setOnline(true);
 					iter.remove();
+				}
+				else {
+					// TODO:
 				}
 			}
 		}
@@ -211,6 +215,22 @@ public class DataCenter implements Serializable {
 		}
 		return tmp;
 	}
+	
+	/**
+	 * Returns a list of all PMs with state Offline
+	 * 
+	 * @return
+	 */
+	public ArrayList<PhysicalMachine> getOfflinePMs() {
+		ArrayList<PhysicalMachine> tmp = new ArrayList<PhysicalMachine>(
+				physicalMachines.size());
+		for (PhysicalMachine pm : physicalMachines) {
+			if (!pm.isRunning()) {
+				tmp.add(pm);
+			}
+		}
+		return tmp;
+	}	
 
 	/**
 	 * This function should be called, if no resources in the dc are available,
