@@ -26,9 +26,9 @@ public class DataCentertBestFit implements DataCenterManagement {
 
 	public void scaleVirtualMachines(DataCenter dc) {
 
-		scaleDC(dc, threshold);
+		//scaleDC(dc, threshold);
 
-		for (PhysicalMachine pm : dc.getPhysicalMachines()) {
+		/*for (PhysicalMachine pm : dc.getPhysicalMachines()) {
 			// First migrate by Memory, because swapping is painful
 			// if Memory usage of PM is 100%
 			if (pm.getMemoryUsage() >= 1.) {
@@ -47,7 +47,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 				logger.debug("Bandwidth > 100% in DC " + dc.getName());
 				this.migrationByBandwidthUsage(pm, dc);
 			}
-		}
+		}*/
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 		ArrayList<VirtualMachine> onlineVMs = pm.getOnlineVMs();
 		Collections.sort(onlineVMs, new Comparator<VirtualMachine>() {
 			public int compare(VirtualMachine vm1, VirtualMachine vm2) {
-				return (int) (vm1.getUsedBandwidth() * 100 - vm2.getUsedBandwidth() * 100);
+				return Double.compare(vm1.getUsedBandwidth(), vm2.getUsedBandwidth());
 
 			}
 		});
@@ -208,7 +208,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 		ArrayList<VirtualMachine> onlineVMs = pm.getOnlineVMs();
 		Collections.sort(onlineVMs, new Comparator<VirtualMachine>() {
 			public int compare(VirtualMachine vm1, VirtualMachine vm2) {
-				return (int) (vm1.getUsedMemory() * 100 - vm2.getUsedMemory() * 100);
+				return Double.compare(vm1.getUsedMemory(), vm2.getUsedMemory());
 
 			}
 		});
@@ -256,7 +256,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 		ArrayList<VirtualMachine> onlineVMs = pm.getOnlineVMs();
 		Collections.sort(onlineVMs, new Comparator<VirtualMachine>() {
 			public int compare(VirtualMachine vm1, VirtualMachine vm2) {
-				return (int) (vm1.getUsedCPUs() * 100 - vm2.getUsedCPUs() * 100);
+				return Double.compare(vm1.getUsedCPUs(), vm2.getUsedCPUs());
 
 			}
 		});

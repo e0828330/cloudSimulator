@@ -328,7 +328,7 @@ public class ConfigParser {
 				if (nextVM == null) {
 					nextVM = VMiter.next();
 				}
-				//if (Utils.VMfitsOnPM(pm, nextVM)) {
+				if (Utils.VMfitsOnPM(pm, nextVM)) {
 					if (pm.getVirtualMachines().size() == 0 && nextVM.isOnline()) {
 						pm.setRunning(true);
 					}
@@ -336,9 +336,9 @@ public class ConfigParser {
 					pm.getVirtualMachines().add(nextVM);
 					VMiter.remove();
 					nextVM = null;
-				//} else {
-				//	break;
-				//}
+				} else {
+					break;
+				}
 			}
 		}
 	}

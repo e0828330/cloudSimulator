@@ -65,6 +65,7 @@ public class SLAViolationAlgorithm {
 			}
 		}
 		
+		
 		for (ServiceLevelAgreement sla : slaList) {
 			double downtime = sla.getDownTimeInPercent(minute);
 			// Downtime is violated
@@ -74,6 +75,8 @@ public class SLAViolationAlgorithm {
 			}
 
 			// Now iterate through the SLAs and check if they are violated
+			
+			System.err.println("BLA VIOLATION");
 			
 			// Memory	
 			double assignedUsedMemory = 0.;

@@ -26,7 +26,7 @@ public class ElasticityManager {
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
 	
 	/* TODO: Move to config */
-	private final int costsPerViolation = 10;
+	private final double costsPerViolation = 10.;
 
 	private ArrayList<DataPoint> energyCostList = new ArrayList<DataPoint>(8760);
 	private ArrayList<DataPoint> slaCostList = new ArrayList<DataPoint>(8760);
@@ -64,7 +64,8 @@ public class ElasticityManager {
 		for (DataCenter dc : dataCenters) {
 			dc.simulate(minute);
 		}
-
+		slaViolations.updateSLAViolsations(minute, (ArrayList<DataCenter>) dataCenters);
+		
 		/* Run the algorithm once per hour */
 		if ((minute % 60) == 0) {
 			algorithm.manageVirtualMachines(this, minute);
@@ -72,11 +73,11 @@ public class ElasticityManager {
 			for (DataCenter dc : dataCenters) {
 				energyCosts += dc.getCurrentEnergyCosts(minute);
 			}
-			slaViolations.updateSLAViolsations(minute, (ArrayList<DataCenter>) dataCenters);
-			double slaCosts = slaViolations.getViolations() * costsPerViolation;
+			double slaCosts = (double)slaViolations.getViolations() * costsPerViolation;
 			energyCostList.add(new DataPoint(hour, energyCosts));
 			slaCostList.add(new DataPoint(hour, slaCosts));
 			hour++;
+			slaViolations.reset();
 		}
 	}
 }
