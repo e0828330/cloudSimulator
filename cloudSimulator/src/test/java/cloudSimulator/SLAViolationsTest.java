@@ -10,6 +10,11 @@ import model.VirtualMachine;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import simulation.DataCenter;
 import simulation.ElasticityManager;
@@ -17,21 +22,23 @@ import algorithms.DataCenterManagement;
 import algorithms.DataCenterMigration;
 import algorithms.SLAViolationAlgorithm;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(loader=AnnotationConfigContextLoader.class, classes={Simulator.class})
 public class SLAViolationsTest {
 
-	private static ElasticityManager em;
-	private static DataCenter dc;
-	private static PhysicalMachine pm1;
-	private static VirtualMachine vm1;
-	private static VirtualMachine vm2;
-	private static ServiceLevelAgreement sla1;
-	private static ServiceLevelAgreement sla2;
-	private static SLAViolationAlgorithm algorithm;
-	private static ArrayList<DataCenter> tmp;
+	@Autowired
+	private ElasticityManager em;
+	private DataCenter dc;
+	private PhysicalMachine pm1;
+	private VirtualMachine vm1;
+	private VirtualMachine vm2;
+	private ServiceLevelAgreement sla1;
+	private ServiceLevelAgreement sla2;
+	private SLAViolationAlgorithm algorithm;
+	private ArrayList<DataCenter> tmp;
 	
 	@Before
 	public void initialize() {
-		em = new ElasticityManager();
 		dc = new DataCenter();
 		pm1 = new PhysicalMachine();
 		vm1 = new VirtualMachine();
