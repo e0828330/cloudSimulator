@@ -53,11 +53,14 @@ public class DataCenter implements Serializable {
     @Transient
     private Forecast forecastService;
     
+    int currentTime = 0;
+    
     /**
      * Gets called on every simulated minute. Here VM allocation and load
      * updating should be done
      */
     public void simulate(int minute) {
+    	currentTime = minute;
         handleMigrations(minute);
         for (PhysicalMachine pm : physicalMachines) {
             if (pm.isRunning()) {
@@ -93,7 +96,7 @@ public class DataCenter implements Serializable {
 	 * @param targetTime
 	 */
 	public void queueAddVirtualMachine(VirtualMachine vm, int targetTime) {
-		migrationQueue.put(vm, targetTime);
+		migrationQueue.put(vm, currentTime + targetTime);
 	}
 
 	/**
@@ -103,7 +106,6 @@ public class DataCenter implements Serializable {
 	 * TODO: LIVE VM Migration?
 	 */
 	private void handleMigrations(int minute) {
-		System.out.println("MIGRATION QUEUE SIZE = " + migrationQueue.size());
 		Iterator<Map.Entry<VirtualMachine, Integer>> iter = migrationQueue
 				.entrySet().iterator();
 		while (iter.hasNext()) {
@@ -111,17 +113,12 @@ public class DataCenter implements Serializable {
 			if (entry.getValue() >= minute) {
 				VirtualMachine vm = entry.getKey();
 				PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
-				if (pm != null) {
+					iter.remove();
 					if (pm.isRunning() == false) {
 						pm.setRunning(true);
 					}
 					pm.getVirtualMachines().add(vm);
 					vm.setOnline(true);
-					iter.remove();
-				}
-				else {
-					// TODO:
-				}
 			}
 		}
 	}

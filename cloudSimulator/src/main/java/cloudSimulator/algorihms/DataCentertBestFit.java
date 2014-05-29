@@ -62,10 +62,6 @@ public class DataCentertBestFit implements DataCenterManagement {
 	 * @param threshold
 	 */
 	private void scaleDC(DataCenter dc, double threshold) {
-		System.out.println("_____________________________________________");
-		System.out.println(dc.getName());
-		System.out.println("Online PMs: " + dc.getOnlinePMs().size());
-		System.out.println("Offline PMs: " + dc.getOfflinePMs().size());
 		ArrayList<VirtualMachine> totalOnlineVMList = new ArrayList<VirtualMachine>(
 				128);
 		ArrayList<VirtualMachine> totalOfflineVMList = new ArrayList<VirtualMachine>(
@@ -101,9 +97,6 @@ public class DataCentertBestFit implements DataCenterManagement {
 		Utils.orderVMsByPriorityAscending(totalOnlineVMList);
 		int size = totalOnlineVMList.size();
 
-		
-		System.out.println("Offline vms total: " + totalOfflineVMList.size());
-		System.out.println("Online vms total: " + totalOnlineVMList.size());
 		while (dcUsedBandwidth / dcTotalBandwidth > threshold
 				|| dcUsedCPUs / dcTotalCPUs > threshold
 				|| dcUsedMemory / dcTotalMemory > threshold) {
@@ -117,7 +110,6 @@ public class DataCentertBestFit implements DataCenterManagement {
 			dcUsedCPUs -= vm.getCpus() * vm.getUsedCPUs();
 			dcUsedMemory -= vm.getMemory() * vm.getUsedMemory();
 			size--;
-			System.out.println("Datacenter intern: Set VM running false.");
 		}
 
 		// Turn on offline vms if they fit
@@ -144,8 +136,6 @@ public class DataCentertBestFit implements DataCenterManagement {
 					vm.getPm().setRunning(true);
 				}
 				vm.setOnline(true);
-				System.out.println("Datacenter intern: Set VM running true.");
-
 			}
 			dcUsedBandwidth += nextVMBandwidth;
 			dcUsedCPUs += nextVMCPUs;
