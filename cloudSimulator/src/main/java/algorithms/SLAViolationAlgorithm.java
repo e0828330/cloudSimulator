@@ -3,22 +3,33 @@ package algorithms;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import lombok.Data;
 import model.PhysicalMachine;
 import model.ServiceLevelAgreement;
 import model.VirtualMachine;
 import simulation.DataCenter;
 import utils.Utils;
 
+@Data
 public class SLAViolationAlgorithm {
+	/**
+	 * This parameter [0.0-1.0] is the percentage where we set a buffer for the violations.
+	 * Normally only if we reach 100% of the resources we will get a violation. By setting this
+	 * parameter to something < 1. we can set a "buffer" by saying: we reached @threshold % of 
+	 * the resources, so rise a violation.
+	 */
+	private double threshold = 1.0;
 
 	/**
 	 * Returns the current SLA violations
 	 * If this function is called with only 1 datacenter in @datacenterList and we have violations,
 	 * an action like migrations of VMs should be done
+	 * @minute The Current minute for violation-calculation related to downtime
+	 * @datacenterList The list of datacenters where the violations may occur
 	 * @return Returns the number of total SLA violations in all datacenters given by @datacenterList
 	 * 		   If > 0, we have violations
 	 */
-	// TODO: Add 3rd parameter, threshold for setting violations before the limit of 100% is reached
+
 	public int getCurrentSLAViolsations(int minute, ArrayList<DataCenter> datacenterList) {
 		int violations = 0;
 		// Stores if a PM has violations
@@ -33,13 +44,13 @@ public class SLAViolationAlgorithm {
 			slaList = dc.getSLAs();
 			for (PhysicalMachine pm : dc.getPhysicalMachines()) {
 				if (!violationMapMemory.containsKey(pm)) {
-					violationMapMemory.put(pm, Utils.PMMemoryIsViolated(pm));
+					violationMapMemory.put(pm, Utils.PMMemoryIsViolated(pm, threshold));
 				}
 				if (!violationMapCPUs.containsKey(pm)) {
-					violationMapCPUs.put(pm, Utils.PMCPUsIsViolated(pm));
+					violationMapCPUs.put(pm, Utils.PMCPUsIsViolated(pm, threshold));
 				}
 				if (!violationMapNetwork.containsKey(pm)) {
-					violationMapNetwork.put(pm, Utils.PMBandwidthIsViolated(pm));
+					violationMapNetwork.put(pm, Utils.PMBandwidthIsViolated(pm, threshold));
 				}				
 			}
 		}

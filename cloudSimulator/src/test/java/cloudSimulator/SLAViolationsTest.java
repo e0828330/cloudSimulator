@@ -37,7 +37,7 @@ public class SLAViolationsTest {
 		vm1 = new VirtualMachine();
 		vm2 = new VirtualMachine();
 		algorithm = new SLAViolationAlgorithm();
-		
+		algorithm.setThreshold(1.);
 		em.setAlgorithm(new DataCenterMigration() {
 			
 			public void manageVirtualMachines(ElasticityManager em, int minute) {
@@ -292,6 +292,31 @@ public class SLAViolationsTest {
 		vm1.setCpus(pm1.getCpus() - diff);
 		vm2.setCpus(diff + 1);
 		em.simulate(1);
+		assertEquals(2, algorithm.getCurrentSLAViolsations(1, tmp));
+	}
+	
+	@Test
+	public void testViolationWithBuffer() {
+		vm1.setOnline(true);
+		vm2.setOnline(true);
+		vm1.setUsedCPUs(1.);
+		vm2.setUsedCPUs(1.);
+		int diff = 10;
+		vm1.setCpus(pm1.getCpus() - diff);
+		vm2.setCpus(diff);
+		
+		em.simulate(1);
+		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.setThreshold(0.9);
+		
+		assertEquals(2, algorithm.getCurrentSLAViolsations(1, tmp));
+		
+		vm1.setCpus((int) (pm1.getCpus() * 0.9 - diff));
+		vm2.setCpus(diff);
+		
+		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		
+		algorithm.setThreshold(0.89);
 		assertEquals(2, algorithm.getCurrentSLAViolsations(1, tmp));
 	}
 
