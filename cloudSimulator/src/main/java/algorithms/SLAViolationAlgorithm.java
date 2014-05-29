@@ -34,9 +34,14 @@ public class SLAViolationAlgorithm {
 	 * @return Returns the number of total SLA violations in all datacenters given by @datacenterList
 	 * 		   If > 0, we have violations
 	 */
+	
+	private int violations = 0;
 
-	public int getCurrentSLAViolsations(int minute, ArrayList<DataCenter> datacenterList) {
-		int violations = 0;
+	public void reset() {
+		this.violations = 0;
+	}
+	
+	public void updateSLAViolsations(int minute, ArrayList<DataCenter> datacenterList) {
 		// Stores if a PM has violations
 		HashMap<PhysicalMachine, Boolean> violationMapMemory = new HashMap<PhysicalMachine, Boolean>();
 		HashMap<PhysicalMachine, Boolean> violationMapCPUs = new HashMap<PhysicalMachine, Boolean>();
@@ -62,7 +67,6 @@ public class SLAViolationAlgorithm {
 		
 		for (ServiceLevelAgreement sla : slaList) {
 			double downtime = sla.getDownTimeInPercent(minute);
-			
 			// Downtime is violated
 			if (downtime > sla.getMaxDowntime()) {
 				violations++;
@@ -153,7 +157,5 @@ public class SLAViolationAlgorithm {
 				}
 			}			
 		}
-
-		return violations;
 	}
 }

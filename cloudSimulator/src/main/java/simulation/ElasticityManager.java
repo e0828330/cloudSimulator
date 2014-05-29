@@ -72,7 +72,8 @@ public class ElasticityManager {
 			for (DataCenter dc : dataCenters) {
 				energyCosts += dc.getCurrentEnergyCosts(minute);
 			}
-			double slaCosts = slaViolations.getCurrentSLAViolsations(minute, (ArrayList<DataCenter>) dataCenters) * costsPerViolation;
+			slaViolations.updateSLAViolsations(minute, (ArrayList<DataCenter>) dataCenters);
+			double slaCosts = slaViolations.getViolations() * costsPerViolation;
 			energyCostList.add(new DataPoint(hour, energyCosts));
 			slaCostList.add(new DataPoint(hour, slaCosts));
 			hour++;

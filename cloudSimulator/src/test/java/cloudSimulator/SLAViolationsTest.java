@@ -112,7 +112,9 @@ public class SLAViolationsTest {
 	public void testDownTimeViolation() {
 		pm1.setRunning(false);
 		em.simulate(1);
-		assertEquals(2, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
+		assertEquals(2, algorithm.getViolations());
 	}
 	
 	@Test
@@ -120,15 +122,22 @@ public class SLAViolationsTest {
 		vm1.setOnline(true);
 		vm2.setOnline(true);
 		em.simulate(1);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
+		assertEquals(0, algorithm.getViolations());
 		
 		vm1.setOnline(false);
 		em.simulate(2);
-		assertEquals(1, algorithm.getCurrentSLAViolsations(2, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(2, tmp);
+		assertEquals(1, algorithm.getViolations());
 		
 		vm2.setOnline(false);
 		em.simulate(3);
-		assertEquals(2, algorithm.getCurrentSLAViolsations(3, tmp));
+		
+		algorithm.reset();
+		algorithm.updateSLAViolsations(3, tmp);
+		assertEquals(2, algorithm.getViolations());
 	}	
 	
 	@Test
@@ -137,11 +146,15 @@ public class SLAViolationsTest {
 		pm1.getVirtualMachines().remove(vm2);
 		sla1.getVms().remove(vm2);
 		em.simulate(1);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
+		assertEquals(0, algorithm.getViolations());
 		
 		vm1.setOnline(false);
 		em.simulate(2);
-		assertEquals(1, algorithm.getCurrentSLAViolsations(2, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(2, tmp);
+		assertEquals(1, algorithm.getViolations());
 	}
 	
 	
@@ -156,10 +169,14 @@ public class SLAViolationsTest {
 		sla1.setMaxDowntime(0.1);
 		
 		em.simulate(1);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
+		assertEquals(0, algorithm.getViolations());
 		
 		em.simulate(2);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(2, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(2, tmp);
+		assertEquals(0, algorithm.getViolations());
 		em.simulate(3);
 		em.simulate(4);
 		em.simulate(5);
@@ -172,8 +189,10 @@ public class SLAViolationsTest {
 		em.simulate(11);
 		em.simulate(12);
 		
-	
-		assertEquals(1, algorithm.getCurrentSLAViolsations(12, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(12, tmp);
+		assertEquals(1, algorithm.getViolations());
+		
 		assertEquals(0.25, sla1.getDownTimeInPercent(12), 0.0);
 	}
 	
@@ -185,9 +204,13 @@ public class SLAViolationsTest {
 		sla1.getVms().remove(vm2);
 		
 		em.simulate(1);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
+		assertEquals(0, algorithm.getViolations());
 		em.simulate(2);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(2, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(2, tmp);
+		assertEquals(0, algorithm.getViolations());
 		em.simulate(3);
 		em.simulate(4);
 		vm1.setOnline(false);
@@ -201,7 +224,9 @@ public class SLAViolationsTest {
 
 		// 10 minutes, 1min offline = 10%, but downtime is 5%
 		sla1.setMaxDowntime(0.15);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(10, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(10, tmp);
+		assertEquals(0, algorithm.getViolations());
 		assertEquals(0.1, sla1.getDownTimeInPercent(10), 0.0);
 	}		
 	
@@ -213,17 +238,23 @@ public class SLAViolationsTest {
 		vm2.setUsedCPUs(1.);
 
 		em.simulate(1);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
+		assertEquals(0, algorithm.getViolations());
 		
 		sla1.setCpus(vm1.getCpus() + vm2.getCpus());
 		em.simulate(2);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(2, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(2, tmp);
+		assertEquals(0, algorithm.getViolations());
 		
 
 		
 		sla1.setCpus(vm1.getCpus() + vm2.getCpus() + 1); // more cpus than available
-		em.simulate(2);
-		assertEquals(1, algorithm.getCurrentSLAViolsations(2, tmp));
+		em.simulate(3);
+		algorithm.reset();
+		algorithm.updateSLAViolsations(3, tmp);
+		assertEquals(1, algorithm.getViolations());
 	}
 	
 	
@@ -235,15 +266,21 @@ public class SLAViolationsTest {
 		vm1.setUsedMemory(1.);
 		vm2.setUsedMemory(1.);
 		em.simulate(1);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
+		assertEquals(0, algorithm.getViolations());
 		
 		sla1.setMemory(vm1.getMemory() + vm2.getMemory());
 		em.simulate(2);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(2, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(2, tmp);
+		assertEquals(0, algorithm.getViolations());
 		
 		sla1.setMemory(vm1.getMemory() + vm2.getMemory() + 1);
-		em.simulate(2);
-		assertEquals(1, algorithm.getCurrentSLAViolsations(2, tmp));
+		em.simulate(3);
+		algorithm.reset();
+		algorithm.updateSLAViolsations(3, tmp);
+		assertEquals(1, algorithm.getViolations());
 	}
 	
 	@Test
@@ -253,15 +290,21 @@ public class SLAViolationsTest {
 		vm1.setUsedMemory(1.);
 		vm2.setUsedMemory(1.);
 		em.simulate(1);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.updateSLAViolsations(1, tmp);
+		algorithm.reset();
+		assertEquals(0, algorithm.getViolations());
 		
 		sla1.setMemory(vm1.getMemory() + vm2.getMemory() + 1);
 		em.simulate(2);
-		assertEquals(1, algorithm.getCurrentSLAViolsations(2, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(2, tmp);
+		assertEquals(1, algorithm.getViolations());
 		
 		sla2.setMemory(vm1.getMemory() + vm2.getMemory() + 1);
 		em.simulate(2);
-		assertEquals(2, algorithm.getCurrentSLAViolsations(2, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(3, tmp);
+		assertEquals(2, algorithm.getViolations());
 	}
 
 	@Test
@@ -271,15 +314,21 @@ public class SLAViolationsTest {
 		vm1.setUsedBandwidth(1.);
 		vm2.setUsedBandwidth(1.);
 		em.simulate(1);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.updateSLAViolsations(1, tmp);
+		algorithm.reset();
+		assertEquals(0, algorithm.getViolations());
 		
 		sla1.setBandwidth(vm1.getBandwidth() + vm2.getBandwidth() + 1);
 		em.simulate(2);
-		assertEquals(1, algorithm.getCurrentSLAViolsations(2, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(2, tmp);
+		assertEquals(1, algorithm.getViolations());
 		
 		sla2.setBandwidth(vm1.getBandwidth() + vm2.getBandwidth() + 1);
 		em.simulate(2);
-		assertEquals(2, algorithm.getCurrentSLAViolsations(2, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(3, tmp);
+		assertEquals(2, algorithm.getViolations());
 	}	
 	
 	@Test
@@ -292,7 +341,9 @@ public class SLAViolationsTest {
 		vm1.setCpus(pm1.getCpus() - diff);
 		vm2.setCpus(diff + 1);
 		em.simulate(1);
-		assertEquals(2, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
+		assertEquals(2, algorithm.getViolations());
 	}
 	
 	@Test
@@ -306,18 +357,26 @@ public class SLAViolationsTest {
 		vm2.setCpus(diff);
 		
 		em.simulate(1);
-		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
+		assertEquals(0, algorithm.getViolations());
 		algorithm.setThreshold(0.9);
 		
-		assertEquals(2, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
+		assertEquals(2, algorithm.getViolations());
 		
 		vm1.setCpus((int) (pm1.getCpus() * 0.9 - diff));
 		vm2.setCpus(diff);
 		
-		assertEquals(0, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
+		assertEquals(0, algorithm.getViolations());
 		
 		algorithm.setThreshold(0.89);
-		assertEquals(2, algorithm.getCurrentSLAViolsations(1, tmp));
+		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
+		assertEquals(2, algorithm.getViolations());
 	}
-
+	
 }

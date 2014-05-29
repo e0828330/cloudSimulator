@@ -69,15 +69,15 @@ public class DataCenter implements Serializable {
         // Check if a sla is down
         ArrayList<ServiceLevelAgreement> slaList = getSLAs();
         for (ServiceLevelAgreement sla : slaList) {
-        	boolean isDown = false;
+        	boolean allDown = false;
         	
 
         	
         	for (VirtualMachine vm : sla.getVms()) {
-        		isDown |= vm.isOnline();
+        		allDown |= vm.isOnline();
         	}
  
-        	if (!isDown) {
+        	if (!allDown) {
         		sla.incrementDowntime();
         	}
         }
