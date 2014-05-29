@@ -27,6 +27,7 @@ import utils.Utils;
 import algorithms.DataCenterManagement;
 import algorithms.DataCenterMigration;
 import cloudSimulator.repo.DataCenterRepository;
+import cloudSimulator.repo.VirtualMachineRepository;
 import cloudSimulator.weather.Forecast;
 import cloudSimulator.weather.Location;
 
@@ -48,6 +49,9 @@ public class ConfigParser {
 
 	@Autowired
 	private DataCenterRepository repo;
+	
+	@Autowired
+	private VirtualMachineRepository vmRepo;
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -288,8 +292,15 @@ public class ConfigParser {
 	 * Saves the datacenter list to the database
 	 */
 	private void saveToDB() {
-		mongoTemplate.remove(new Query(), "dataCenter");
+		repo.deleteAll();
+		vmRepo.deleteAll();
+		
 		for (DataCenter dc : dataCenters) {
+			for(PhysicalMachine pm : dc.getPhysicalMachines()) {
+				for (VirtualMachine vm : pm.getVirtualMachines()) {
+					vmRepo.save(vm);
+				}
+			}
 			repo.save(dc);
 		}
 		logger.info("Saved data to database.");
