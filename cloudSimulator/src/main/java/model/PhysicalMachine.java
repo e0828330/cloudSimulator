@@ -131,5 +131,19 @@ public class PhysicalMachine implements Serializable {
 			}
 		}
 		return tmp;
+	}
+	
+	/**
+	 * Returns a list of all VMs with state Online
+	 * @return
+	 */
+	public ArrayList<VirtualMachine> getOfflineVMs() {
+		ArrayList<VirtualMachine> tmp = new ArrayList<VirtualMachine>(virtualMachines.size());
+		for (VirtualMachine vm : virtualMachines) {
+			if (!vm.isOnline()) {
+				tmp.add(vm);
+			}
+		}
+		return tmp;
 	}	
 }

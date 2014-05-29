@@ -28,7 +28,7 @@ public class Utils {
 	 * 
 	 * @param vmList
 	 */
-	public static void orderVMsByPriority(List<VirtualMachine> vmList) {
+	public static void orderVMsByPriorityDescending(List<VirtualMachine> vmList) {
 		Collections.sort(vmList, new Comparator<VirtualMachine>() {
 			public int compare(VirtualMachine vm1, VirtualMachine vm2) {
 				if (vm1.getSla() == null && vm2.getSla() == null) {
@@ -41,6 +41,26 @@ public class Utils {
 			}
 		});
 	}
+	
+	/**
+	 * Sorts the given list @vmList by priority ascending (Lowest priority
+	 * first).
+	 * 
+	 * @param vmList
+	 */
+	public static void orderVMsByPriorityAscending(List<VirtualMachine> vmList) {
+		Collections.sort(vmList, new Comparator<VirtualMachine>() {
+			public int compare(VirtualMachine vm1, VirtualMachine vm2) {
+				if (vm1.getSla() == null && vm2.getSla() == null) {
+					return 0;
+				}
+				if (vm1.getSla() != null && vm2.getSla() != null) {
+					return vm1.getSla().getPriority() - vm2.getSla().getPriority();
+				}
+				return 0;
+			}
+		});
+	}	
 
 	/**
 	 * Checks if the virtual machine @vm has place on the physical machine @pm

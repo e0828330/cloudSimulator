@@ -244,7 +244,7 @@ public class DataCenter implements Serializable {
 			
 			// Get copy of vms running
 			ArrayList<VirtualMachine> vms = new ArrayList<VirtualMachine>(pm.getOnlineVMs());
-			Utils.orderVMsByPriority(vms);
+			Utils.orderVMsByPriorityDescending(vms);
 			
 			// get resources of current VMs running on PM
 			double currentMemory = Utils.getVMsMemory(vms);

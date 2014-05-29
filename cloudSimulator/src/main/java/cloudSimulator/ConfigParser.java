@@ -239,7 +239,7 @@ public class ConfigParser {
 		this.initPMs();
 
 		// Order VMs by priority
-		Utils.orderVMsByPriority(vmList);
+		Utils.orderVMsByPriorityDescending(vmList);
 
 		// Assignment
 		this.assignVM2PM();
