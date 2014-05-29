@@ -185,8 +185,8 @@ public class DataCentertBestFit implements DataCenterManagement {
 			// Migrate
 			for (VirtualMachine migVM : migrationList) {
 				// Remove from physical machine
-				pm.getVirtualMachines().remove(migVM);
-				migVM.setOnline(false);
+				//pm.getVirtualMachines().remove(migVM);
+				//migVM.setOnline(false);
 				dc.queueAddVirtualMachine(migVM,
 						Utils.getMigrationTime(
 								pm.getBandwidth()
@@ -235,8 +235,8 @@ public class DataCentertBestFit implements DataCenterManagement {
 			// Migrate
 			for (VirtualMachine migVM : migrationList) {
 				// Remove from physical machine
-				pm.getVirtualMachines().remove(migVM);
-				migVM.setOnline(false);
+				//pm.getVirtualMachines().remove(migVM);
+				//migVM.setOnline(false);
 				dc.queueAddVirtualMachine(migVM,
 						Utils.getMigrationTime(
 								pm.getBandwidth()
@@ -282,8 +282,8 @@ public class DataCentertBestFit implements DataCenterManagement {
 			// Migrate
 			for (VirtualMachine migVM : migrationList) {
 				// Remove from physical machine
-				pm.getVirtualMachines().remove(migVM);
-				migVM.setOnline(false);
+				//pm.getVirtualMachines().remove(migVM);
+				//migVM.setOnline(false);
 				dc.queueAddVirtualMachine(migVM,
 						Utils.getMigrationTime(
 								pm.getBandwidth()

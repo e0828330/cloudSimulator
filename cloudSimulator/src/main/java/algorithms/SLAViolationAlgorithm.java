@@ -79,7 +79,9 @@ public class SLAViolationAlgorithm {
 			double assignedUsedMemory = 0.;
 			boolean allVMsHaveFullMemoryLoad = true;
 			
-			for (VirtualMachine vm : sla.getVms()) {
+			ArrayList<VirtualMachine> tmpVMList = sla.getVms();
+			
+			for (VirtualMachine vm : tmpVMList) {
 				if (vm.isOnline() == false) continue;
 				assignedUsedMemory += vm.getUsedMemory() * vm.getMemory();
 				allVMsHaveFullMemoryLoad = allVMsHaveFullMemoryLoad && (vm.getUsedMemory() >= 1.); // if this vm has full memory load
@@ -93,7 +95,7 @@ public class SLAViolationAlgorithm {
 				// All vms of this sla have full load, but the SLA is not yet violated.
 				// Now check if one PM where the vms are running is overloaded, if yes, we have a violation (swapping)
 				boolean isViolated = false;
-				for (VirtualMachine vm : sla.getVms()) {
+				for (VirtualMachine vm : tmpVMList) {
 					isViolated |= violationMapMemory.get(vm.getPm());
 				}
 				// This SLA is violated in memory
@@ -107,7 +109,7 @@ public class SLAViolationAlgorithm {
 			double assignedUsedCPUs = 0.;
 			boolean allVMsHaveFullCPULoad = true;
 			
-			for (VirtualMachine vm : sla.getVms()) {
+			for (VirtualMachine vm : tmpVMList) {
 				if (vm.isOnline() == false) continue;
 				assignedUsedCPUs += vm.getUsedCPUs() * vm.getCpus();
 				allVMsHaveFullCPULoad = allVMsHaveFullCPULoad && (vm.getUsedCPUs() >= 1.); // if this vm has full cpu load
@@ -121,7 +123,7 @@ public class SLAViolationAlgorithm {
 				// All vms of this sla have full load, but the SLA is not yet violated.
 				// Now check if one PM where the vms are running is overloaded, if yes, we have a violation
 				boolean isViolated = false;
-				for (VirtualMachine vm : sla.getVms()) {
+				for (VirtualMachine vm : tmpVMList) {
 					isViolated |= violationMapCPUs.get(vm.getPm());
 				}
 				// This SLA is violated in cpus
@@ -134,7 +136,7 @@ public class SLAViolationAlgorithm {
 			double assignedUsedBandwidth = 0.;
 			boolean allVMsHaveFullBandwidthLoad = true;
 			
-			for (VirtualMachine vm : sla.getVms()) {
+			for (VirtualMachine vm : tmpVMList) {
 				if (vm.isOnline() == false) continue;
 				assignedUsedBandwidth += vm.getUsedBandwidth() * vm.getBandwidth();
 				allVMsHaveFullBandwidthLoad = allVMsHaveFullBandwidthLoad && (vm.getUsedBandwidth() >= 1.); // if this vm has full bandwidth load
@@ -148,7 +150,7 @@ public class SLAViolationAlgorithm {
 				// All vms of this sla have full load, but the SLA is not yet violated.
 				// Now check if one PM where the vms are running is overloaded, if yes, we have a violation
 				boolean isViolated = false;
-				for (VirtualMachine vm : sla.getVms()) {
+				for (VirtualMachine vm : tmpVMList) {
 					isViolated |= violationMapNetwork.get(vm.getPm());
 				}
 				// This SLA is violated in networkbandwidth
