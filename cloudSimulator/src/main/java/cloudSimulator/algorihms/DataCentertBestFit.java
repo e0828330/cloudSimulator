@@ -3,9 +3,6 @@ package cloudSimulator.algorihms;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
 
 import lombok.Data;
 import model.PhysicalMachine;
@@ -328,7 +325,6 @@ public class DataCentertBestFit implements DataCenterManagement {
 				if (Utils.getFutureEnergyConsumption(pm, vm) < Utils
 						.getFutureEnergyConsumption(result, vm)) {
 					result = pm;
-					continue;
 				}
 			}
 		}

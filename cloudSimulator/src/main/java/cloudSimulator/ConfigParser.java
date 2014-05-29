@@ -116,12 +116,17 @@ public class ConfigParser {
 		Iterator<ServiceLevelAgreement> iter = slaList.iterator();
 		for (int i = 0; i < numVMs; i++) {
 			VirtualMachine vm = new VirtualMachine();
-
-			if (iter.hasNext()) {
+			
+			if (!iter.hasNext()) {
+				iter = slaList.iterator();
+			}
+			
+			//if (iter.hasNext()) {
 				ServiceLevelAgreement sla = iter.next();
-				iter.remove();
+				//iter.remove();
 				sla.getVms().add(vm);
 				vm.setSla(sla);
+				
 				vm.setBandwidth((int) (sla.getBandwidth()));
 				int initCPUS = (int) (sla.getCpus());
 				vm.setCpus(initCPUS < 1 ? 1 : initCPUS);
@@ -129,9 +134,9 @@ public class ConfigParser {
 				vm.setMemory(initMemory < 1 ? 1 : initMemory);
 				vm.setOnline(true);
 				vm.setSize((int) (sla.getSize()));
-			} else {
+			/*} else {
 				vm.setOnline(false);
-			}
+			}*/
 			vm.buildLoadMaps();
 			vmList.add(vm);
 		}

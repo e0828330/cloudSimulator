@@ -71,12 +71,7 @@ public class DataCenter implements Serializable {
         for (ServiceLevelAgreement sla : slaList) {
         	boolean isDown = false;
         	
-        	/*
-        	 * TODO: MARTIN FIX THAT! ... NullPointerException ...
-        	 */
-        	if (1 > 0) {
-        		break;
-        	}
+
         	
         	for (VirtualMachine vm : sla.getVms()) {
         		isDown |= vm.isOnline();

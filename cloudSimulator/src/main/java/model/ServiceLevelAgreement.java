@@ -9,8 +9,10 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(exclude={"vms"})
 public class ServiceLevelAgreement implements Serializable {
 	/**
 	 * 
