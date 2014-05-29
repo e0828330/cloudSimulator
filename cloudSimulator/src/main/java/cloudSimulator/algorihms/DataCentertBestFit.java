@@ -205,7 +205,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 			}
 		}
 		if (result == null) {
-			// TODO: Shut down one VM with lower prio
+			// Shut down one VM with lower prio
 			ConcurrentHashMap<PhysicalMachine, ArrayList<VirtualMachine>> map = dc.getPMWithLowerPriorityVMList(dc, vm);
 			if (map == null) {
 				return null;
