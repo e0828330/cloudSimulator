@@ -208,6 +208,22 @@ public class DataCentertBestFit implements DataCenterManagement {
 				}
 			}
 		}
+		
+		/* Does not fit anywhere just give the lowest power consumption */
+		if (result == null) {
+			for (PhysicalMachine pm : dc.getPhysicalMachines()) {
+				if (result == null) {
+					result = pm;
+					continue;
+				}
+				if (Utils.getFutureEnergyConsumption(pm, vm) < Utils.getFutureEnergyConsumption(result, vm)) {
+					result = pm;
+					continue;
+				}
+			}
+		}		
+		
+		/*
 		if (result == null) {
 			// Shut down one VM with lower prio
 			ConcurrentHashMap<PhysicalMachine, ArrayList<VirtualMachine>> map = dc.getPMWithLowerPriorityVMList(dc, vm);
@@ -224,7 +240,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 					return entry.getKey();
 				}
 			}
-		}
+		}*/
 		return result;
 	}
 }

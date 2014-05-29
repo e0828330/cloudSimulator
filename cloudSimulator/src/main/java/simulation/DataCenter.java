@@ -1,6 +1,7 @@
 package simulation;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,24 +9,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.Data;
 import model.PhysicalMachine;
 import model.ServiceLevelAgreement;
 import model.VirtualMachine;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+
+import utils.Utils;
 import algorithms.DataCenterManagement;
 import cloudSimulator.weather.Forecast;
 import cloudSimulator.weather.Location;
 import cloudSimulator.weather.Weather;
-
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-
-import utils.Utils;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 
 @Data
 public class DataCenter implements Serializable {
