@@ -76,7 +76,6 @@ public class SLAViolationAlgorithm {
 
 			// Now iterate through the SLAs and check if they are violated
 			
-			System.err.println("BLA VIOLATION");
 			
 			// Memory	
 			double assignedUsedMemory = 0.;

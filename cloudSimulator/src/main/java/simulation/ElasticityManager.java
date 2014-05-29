@@ -61,10 +61,11 @@ public class ElasticityManager {
 	}
 
 	public void simulate(int minute) {
+		slaViolations.updateSLAViolsations(minute, (ArrayList<DataCenter>) dataCenters);
+
 		for (DataCenter dc : dataCenters) {
 			dc.simulate(minute);
 		}
-		slaViolations.updateSLAViolsations(minute, (ArrayList<DataCenter>) dataCenters);
 		
 		/* Run the algorithm once per hour */
 		if ((minute % 60) == 0) {

@@ -18,8 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import simulation.DataCenter;
@@ -27,6 +25,7 @@ import utils.Utils;
 import algorithms.DataCenterManagement;
 import algorithms.DataCenterMigration;
 import cloudSimulator.repo.DataCenterRepository;
+import cloudSimulator.repo.PhysicalMachineRepository;
 import cloudSimulator.repo.VirtualMachineRepository;
 import cloudSimulator.weather.Forecast;
 import cloudSimulator.weather.Location;
@@ -54,8 +53,7 @@ public class ConfigParser {
 	private VirtualMachineRepository vmRepo;
 	
 	@Autowired
-	private MongoTemplate mongoTemplate;
-	
+	private PhysicalMachineRepository pmRepo;
 	
 	@Autowired
 	private Forecast forecastService;
@@ -274,6 +272,7 @@ public class ConfigParser {
 		dataCenters = repo.findAll();
 		for(DataCenter dc : dataCenters) {
 			dc.setAlgorithm(algorithm);
+			dc.setForecastService(forecastService);
 			for (PhysicalMachine pm : dc.getPhysicalMachines()) {
 				pm.setDataCenter(dc);
 				for (VirtualMachine vm : pm.getVirtualMachines()) {
@@ -293,6 +292,7 @@ public class ConfigParser {
 	 */
 	private void saveToDB() {
 		repo.deleteAll();
+		pmRepo.deleteAll();
 		vmRepo.deleteAll();
 		
 		for (DataCenter dc : dataCenters) {
@@ -300,6 +300,7 @@ public class ConfigParser {
 				for (VirtualMachine vm : pm.getVirtualMachines()) {
 					vmRepo.save(vm);
 				}
+				pmRepo.save(pm);
 			}
 			repo.save(dc);
 		}

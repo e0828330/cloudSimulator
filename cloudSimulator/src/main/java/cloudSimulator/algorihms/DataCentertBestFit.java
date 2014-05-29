@@ -26,9 +26,9 @@ public class DataCentertBestFit implements DataCenterManagement {
 
 	public void scaleVirtualMachines(DataCenter dc) {
 
-		//scaleDC(dc, threshold);
+		scaleDC(dc, threshold);
 
-		/*for (PhysicalMachine pm : dc.getPhysicalMachines()) {
+		for (PhysicalMachine pm : dc.getPhysicalMachines()) {
 			// First migrate by Memory, because swapping is painful
 			// if Memory usage of PM is 100%
 			if (pm.getMemoryUsage() >= 1.) {
@@ -47,7 +47,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 				logger.debug("Bandwidth > 100% in DC " + dc.getName());
 				this.migrationByBandwidthUsage(pm, dc);
 			}
-		}*/
+		}
 	}
 
 	/**
