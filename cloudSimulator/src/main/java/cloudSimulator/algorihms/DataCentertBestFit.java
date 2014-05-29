@@ -159,7 +159,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 		ArrayList<VirtualMachine> onlineVMs = pm.getOnlineVMs();
 		Collections.sort(onlineVMs, new Comparator<VirtualMachine>() {
 			public int compare(VirtualMachine vm1, VirtualMachine vm2) {
-				return (int) ((vm1.getUsedBandwidth() - vm2.getUsedBandwidth()) * 100);
+				return (int) (vm1.getUsedBandwidth() * 100 - vm2.getUsedBandwidth() * 100);
 
 			}
 		});
@@ -208,7 +208,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 		ArrayList<VirtualMachine> onlineVMs = pm.getOnlineVMs();
 		Collections.sort(onlineVMs, new Comparator<VirtualMachine>() {
 			public int compare(VirtualMachine vm1, VirtualMachine vm2) {
-				return (int) ((vm1.getUsedMemory() - vm2.getUsedMemory()) * 100);
+				return (int) (vm1.getUsedMemory() * 100 - vm2.getUsedMemory() * 100);
 
 			}
 		});
@@ -256,7 +256,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 		ArrayList<VirtualMachine> onlineVMs = pm.getOnlineVMs();
 		Collections.sort(onlineVMs, new Comparator<VirtualMachine>() {
 			public int compare(VirtualMachine vm1, VirtualMachine vm2) {
-				return (int) ((vm1.getUsedCPUs() - vm2.getUsedCPUs()) * 100);
+				return (int) (vm1.getUsedCPUs() * 100 - vm2.getUsedCPUs() * 100);
 
 			}
 		});
