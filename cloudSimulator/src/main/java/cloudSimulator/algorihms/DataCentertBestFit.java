@@ -24,11 +24,11 @@ import algorithms.DataCenterManagement;
 public class DataCentertBestFit implements DataCenterManagement {
 
 	static Logger logger = LoggerFactory.getLogger(DataCentertBestFit.class);
-	
+
 	private double threshold = 1.;
-	
+
 	public void scaleVirtualMachines(DataCenter dc) {
-		
+
 		scaleDC(dc, threshold);
 
 		for (PhysicalMachine pm : dc.getPhysicalMachines()) {
@@ -52,107 +52,106 @@ public class DataCentertBestFit implements DataCenterManagement {
 			}
 		}
 	}
-	
+
 	/**
-	 * Scales the Datacenter @dc
-	 * First we get the total resources used in the dc and calculate the percentage.
-	 * If the percentage is bigger than the @threshold, we get all online VMs running
-	 * and sort them by the priority (lowest first). Then we remove one VM after another,
-	 * until we drop under @threshold with the dc utilization.
-	 * After this, we look if we can again, set VMs which are offline to running.
+	 * Scales the Datacenter @dc First we get the total resources used in the dc
+	 * and calculate the percentage. If the percentage is bigger than the
+	 * @threshold, we get all online VMs running and sort them by the priority
+	 * (lowest first). Then we remove one VM after another, until we drop under @threshold
+	 * with the dc utilization. After this, we look if we can again, set VMs
+	 * which are offline to running.
+	 * 
 	 * @param dc
 	 * @param threshold
 	 */
 	private void scaleDC(DataCenter dc, double threshold) {
-		ArrayList<VirtualMachine> totalOnlineVMList = new ArrayList<VirtualMachine>(128);
-		ArrayList<VirtualMachine> totalOfflineVMList = new ArrayList<VirtualMachine>(128);
-		
+		ArrayList<VirtualMachine> totalOnlineVMList = new ArrayList<VirtualMachine>(
+				128);
+		ArrayList<VirtualMachine> totalOfflineVMList = new ArrayList<VirtualMachine>(
+				128);
+
 		double dcTotalMemory = 0.;
 		double dcTotalCPUs = 0.;
 		double dcTotalBandwidth = 0.;
-		
+
 		double dcUsedMemory = 0.;
 		double dcUsedCPUs = 0.;
 		double dcUsedBandwidth = 0.;
-		
+
 		// Store the ressources needed by the datacenter
 		for (PhysicalMachine pm : dc.getPhysicalMachines()) {
 			dcTotalMemory += pm.getMemory();
 			dcTotalCPUs += pm.getCpus();
 			dcTotalBandwidth += pm.getBandwidth();
-			
+
 			if (pm.isRunning()) {
 				dcUsedMemory += pm.getMemory() * pm.getMemoryUsage();
 				dcUsedCPUs += pm.getCpus() * pm.getCPULoad();
-				dcUsedBandwidth += pm.getBandwidth() * pm.getBandwidthUtilization();
+				dcUsedBandwidth += pm.getBandwidth()
+						* pm.getBandwidthUtilization();
 			}
-			
+
 			totalOnlineVMList.addAll(pm.getOnlineVMs());
 			totalOfflineVMList.addAll(pm.getOfflineVMs());
 		}
-		
-		
+
 		Utils.orderVMsByPriorityAscending(totalOnlineVMList);
 		int size = totalOnlineVMList.size();
-		
-		// Shut down vms ordered by priority
-		if (dcUsedBandwidth / dcTotalBandwidth > threshold ||
-				dcUsedCPUs / dcTotalCPUs > threshold ||
-				dcUsedMemory / dcTotalMemory > threshold) {
-		
-			while (dcUsedBandwidth / dcTotalBandwidth > threshold ||
-					dcUsedCPUs / dcTotalCPUs > threshold ||
-					dcUsedMemory / dcTotalMemory > threshold) {
-			
-				if (size == 0) break;
-				
-				VirtualMachine vm = totalOnlineVMList.remove(0);
-				vm.setOnline(false);
-				dcUsedBandwidth -= vm.getBandwidth() * vm.getUsedBandwidth();
-				dcUsedCPUs -= vm.getCpus() * vm.getUsedCPUs();
-				dcUsedMemory -= vm.getMemory() * vm.getUsedMemory();
-				size--;
-			}
+
+		while (dcUsedBandwidth / dcTotalBandwidth > threshold
+				|| dcUsedCPUs / dcTotalCPUs > threshold
+				|| dcUsedMemory / dcTotalMemory > threshold) {
+
+			if (size == 0)
+				break;
+
+			VirtualMachine vm = totalOnlineVMList.remove(0);
+			vm.setOnline(false);
+			dcUsedBandwidth -= vm.getBandwidth() * vm.getUsedBandwidth();
+			dcUsedCPUs -= vm.getCpus() * vm.getUsedCPUs();
+			dcUsedMemory -= vm.getMemory() * vm.getUsedMemory();
+			size--;
 		}
-		
+
 		// Turn on offline vms if they fit
 		size = totalOfflineVMList.size();
 		Utils.orderVMsByPriorityDescending(totalOfflineVMList);
-		
-		while (dcUsedBandwidth / dcTotalBandwidth <= threshold ||
-				dcUsedCPUs / dcTotalCPUs <= threshold ||
-				dcUsedMemory / dcTotalMemory <= threshold) {
-		
-			if (size == 0) break;
-			
+
+		while (dcUsedBandwidth / dcTotalBandwidth <= threshold
+				|| dcUsedCPUs / dcTotalCPUs <= threshold
+				|| dcUsedMemory / dcTotalMemory <= threshold) {
+
+			if (size == 0)
+				break;
+
 			VirtualMachine vm = totalOfflineVMList.remove(0);
-			
+
 			double nextVMBandwidth = vm.getBandwidth() * vm.getUsedBandwidth();
 			double nextVMCPUs = vm.getCpus() * vm.getUsedCPUs();
 			double nextVMMemory = vm.getMemory() * vm.getUsedMemory();
-			
-			if ((nextVMBandwidth + dcUsedBandwidth) / dcTotalBandwidth <= threshold &&
-					(nextVMCPUs + dcUsedCPUs) / dcTotalCPUs <= threshold &&
-					(nextVMMemory + dcUsedMemory) / dcTotalMemory <= threshold) {
+
+			if ((nextVMBandwidth + dcUsedBandwidth) / dcTotalBandwidth <= threshold
+					&& (nextVMCPUs + dcUsedCPUs) / dcTotalCPUs <= threshold
+					&& (nextVMMemory + dcUsedMemory) / dcTotalMemory <= threshold) {
 				if (vm.getPm().isRunning() == false) {
 					vm.getPm().setRunning(true);
 				}
 				vm.setOnline(true);
-				
+
 			}
 			dcUsedBandwidth += nextVMBandwidth;
 			dcUsedCPUs += nextVMCPUs;
 			dcUsedMemory += nextVMMemory;
 			size--;
 		}
-		
+
 		// Check if PMs are running with no VMs
 		for (PhysicalMachine pm : dc.getPhysicalMachines()) {
 			if (pm.getOnlineVMs().size() == 0) {
 				pm.setRunning(false);
 			}
 		}
-		
+
 	}
 
 	private void migrationByBandwidthUsage(PhysicalMachine pm, DataCenter dc) {
@@ -172,8 +171,8 @@ public class DataCentertBestFit implements DataCenterManagement {
 			usedVMBandwidth += vm.getUsedBandwidth() * vm.getBandwidth();
 		}
 
-		logger.debug("Needed Bandwidth: " + usedVMBandwidth
-				+ " but available " + pm.getBandwidth());
+		logger.debug("Needed Bandwidth: " + usedVMBandwidth + " but available "
+				+ pm.getBandwidth());
 
 		// more bandwidth needed than available on PM
 		if (usedVMBandwidth > pm.getBandwidth()) {
@@ -310,14 +309,15 @@ public class DataCentertBestFit implements DataCenterManagement {
 				result = pm;
 				continue;
 			}
-			if (Utils.VMfitsOnPM(pm, vm)) {				
-				if (Utils.getFutureEnergyConsumption(pm, vm) < Utils.getFutureEnergyConsumption(result, vm)) {
+			if (Utils.VMfitsOnPM(pm, vm)) {
+				if (Utils.getFutureEnergyConsumption(pm, vm) < Utils
+						.getFutureEnergyConsumption(result, vm)) {
 					result = pm;
 					continue;
 				}
 			}
 		}
-		
+
 		/* Does not fit anywhere just give the lowest power consumption */
 		if (result == null) {
 			for (PhysicalMachine pm : dc.getPhysicalMachines()) {
@@ -325,31 +325,24 @@ public class DataCentertBestFit implements DataCenterManagement {
 					result = pm;
 					continue;
 				}
-				if (Utils.getFutureEnergyConsumption(pm, vm) < Utils.getFutureEnergyConsumption(result, vm)) {
+				if (Utils.getFutureEnergyConsumption(pm, vm) < Utils
+						.getFutureEnergyConsumption(result, vm)) {
 					result = pm;
 					continue;
 				}
 			}
-		}		
-		
+		}
+
 		/*
-		if (result == null) {
-			// Shut down one VM with lower prio
-			ConcurrentHashMap<PhysicalMachine, ArrayList<VirtualMachine>> map = dc.getPMWithLowerPriorityVMList(dc, vm);
-			if (map == null) {
-				return null;
-			}
-			else {
-				// should only have 1 iteration
-				// set all lower priority vms offline and then return pm
-				for (Entry<PhysicalMachine, ArrayList<VirtualMachine>> entry : map.entrySet()) {
-					for (VirtualMachine tmpVM : entry.getValue()) {
-						tmpVM.setOnline(false);
-					}
-					return entry.getKey();
-				}
-			}
-		}*/
+		 * if (result == null) { // Shut down one VM with lower prio
+		 * ConcurrentHashMap<PhysicalMachine, ArrayList<VirtualMachine>> map =
+		 * dc.getPMWithLowerPriorityVMList(dc, vm); if (map == null) { return
+		 * null; } else { // should only have 1 iteration // set all lower
+		 * priority vms offline and then return pm for (Entry<PhysicalMachine,
+		 * ArrayList<VirtualMachine>> entry : map.entrySet()) { for
+		 * (VirtualMachine tmpVM : entry.getValue()) { tmpVM.setOnline(false); }
+		 * return entry.getKey(); } } }
+		 */
 		return result;
 	}
 }
