@@ -73,6 +73,7 @@ public class SLAViolationsTest {
 		pm1.getVirtualMachines().add(vm1);
 		pm1.getVirtualMachines().add(vm2);
 		
+		pm1.setId("1");
 		pm1.setBandwidth(1000);
 		pm1.setCpus(100);
 		pm1.setMemory(100);

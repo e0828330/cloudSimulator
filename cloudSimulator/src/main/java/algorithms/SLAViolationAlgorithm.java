@@ -43,9 +43,9 @@ public class SLAViolationAlgorithm {
 	
 	public void updateSLAViolsations(int minute, ArrayList<DataCenter> datacenterList) {
 		// Stores if a PM has violations
-		HashMap<PhysicalMachine, Boolean> violationMapMemory = new HashMap<PhysicalMachine, Boolean>();
-		HashMap<PhysicalMachine, Boolean> violationMapCPUs = new HashMap<PhysicalMachine, Boolean>();
-		HashMap<PhysicalMachine, Boolean> violationMapNetwork = new HashMap<PhysicalMachine, Boolean>();
+		HashMap<String, Boolean> violationMapMemory = new HashMap<String, Boolean>();
+		HashMap<String, Boolean> violationMapCPUs = new HashMap<String, Boolean>();
+		HashMap<String, Boolean> violationMapNetwork = new HashMap<String, Boolean>();
 		
 		ArrayList<ServiceLevelAgreement> slaList = new ArrayList<ServiceLevelAgreement>();
 		
@@ -53,14 +53,14 @@ public class SLAViolationAlgorithm {
 		for (DataCenter dc : datacenterList) {
 			slaList = dc.getSLAs();
 			for (PhysicalMachine pm : dc.getPhysicalMachines()) {
-				if (!violationMapMemory.containsKey(pm)) {
-					violationMapMemory.put(pm, Utils.PMMemoryIsViolated(pm, threshold));
+				if (!violationMapMemory.containsKey(pm.getId())) {
+					violationMapMemory.put(pm.getId(), Utils.PMMemoryIsViolated(pm, threshold));
 				}
-				if (!violationMapCPUs.containsKey(pm)) {
-					violationMapCPUs.put(pm, Utils.PMCPUsIsViolated(pm, threshold));
+				if (!violationMapCPUs.containsKey(pm.getId())) {
+					violationMapCPUs.put(pm.getId(), Utils.PMCPUsIsViolated(pm, threshold));
 				}
-				if (!violationMapNetwork.containsKey(pm)) {
-					violationMapNetwork.put(pm, Utils.PMBandwidthIsViolated(pm, threshold));
+				if (!violationMapNetwork.containsKey(pm.getId())) {
+					violationMapNetwork.put(pm.getId(), Utils.PMBandwidthIsViolated(pm, threshold));
 				}				
 			}
 		}
@@ -98,7 +98,7 @@ public class SLAViolationAlgorithm {
 				// Now check if one PM where the vms are running is overloaded, if yes, we have a violation (swapping)
 				boolean isViolated = false;
 				for (VirtualMachine vm : tmpVMList) {
-					isViolated |= violationMapMemory.get(vm.getPm());
+					isViolated |= violationMapMemory.get(vm.getPm().getId());
 				}
 				// This SLA is violated in memory
 				if (isViolated) {
@@ -126,7 +126,7 @@ public class SLAViolationAlgorithm {
 				// Now check if one PM where the vms are running is overloaded, if yes, we have a violation
 				boolean isViolated = false;
 				for (VirtualMachine vm : tmpVMList) {
-					isViolated |= violationMapCPUs.get(vm.getPm());
+					isViolated |= violationMapCPUs.get(vm.getPm().getId());
 				}
 				// This SLA is violated in cpus
 				if (isViolated) {
@@ -153,7 +153,7 @@ public class SLAViolationAlgorithm {
 				// Now check if one PM where the vms are running is overloaded, if yes, we have a violation
 				boolean isViolated = false;
 				for (VirtualMachine vm : tmpVMList) {
-					isViolated |= violationMapNetwork.get(vm.getPm());
+					isViolated |= violationMapNetwork.get(vm.getPm().getId());
 				}
 				// This SLA is violated in networkbandwidth
 				if (isViolated) {
