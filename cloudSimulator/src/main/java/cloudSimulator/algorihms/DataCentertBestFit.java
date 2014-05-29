@@ -9,6 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import model.PhysicalMachine;
 import model.VirtualMachine;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import simulation.DataCenter;
@@ -18,25 +20,27 @@ import algorithms.DataCenterManagement;
 @Service(value = "managementBestFit")
 public class DataCentertBestFit implements DataCenterManagement {
 
+	static Logger logger = LoggerFactory.getLogger(DataCentertBestFit.class);
+	
 	public void scaleVirtualMachines(DataCenter dc) {
 
 		for (PhysicalMachine pm : dc.getPhysicalMachines()) {
 			// First migrate by Memory, because swapping is painful
 			// if Memory usage of PM is 100%
 			if (pm.getMemoryUsage() >= 1.) {
-				System.out.println("Memory Usage > 100% in DC " + dc.getName());
+				logger.debug("Memory Usage > 100% in DC " + dc.getName());
 				this.migrationByMemoryUsage(pm, dc);
 			}
 
 			// if CPU load of PM is 100%
 			if (pm.getCPULoad() >= 1.) {
-				System.out.println("CPU Load > 100% in DC " + dc.getName());
+				logger.debug("CPU Load > 100% in DC " + dc.getName());
 				this.migrationByCPULoad(pm, dc);
 			}
 
 			// if Bandwidth load of PM is 100%
 			if (pm.getBandwidthUtilization() >= 1.) {
-				System.out.println("Bandwidth > 100% in DC " + dc.getName());
+				logger.debug("Bandwidth > 100% in DC " + dc.getName());
 				this.migrationByBandwidthUsage(pm, dc);
 			}
 		}
@@ -59,7 +63,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 			usedVMBandwidth += vm.getUsedBandwidth() * vm.getBandwidth();
 		}
 
-		System.out.println("Needed Bandwidth: " + usedVMBandwidth
+		logger.debug("Needed Bandwidth: " + usedVMBandwidth
 				+ " but available " + pm.getBandwidth());
 
 		// more bandwidth needed than available on PM
@@ -87,7 +91,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 
 		}
 
-		System.out.println("Migrated VMs = " + migrationList.size());
+		logger.debug("Migrated VMs = " + migrationList.size());
 
 	}
 
@@ -108,7 +112,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 			usedVMMemory += vm.getUsedMemory() * vm.getMemory();
 		}
 
-		System.out.println("Needed Memory: " + usedVMMemory + " but available "
+		logger.debug("Needed Memory: " + usedVMMemory + " but available "
 				+ pm.getMemory());
 
 		// more memory needed than available on PM
@@ -136,7 +140,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 			}
 
 		}
-		System.out.println("Migrated VMs = " + migrationList.size());
+		logger.debug("Migrated VMs = " + migrationList.size());
 	}
 
 	private void migrationByCPULoad(PhysicalMachine pm, DataCenter dc) {
@@ -155,7 +159,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 		for (VirtualMachine vm : onlineVMs) {
 			usedVMCPUs += vm.getUsedCPUs() * vm.getCpus();
 		}
-		System.out.println("Needed CPUs: " + usedVMCPUs + " but available "
+		logger.debug("Needed CPUs: " + usedVMCPUs + " but available "
 				+ pm.getCpus());
 
 		// more cpus needed than available on PM
@@ -183,7 +187,7 @@ public class DataCentertBestFit implements DataCenterManagement {
 			}
 
 		}
-		System.out.println("Migrated VMs = " + migrationList.size());
+		logger.debug("Migrated VMs = " + migrationList.size());
 	}
 
 	/**

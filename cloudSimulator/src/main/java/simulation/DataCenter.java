@@ -14,13 +14,16 @@ import model.PhysicalMachine;
 import model.ServiceLevelAgreement;
 import model.VirtualMachine;
 import algorithms.DataCenterManagement;
+import cloudSimulator.weather.Forecast;
 import cloudSimulator.weather.Location;
+import cloudSimulator.weather.Weather;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import utils.Utils;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
@@ -49,6 +52,9 @@ public class DataCenter implements Serializable {
     @Transient
     private HashMap<VirtualMachine, Integer> migrationQueue = new HashMap<VirtualMachine, Integer>();
 
+    @Transient
+    private Forecast forecastService;
+    
     /**
      * Gets called on every simulated minute. Here VM allocation and load
      * updating should be done
@@ -64,9 +70,15 @@ public class DataCenter implements Serializable {
         
         // Check if a sla is down
         ArrayList<ServiceLevelAgreement> slaList = getSLAs();
-     
         for (ServiceLevelAgreement sla : slaList) {
         	boolean isDown = false;
+        	
+        	/*
+        	 * TODO: MARTIN FIX THAT! ... NullPointerException ...
+        	 */
+        	if (1 > 0) {
+        		break;
+        	}
         	
         	for (VirtualMachine vm : sla.getVms()) {
         		isDown |= vm.isOnline();
@@ -117,6 +129,12 @@ public class DataCenter implements Serializable {
 		}
 	}
 
+	/**
+	 * Returns the current energy price for a given date
+	 * 
+	 * @param date
+	 * @return
+	 */
 	public float getCurrentEneryPrice(Date date) {
 		Calendar cal = Calendar.getInstance(); // creates calendar
 		cal.setTime(new Date()); // sets calendar time/date
@@ -126,6 +144,18 @@ public class DataCenter implements Serializable {
 				: this.energyPriceNight;
 	}
 
+	/**
+	 * Returns the current energy costs
+	 * 
+	 * @param minute
+	 * @return
+	 */
+	public double getCurrentEnergyCosts(int minute) {
+		Date currentTime = Utils.getCurrentTime(minute);
+		Weather currentWeather = forecastService.getForecast(currentTime, location, true);
+		return Utils.getCoolingEnergyFactor(currentWeather.getCurrentTemperature()) * getCurrentEneryPrice(currentTime);
+	}
+	
 	/**
 	 * Returns the averange prive per
 	 * 

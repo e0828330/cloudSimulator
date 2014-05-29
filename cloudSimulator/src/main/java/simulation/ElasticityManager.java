@@ -1,28 +1,42 @@
 package simulation;
 
-import algorithms.DataCenterMigration;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import lombok.Data;
-import model.PhysicalMachine;
-import model.ServiceLevelAgreement;
+import model.DataPoint;
 import model.VirtualMachine;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import utils.Utils;
+import algorithms.DataCenterMigration;
+import algorithms.SLAViolationAlgorithm;
 
 @Data
+@Service
 public class ElasticityManager {
 
+	static Logger logger = LoggerFactory.getLogger(ElasticityManager.class);
+	
 	private DataCenterMigration algorithm;
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
+	
+	/* TODO: Move to config */
+	private final int costsPerViolation = 10;
 
-	/* TODO: Implement */
+	private ArrayList<DataPoint> energyCostList = new ArrayList<DataPoint>(8760);
+	private ArrayList<DataPoint> slaCostList = new ArrayList<DataPoint>(8760);
+	
+	private int hour = 0;
+	
+	@Autowired
+	private SLAViolationAlgorithm slaViolations;
 
 	/**
-	 * TODO: LIVE VM Migration?
 	 * 
 	 * Migrates a VM from the dataCenter source to target This works as follows:
 	 * 1) VM is set to off line 2) VM gets removed from source dataCenter 3) VM
@@ -47,7 +61,6 @@ public class ElasticityManager {
 	}
 
 	public void simulate(int minute) {
-		// TODO: Implement rest
 		for (DataCenter dc : dataCenters) {
 			dc.simulate(minute);
 		}
@@ -55,7 +68,14 @@ public class ElasticityManager {
 		/* Run the algorithm once per hour */
 		if ((minute % 60) == 0) {
 			algorithm.manageVirtualMachines(this, minute);
+			double energyCosts = 0.;
+			for (DataCenter dc : dataCenters) {
+				energyCosts += dc.getCurrentEnergyCosts(minute);
+			}
+			double slaCosts = slaViolations.getCurrentSLAViolsations(minute, (ArrayList<DataCenter>) dataCenters) * costsPerViolation;
+			energyCostList.add(new DataPoint(hour, energyCosts));
+			slaCostList.add(new DataPoint(hour, slaCosts));
+			hour++;
 		}
 	}
-
 }

@@ -4,13 +4,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import lombok.Data;
+
+import org.springframework.stereotype.Service;
+
 import model.PhysicalMachine;
 import model.ServiceLevelAgreement;
 import model.VirtualMachine;
 import simulation.DataCenter;
 import utils.Utils;
 
+
 @Data
+@Service
 public class SLAViolationAlgorithm {
 	/**
 	 * This parameter [0.0-1.0] is the percentage where we set a buffer for the violations.
