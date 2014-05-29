@@ -185,14 +185,9 @@ public class DataCentertBestFit implements DataCenterManagement {
 			// Migrate
 			for (VirtualMachine migVM : migrationList) {
 				// Remove from physical machine
-				//pm.getVirtualMachines().remove(migVM);
-				//migVM.setOnline(false);
-				dc.queueAddVirtualMachine(migVM,
-						Utils.getMigrationTime(
-								pm.getBandwidth()
-										* (1. - pm.getBandwidthUtilization()),
-								migVM.getSize() + migVM.getMemory()
-										* migVM.getUsedMemory()));
+				pm.getVirtualMachines().remove(migVM);
+				migVM.setOnline(false);
+				dc.queueAddVirtualMachine(migVM, 0);
 			}
 
 		}
@@ -235,14 +230,9 @@ public class DataCentertBestFit implements DataCenterManagement {
 			// Migrate
 			for (VirtualMachine migVM : migrationList) {
 				// Remove from physical machine
-				//pm.getVirtualMachines().remove(migVM);
-				//migVM.setOnline(false);
-				dc.queueAddVirtualMachine(migVM,
-						Utils.getMigrationTime(
-								pm.getBandwidth()
-										* (1. - pm.getBandwidthUtilization()),
-								migVM.getSize() + migVM.getMemory()
-										* migVM.getUsedMemory()));
+				pm.getVirtualMachines().remove(migVM);
+				migVM.setOnline(false);
+				dc.queueAddVirtualMachine(migVM, 0);
 			}
 
 		}
@@ -282,14 +272,9 @@ public class DataCentertBestFit implements DataCenterManagement {
 			// Migrate
 			for (VirtualMachine migVM : migrationList) {
 				// Remove from physical machine
-				//pm.getVirtualMachines().remove(migVM);
-				//migVM.setOnline(false);
-				dc.queueAddVirtualMachine(migVM,
-						Utils.getMigrationTime(
-								pm.getBandwidth()
-										* (1. - pm.getBandwidthUtilization()),
-								migVM.getSize() + migVM.getMemory()
-										* migVM.getUsedMemory()));
+				pm.getVirtualMachines().remove(migVM);
+				migVM.setOnline(false);
+				dc.queueAddVirtualMachine(migVM, 0);
 			}
 
 		}

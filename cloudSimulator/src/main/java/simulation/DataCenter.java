@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -48,7 +47,10 @@ public class DataCenter implements Serializable {
     private Location location;
 
     @Transient
-    private HashMap<VirtualMachine, Integer> migrationQueue = new HashMap<VirtualMachine, Integer>();
+    private List<VirtualMachine> vmList = new ArrayList<VirtualMachine>();
+    
+    @Transient
+    private HashMap<String, Integer> migrationQueue = new HashMap<String, Integer>();
 
     @Transient
     private Forecast forecastService;
@@ -96,7 +98,16 @@ public class DataCenter implements Serializable {
 	 * @param targetTime
 	 */
 	public void queueAddVirtualMachine(VirtualMachine vm, int targetTime) {
-		migrationQueue.put(vm, currentTime + targetTime);
+		if (vm.getPm().getDataCenter() == this) {
+			PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
+			pm.setRunning(true);
+			pm.getVirtualMachines().add(vm);
+			vm.setOnline(true);
+		}
+		else if (!migrationQueue.containsKey(vm.getId())) {
+			vmList.add(vm);
+			migrationQueue.put(vm.getId(), currentTime + targetTime);
+		}
 	}
 
 	/**
@@ -106,19 +117,17 @@ public class DataCenter implements Serializable {
 	 * TODO: LIVE VM Migration?
 	 */
 	private void handleMigrations(int minute) {
-		Iterator<Map.Entry<VirtualMachine, Integer>> iter = migrationQueue
-				.entrySet().iterator();
+		Iterator<VirtualMachine> iter = vmList.iterator();
 		while (iter.hasNext()) {
-			Map.Entry<VirtualMachine, Integer> entry = iter.next();
-			if (entry.getValue() >= minute) {
-				VirtualMachine vm = entry.getKey();
+			VirtualMachine vm = iter.next();
+			Integer time = migrationQueue.get(vm.getId());
+			if (time >= minute) {
 				PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
-					iter.remove();
-					if (pm.isRunning() == false) {
-						pm.setRunning(true);
-					}
-					pm.getVirtualMachines().add(vm);
-					vm.setOnline(true);
+				iter.remove();
+				migrationQueue.remove(vm.getId());
+				pm.setRunning(true);
+				pm.getVirtualMachines().add(vm);
+				vm.setOnline(true);
 			}
 		}
 	}
