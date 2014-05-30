@@ -297,9 +297,9 @@ public class SLAViolationsTest {
 		vm2.setOnline(true);
 		vm1.setUsedMemory(1.);
 		vm2.setUsedMemory(1.);
-		em.simulate(1);
-		algorithm.updateSLAViolsations(1, tmp);
+		//em.simulate(1);
 		algorithm.reset();
+		algorithm.updateSLAViolsations(1, tmp);
 		assertEquals(0, algorithm.getViolations());
 		
 		sla1.setMemory(vm1.getMemory() + vm2.getMemory() + 1);

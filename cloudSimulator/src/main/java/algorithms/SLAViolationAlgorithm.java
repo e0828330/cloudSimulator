@@ -65,7 +65,7 @@ public class SLAViolationAlgorithm {
 			}
 		}
 		
-		
+		int i = 1;
 		for (ServiceLevelAgreement sla : slaList) {
 			double downtime = sla.getDownTimeInPercent(minute);
 			// Downtime is violated
@@ -92,6 +92,7 @@ public class SLAViolationAlgorithm {
 			if (allVMsHaveFullMemoryLoad && assignedUsedMemory < sla.getMemory()) {
 				// Memory of sla is violated because the load of all vms is 100% and the memory of the vms assigned < SLA
 				violations++;
+				continue;
 			}
 			else if (allVMsHaveFullMemoryLoad) {
 				// All vms of this sla have full load, but the SLA is not yet violated.
@@ -103,10 +104,21 @@ public class SLAViolationAlgorithm {
 				// This SLA is violated in memory
 				if (isViolated) {
 					violations++;
+					continue;
 				}
 			}
-			
-			
+			else {
+				// all vms running on pms which are  overloaded
+				boolean allPMsOverloaded = true;
+				for (VirtualMachine vm : tmpVMList) {
+					allPMsOverloaded = allPMsOverloaded && violationMapMemory.get(vm.getPm().getId());
+				}
+				if (allPMsOverloaded) {
+					violations++;
+					continue;
+				}
+			}
+
 			// CPUs
 			double assignedUsedCPUs = 0.;
 			boolean allVMsHaveFullCPULoad = true;
@@ -120,6 +132,7 @@ public class SLAViolationAlgorithm {
 			if (allVMsHaveFullCPULoad && assignedUsedCPUs < sla.getCpus()) {
 				// CPUs of sla is violated because the load of all vms is 100% and the cpus of the vms assigned < SLA
 				violations++;
+				continue;
 			}
 			else if (allVMsHaveFullCPULoad) {
 				// All vms of this sla have full load, but the SLA is not yet violated.
@@ -131,6 +144,19 @@ public class SLAViolationAlgorithm {
 				// This SLA is violated in cpus
 				if (isViolated) {
 					violations++;
+					continue;
+				}
+			}
+			else {
+				// all vms running on pms which are  overloaded
+				boolean allPMsOverloaded = true;
+				for (VirtualMachine vm : tmpVMList) {
+					System.out.println("PMID = " + vm.getPm().getId());
+					allPMsOverloaded = allPMsOverloaded && violationMapCPUs.get(vm.getPm().getId());
+				}
+				if (allPMsOverloaded) {
+					violations++;
+					continue;
 				}
 			}			
 			
@@ -147,6 +173,7 @@ public class SLAViolationAlgorithm {
 			if (allVMsHaveFullBandwidthLoad && assignedUsedBandwidth < sla.getBandwidth()) {
 				// CPUs of sla is violated because the load of all vms is 100% and the bandwidth of the vms assigned < SLA
 				violations++;
+				continue;
 			}
 			else if (allVMsHaveFullBandwidthLoad) {
 				// All vms of this sla have full load, but the SLA is not yet violated.
@@ -158,6 +185,18 @@ public class SLAViolationAlgorithm {
 				// This SLA is violated in networkbandwidth
 				if (isViolated) {
 					violations++;
+					continue;
+				}
+			}
+			else {
+				// all vms running on pms which are  overloaded
+				boolean allPMsOverloaded = true;
+				for (VirtualMachine vm : tmpVMList) {
+					allPMsOverloaded = allPMsOverloaded && violationMapNetwork.get(vm.getPm().getId());
+				}
+				if (allPMsOverloaded) {
+					violations++;
+					continue;
 				}
 			}			
 		}
