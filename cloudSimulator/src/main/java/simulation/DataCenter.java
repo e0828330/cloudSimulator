@@ -1,27 +1,30 @@
 package simulation;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.Data;
 import model.PhysicalMachine;
+import model.ServiceLevelAgreement;
 import model.VirtualMachine;
-import algorithms.DataCenterManagement;
-import cloudSimulator.weather.Location;
 
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-
-import utils.Utils;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+
+import utils.Utils;
+import algorithms.DataCenterManagement;
+import cloudSimulator.weather.Forecast;
+import cloudSimulator.weather.Location;
+import cloudSimulator.weather.Weather;
 
 @Data
 public class DataCenter implements Serializable {
@@ -35,7 +38,9 @@ public class DataCenter implements Serializable {
 	private String id;
 	
 	private String name;
-    private List<PhysicalMachine> physicalMachines;
+    private List<PhysicalMachine> physicalMachines = new ArrayList<PhysicalMachine>();
+    
+    private boolean isOverloaded = false;
     
     @Transient
     private DataCenterManagement algorithm;
@@ -46,13 +51,25 @@ public class DataCenter implements Serializable {
     private Location location;
 
     @Transient
-    private HashMap<VirtualMachine, Integer> migrationQueue = new HashMap<VirtualMachine, Integer>();
+    private List<VirtualMachine> vmList = new ArrayList<VirtualMachine>();
+    
+    @Transient
+    private HashMap<String, Integer> migrationQueue = new HashMap<String, Integer>();
 
+    @Transient
+    private Forecast forecastService;
+    
+    @Transient
+    static Logger logger = LoggerFactory.getLogger(DataCenter.class);
+    
+    int currentTime = 0;
+    
     /**
      * Gets called on every simulated minute. Here VM allocation and load
      * updating should be done
      */
     public void simulate(int minute) {
+    	currentTime = minute;
         handleMigrations(minute);
         for (PhysicalMachine pm : physicalMachines) {
             if (pm.isRunning()) {
@@ -60,6 +77,23 @@ public class DataCenter implements Serializable {
             }
         }
         algorithm.scaleVirtualMachines(this);
+        
+        // Check if a sla is down
+        ArrayList<ServiceLevelAgreement> slaList = getSLAs();
+        for (ServiceLevelAgreement sla : slaList) {
+        	boolean allVMsOnline = false;
+        	
+
+        	
+        	for (VirtualMachine vm : sla.getVms()) {
+        		allVMsOnline |= vm.isOnline();
+        	}
+ 
+        	if (!allVMsOnline) {
+        		sla.incrementDowntime();
+        	}
+        }
+        
 		// System.out.printf("[%s] - Simulated times is %s\n", name,
 		// Utils.getCurrentTime(minute));
 	}
@@ -71,7 +105,17 @@ public class DataCenter implements Serializable {
 	 * @param targetTime
 	 */
 	public void queueAddVirtualMachine(VirtualMachine vm, int targetTime) {
-		migrationQueue.put(vm, targetTime);
+		if (vm.getPm().getDataCenter() == this) {
+			PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
+			pm.setRunning(true);
+			pm.getVirtualMachines().add(vm);
+			vm.setPm(pm);
+			vm.setOnline(true);
+		}
+		else if (!migrationQueue.containsKey(vm.getId())) {
+			vmList.add(vm);
+			migrationQueue.put(vm.getId(), currentTime + targetTime);
+		}
 	}
 
 	/**
@@ -81,25 +125,29 @@ public class DataCenter implements Serializable {
 	 * TODO: LIVE VM Migration?
 	 */
 	private void handleMigrations(int minute) {
-		Iterator<Map.Entry<VirtualMachine, Integer>> iter = migrationQueue
-				.entrySet().iterator();
+		Iterator<VirtualMachine> iter = vmList.iterator();
 		while (iter.hasNext()) {
-			Map.Entry<VirtualMachine, Integer> entry = iter.next();
-			if (entry.getValue() >= minute) {
-				VirtualMachine vm = entry.getKey();
+			VirtualMachine vm = iter.next();
+			Integer time = migrationQueue.get(vm.getId());
+			if (time >= minute) {
 				PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
-				if (pm != null) {
-					if (pm.isRunning() == false) {
-						pm.setRunning(true);
-					}
-					pm.getVirtualMachines().add(vm);
-					vm.setOnline(true);
-					iter.remove();
-				}
+				iter.remove();
+				migrationQueue.remove(vm.getId());
+				pm.setRunning(true);
+				pm.getVirtualMachines().add(vm);
+				vm.setPm(pm);
+				vm.setOnline(true);
+				//System.out.printf("VM[%s] at time (%d) arrived at DC : [%s]\n", vm.getId(), minute, vm.getPm().getDataCenter().getName());
 			}
 		}
 	}
 
+	/**
+	 * Returns the current energy price for a given date
+	 * 
+	 * @param date
+	 * @return
+	 */
 	public float getCurrentEneryPrice(Date date) {
 		Calendar cal = Calendar.getInstance(); // creates calendar
 		cal.setTime(new Date()); // sets calendar time/date
@@ -109,6 +157,18 @@ public class DataCenter implements Serializable {
 				: this.energyPriceNight;
 	}
 
+	/**
+	 * Returns the current energy costs
+	 * 
+	 * @param minute
+	 * @return
+	 */
+	public double getCurrentEnergyCosts(int minute) {
+		Date currentTime = Utils.getCurrentTime(minute);
+		Weather currentWeather = forecastService.getForecast(currentTime, location, true);
+		return Utils.getCoolingEnergyFactor(currentWeather.getCurrentTemperature()) * getCurrentEneryPrice(currentTime);
+	}
+	
 	/**
 	 * Returns the averange prive per
 	 * 
@@ -171,6 +231,22 @@ public class DataCenter implements Serializable {
 		}
 		return tmp;
 	}
+	
+	/**
+	 * Returns a list of all PMs with state Offline
+	 * 
+	 * @return
+	 */
+	public ArrayList<PhysicalMachine> getOfflinePMs() {
+		ArrayList<PhysicalMachine> tmp = new ArrayList<PhysicalMachine>(
+				physicalMachines.size());
+		for (PhysicalMachine pm : physicalMachines) {
+			if (!pm.isRunning()) {
+				tmp.add(pm);
+			}
+		}
+		return tmp;
+	}	
 
 	/**
 	 * This function should be called, if no resources in the dc are available,
@@ -199,7 +275,7 @@ public class DataCenter implements Serializable {
 			
 			// Get copy of vms running
 			ArrayList<VirtualMachine> vms = new ArrayList<VirtualMachine>(pm.getOnlineVMs());
-			Utils.orderVMsByPriority(vms);
+			Utils.orderVMsByPriorityDescending(vms);
 			
 			// get resources of current VMs running on PM
 			double currentMemory = Utils.getVMsMemory(vms);
@@ -296,4 +372,17 @@ public class DataCenter implements Serializable {
 				
 		return null;
 	}
+	
+	public ArrayList<ServiceLevelAgreement> getSLAs() {
+		ArrayList<ServiceLevelAgreement> slaList = new ArrayList<ServiceLevelAgreement>(
+				32);
+		for (PhysicalMachine pm : physicalMachines) {
+			for (VirtualMachine vm : pm.getVirtualMachines()) {
+				slaList.add(vm.getSla());
+			}
+		}
+		return slaList;
+	}
+	
+	
 }

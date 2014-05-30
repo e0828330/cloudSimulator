@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Simulation Data Visualizer</title>
+    <script type="text/javascript" src="canvasjs.min.js"></script>
+<body>
+<h1>Simulation Data Visualizer</h1><br />
+<div style="margin: auto; width: 600px; border: 2px solid darkgrey; text-align:center">
+    <form>
+        <p>Please select the result files and click <strong>Visualize</strong></p>
+        <label>Energy Costs Data File <input type="file" id="energyData" name="energyData" /></label><br />
+        <label>SLA Costs Data File <input type="file" id="slaData" name="slaData" /></label> <br />
+        <br />
+        <input type="button" onclick="render()" value="Visualize" />
+        <br /><br />
+    </form>
+</div>
+<br />
+<div id="chartContainer" style="height: 100%; width: 98%; margin: auto"></div>
+<script type="text/javascript">
+function Renderer() {
+    this.init();
+}
+
+Renderer.prototype.init = function () {
+    /* The reference counter is needed to handle the async file loading */
+    this._refcount = 2;
+    this._totalData = [];
+    this._energyData = [];
+    this._slaData = [];
+};
+
+Renderer.prototype.setEnergyData = function (str) {
+    this._energyData = JSON.parse(str);
+    this._refcount--;
+};
+
+Renderer.prototype.setSlaData = function (str) {
+    this._slaData = JSON.parse(str);
+    this._refcount--;
+};
+
+Renderer.prototype.render = function () {
+    if (this._refcount == 0) {
+
+        var totalData = [];
+        for (var i = 0; i < this._energyData.length; i++) {
+            totalData.push({ x: i, y: this._energyData[i].y + this._slaData[i].y});
+        }
+
+        var chart = new CanvasJS.Chart("chartContainer", {
+            zoomEnabled: true,
+            title: {
+                text: "Simulation Results"
+            },
+            axisY2: {
+                valueFormatString: "0.00 $",
+                interlacedColor: "#F5F5F5",
+                gridColor: "#D7D7D7",
+                tickColor: "#D7D7D7"
+            },
+            theme: "theme2",
+            toolTip: {
+                shared: true
+            },
+            legend: {
+                verticalAlign: "bottom",
+                horizontalAlign: "center",
+                fontSize: 15,
+                fontFamily: "Lucida Sans Unicode"
+
+            },
+            data: [{
+                type: "line",
+                lineThickness: 1,
+                markerSize: 0,
+                axisYType: "secondary",
+                showInLegend: true,
+                name: "Energy Costs",
+                dataPoints: this._energyData
+            }, {
+                type: "line",
+                lineThickness: 1,
+                markerSize: 0,
+                showInLegend: true,
+                name: "SLA Costs",
+                axisYType: "secondary",
+                dataPoints: this._slaData
+            }, {
+                type: "line",
+                lineThickness: 1,
+                markerSize: 0,
+                showInLegend: true,
+                name: "Total Costs",
+                axisYType: "secondary",
+                dataPoints: totalData
+            }]
+        });
+
+        chart.render();
+    }
+};
+
+function render() {
+    var renderer = new Renderer();
+    var energyDataFile = document.getElementById("energyData").files[0];
+    var slaDataFile = document.getElementById("slaData").files[0];
+
+    if (!slaDataFile || !energyDataFile) {
+        alert("Please select all two files!");
+        return;
+    }
+
+    var readerEnergy = new FileReader();
+    readerEnergy.onload = function (e) {
+        renderer.setEnergyData(readerEnergy.result);
+        renderer.render();
+    }
+    readerEnergy.readAsText(energyDataFile);
+
+    var readerSla = new FileReader();
+    readerSla.onload = function (e) {
+        renderer.setSlaData(readerSla.result);
+        renderer.render();
+    }
+    readerSla.readAsText(slaDataFile);
+}
+</script>
+</body>
+</html>
+

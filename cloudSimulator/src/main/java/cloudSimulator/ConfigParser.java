@@ -18,8 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import simulation.DataCenter;
@@ -27,6 +25,9 @@ import utils.Utils;
 import algorithms.DataCenterManagement;
 import algorithms.DataCenterMigration;
 import cloudSimulator.repo.DataCenterRepository;
+import cloudSimulator.repo.PhysicalMachineRepository;
+import cloudSimulator.repo.VirtualMachineRepository;
+import cloudSimulator.weather.Forecast;
 import cloudSimulator.weather.Location;
 
 @Service
@@ -49,7 +50,13 @@ public class ConfigParser {
 	private DataCenterRepository repo;
 	
 	@Autowired
-	private MongoTemplate mongoTemplate;
+	private VirtualMachineRepository vmRepo;
+	
+	@Autowired
+	private PhysicalMachineRepository pmRepo;
+	
+	@Autowired
+	private Forecast forecastService;
 	
 	/* Resulting datacenters */
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
@@ -92,12 +99,12 @@ public class ConfigParser {
 
 		for (int i = 0; i < numSLAs; i++) {
 			ServiceLevelAgreement sla = new ServiceLevelAgreement();
-			sla.setBandwith((int) slaBandwidth.sample());
+			sla.setBandwidth((int) slaBandwidth.sample());
 			sla.setCpus((int) slaCpus.sample() + 1);
 			sla.setMemory((int) slaMemory.sample());
 			sla.setSize((int) slaSize.sample() + 2);
 			sla.setMaxDowntime(slaMaxDowntime.sample());
-			int priority = (int) slaPriority.sample();
+			int priority = Math.max(1,(int) slaPriority.sample());
 			sla.setPriority(priority < 0 ? 0 : priority);
 			slaList.add(sla);
 		}
@@ -113,22 +120,27 @@ public class ConfigParser {
 		Iterator<ServiceLevelAgreement> iter = slaList.iterator();
 		for (int i = 0; i < numVMs; i++) {
 			VirtualMachine vm = new VirtualMachine();
-
-			if (iter.hasNext()) {
+			
+			if (!iter.hasNext()) {
+				iter = slaList.iterator();
+			}
+			
+			//if (iter.hasNext()) {
 				ServiceLevelAgreement sla = iter.next();
-				iter.remove();
+				//iter.remove();
 				sla.getVms().add(vm);
 				vm.setSla(sla);
-				vm.setBandwidth((int) (sla.getBandwith()));
+				
+				vm.setBandwidth((int) (sla.getBandwidth()));
 				int initCPUS = (int) (sla.getCpus());
 				vm.setCpus(initCPUS < 1 ? 1 : initCPUS);
 				int initMemory = (int) (sla.getMemory());
 				vm.setMemory(initMemory < 1 ? 1 : initMemory);
 				vm.setOnline(true);
 				vm.setSize((int) (sla.getSize()));
-			} else {
+			/*} else {
 				vm.setOnline(false);
-			}
+			}*/
 			vm.buildLoadMaps();
 			vmList.add(vm);
 		}
@@ -164,6 +176,7 @@ public class ConfigParser {
 
 			// Phsyical Machines for DataCenter
 			int numPMs = (int) pmND.sample();
+			if (numPMs < 1) numPMs = 1;
 			List<PhysicalMachine> pms = new ArrayList<PhysicalMachine>(numPMs);
 			for (int i = 0; i < numPMs; i++) {
 				PhysicalMachine pm = new PhysicalMachine();
@@ -185,6 +198,7 @@ public class ConfigParser {
 				totalPMs.add(pm);
 			}
 			dc.setPhysicalMachines(pms);
+			dc.setForecastService(forecastService);
 			dataCenters.add(dc);
 		}
 	}
@@ -226,6 +240,8 @@ public class ConfigParser {
 
 		int numSLAs = (int) slaND.sample();
 		int numVMs = (int) vmND.sample();
+		
+		//System.out.println("NUM VMS: " + numVMs);
 
 		// If generated data generates more SLAs than VMs, set max to VMs
 		if (numSLAs > numVMs) {
@@ -245,7 +261,7 @@ public class ConfigParser {
 		this.initPMs();
 
 		// Order VMs by priority
-		Utils.orderVMsByPriority(vmList);
+		Utils.orderVMsByPriorityDescending(vmList);
 
 		// Assignment
 		this.assignVM2PM();
@@ -268,6 +284,7 @@ public class ConfigParser {
 		dataCenters = repo.findAll();
 		for(DataCenter dc : dataCenters) {
 			dc.setAlgorithm(algorithm);
+			dc.setForecastService(forecastService);
 			for (PhysicalMachine pm : dc.getPhysicalMachines()) {
 				pm.setDataCenter(dc);
 				for (VirtualMachine vm : pm.getVirtualMachines()) {
@@ -286,8 +303,17 @@ public class ConfigParser {
 	 * Saves the datacenter list to the database
 	 */
 	private void saveToDB() {
-		mongoTemplate.remove(new Query(), "dataCenter");
+		repo.deleteAll();
+		pmRepo.deleteAll();
+		vmRepo.deleteAll();
+		
 		for (DataCenter dc : dataCenters) {
+			for(PhysicalMachine pm : dc.getPhysicalMachines()) {
+				for (VirtualMachine vm : pm.getVirtualMachines()) {
+					vmRepo.save(vm);
+				}
+				pmRepo.save(pm);
+			}
 			repo.save(dc);
 		}
 		logger.info("Saved data to database.");
@@ -299,6 +325,9 @@ public class ConfigParser {
 	private void assignVM2PM() {
 		// Set VM -> PM
 		// Shuffle PMs to avoid clustered allocation
+		
+		System.out.println("NR PMS " + totalPMs.size());
+		System.out.println("NR VMs " + vmList.size());
 		Collections.shuffle(totalPMs);
 
 		Iterator<PhysicalMachine> PMiter = totalPMs.iterator();

@@ -28,7 +28,7 @@ public class Utils {
 	 * 
 	 * @param vmList
 	 */
-	public static void orderVMsByPriority(List<VirtualMachine> vmList) {
+	public static void orderVMsByPriorityDescending(List<VirtualMachine> vmList) {
 		Collections.sort(vmList, new Comparator<VirtualMachine>() {
 			public int compare(VirtualMachine vm1, VirtualMachine vm2) {
 				if (vm1.getSla() == null && vm2.getSla() == null) {
@@ -41,6 +41,26 @@ public class Utils {
 			}
 		});
 	}
+	
+	/**
+	 * Sorts the given list @vmList by priority ascending (Lowest priority
+	 * first).
+	 * 
+	 * @param vmList
+	 */
+	public static void orderVMsByPriorityAscending(List<VirtualMachine> vmList) {
+		Collections.sort(vmList, new Comparator<VirtualMachine>() {
+			public int compare(VirtualMachine vm1, VirtualMachine vm2) {
+				if (vm1.getSla() == null && vm2.getSla() == null) {
+					return 0;
+				}
+				if (vm1.getSla() != null && vm2.getSla() != null) {
+					return vm1.getSla().getPriority() - vm2.getSla().getPriority();
+				}
+				return 0;
+			}
+		});
+	}	
 
 	/**
 	 * Checks if the virtual machine @vm has place on the physical machine @pm
@@ -250,6 +270,61 @@ public class Utils {
         return r * (Math.log(dc.getPhysicalMachines().size()) - Math.log(dc.getOnlinePMs().size()));
     }
     
+    
+    
+    /**
+     * Checks if the physical machine @pm has less memory than used by the vms running on it
+     * @param pm
+     * @threshold Set buffer in % [0.0-1.0]
+     * @return
+     */
+    public static boolean PMMemoryIsViolated(PhysicalMachine pm, double threshold) {
+    	ArrayList<VirtualMachine> onlineVMs = pm.getOnlineVMs();
+		double usedVMMemory = 0.;
+		for (VirtualMachine vm : onlineVMs) {
+			usedVMMemory += vm.getUsedMemory() * vm.getMemory();
+		}
+		if (usedVMMemory > pm.getMemory() * threshold) {
+			return true;
+		}
+    	return false;
+    }
+    
+    /**
+     * Checks if the physical machine @pm has less cpus than used by the vms running on it
+     * @param pm
+     * @threshold Set buffer in % [0.0-1.0]
+     * @return
+     */    
+    public static boolean PMCPUsIsViolated(PhysicalMachine pm, double threshold) {
+    	ArrayList<VirtualMachine> onlineVMs = pm.getOnlineVMs();
+		double usedVMCPUs = 0.;
+		for (VirtualMachine vm : onlineVMs) {
+			usedVMCPUs += vm.getUsedCPUs() * vm.getCpus();
+		}
+		if (usedVMCPUs > pm.getCpus() * threshold) {
+			return true;
+		}
+    	return false;
+    } 
+    
+    /**
+     * Checks if the physical machine @pm has less bandwidth than used by the vms running on it
+     * @param pm
+     * @threshold Set buffer in % [0.0-1.0]
+     * @return
+     */    
+    public static boolean PMBandwidthIsViolated(PhysicalMachine pm, double threshold) {
+    	ArrayList<VirtualMachine> onlineVMs = pm.getOnlineVMs();
+		double usedVMBandwidth = 0.;
+		for (VirtualMachine vm : onlineVMs) {
+			usedVMBandwidth += vm.getUsedBandwidth() * vm.getBandwidth();
+		}
+		if (usedVMBandwidth > pm.getBandwidth() * threshold) {
+			return true;
+		}
+    	return false;
+    }     
     
 
 }

@@ -50,7 +50,7 @@ public class LowerPriorityAlgorithm {
 	@Test
 	public void test_enoughResourcesShouldReturnNoVMs() {
 		ServiceLevelAgreement sla = new ServiceLevelAgreement();
-		sla.setBandwith(50);
+		sla.setBandwidth(50);
 		sla.setCpus(4);
 		sla.setMaxDowntime(1.0);
 		sla.setMemory(4);
@@ -58,7 +58,7 @@ public class LowerPriorityAlgorithm {
 		sla.setSize(30);
 		
 		ServiceLevelAgreement sla2 = new ServiceLevelAgreement();
-		sla2.setBandwith(50);
+		sla2.setBandwidth(50);
 		sla2.setCpus(4);
 		sla2.setMaxDowntime(1.0);
 		sla2.setMemory(4);
@@ -100,7 +100,7 @@ public class LowerPriorityAlgorithm {
 	@Test
 	public void test_notEnoughResourcesShouldReturnVM1() {
 		ServiceLevelAgreement sla = new ServiceLevelAgreement();
-		sla.setBandwith(50);
+		sla.setBandwidth(50);
 		sla.setCpus(4);
 		sla.setMaxDowntime(1.0);
 		sla.setMemory(4);
@@ -108,7 +108,7 @@ public class LowerPriorityAlgorithm {
 		sla.setSize(30);
 		
 		ServiceLevelAgreement sla2 = new ServiceLevelAgreement();
-		sla2.setBandwith(50);
+		sla2.setBandwidth(50);
 		sla2.setCpus(4);
 		sla2.setMaxDowntime(1.0);
 		sla2.setMemory(4);
@@ -150,7 +150,7 @@ public class LowerPriorityAlgorithm {
 	@Test
 	public void test_notEnoughResourcesShouldReturnVM2() {
 		ServiceLevelAgreement sla = new ServiceLevelAgreement();
-		sla.setBandwith(50);
+		sla.setBandwidth(50);
 		sla.setCpus(4);
 		sla.setMaxDowntime(1.0);
 		sla.setMemory(4);
@@ -158,7 +158,7 @@ public class LowerPriorityAlgorithm {
 		sla.setSize(30);
 		
 		ServiceLevelAgreement sla2 = new ServiceLevelAgreement();
-		sla2.setBandwith(50);
+		sla2.setBandwidth(50);
 		sla2.setCpus(4);
 		sla2.setMaxDowntime(1.0);
 		sla2.setMemory(4);
@@ -200,7 +200,7 @@ public class LowerPriorityAlgorithm {
 	@Test
 	public void test_samePriority_notEnoughResourcesShouldReturnNull() {
 		ServiceLevelAgreement sla = new ServiceLevelAgreement();
-		sla.setBandwith(50);
+		sla.setBandwidth(50);
 		sla.setCpus(4);
 		sla.setMaxDowntime(1.0);
 		sla.setMemory(4);
@@ -208,7 +208,7 @@ public class LowerPriorityAlgorithm {
 		sla.setSize(30);
 		
 		ServiceLevelAgreement sla2 = new ServiceLevelAgreement();
-		sla2.setBandwith(50);
+		sla2.setBandwidth(50);
 		sla2.setCpus(4);
 		sla2.setMaxDowntime(1.0);
 		sla2.setMemory(4);
@@ -247,7 +247,7 @@ public class LowerPriorityAlgorithm {
 	@Test
 	public void test_notEnoughResourcesShouldReturnCorrectPMWithLowerConsumption() {
 		ServiceLevelAgreement sla = new ServiceLevelAgreement();
-		sla.setBandwith(50);
+		sla.setBandwidth(50);
 		sla.setCpus(4);
 		sla.setMaxDowntime(1.0);
 		sla.setMemory(4);
@@ -255,7 +255,7 @@ public class LowerPriorityAlgorithm {
 		sla.setSize(30);
 		
 		ServiceLevelAgreement sla2 = new ServiceLevelAgreement();
-		sla2.setBandwith(50);
+		sla2.setBandwidth(50);
 		sla2.setCpus(4);
 		sla2.setMaxDowntime(1.0);
 		sla2.setMemory(5);
@@ -263,7 +263,7 @@ public class LowerPriorityAlgorithm {
 		sla2.setSize(30);
 		
 		ServiceLevelAgreement sla3 = new ServiceLevelAgreement();
-		sla3.setBandwith(50);
+		sla3.setBandwidth(50);
 		sla3.setCpus(4);
 		sla3.setMaxDowntime(1.0);
 		sla3.setMemory(5);
@@ -335,7 +335,7 @@ public class LowerPriorityAlgorithm {
 	@Test
 	public void test_notEnoughResourcesShouldReturnCorrectPMWithLowerConsumptionAndVMs() {
 		ServiceLevelAgreement sla = new ServiceLevelAgreement();
-		sla.setBandwith(50);
+		sla.setBandwidth(50);
 		sla.setCpus(4);
 		sla.setMaxDowntime(1.0);
 		sla.setMemory(4);
@@ -343,7 +343,7 @@ public class LowerPriorityAlgorithm {
 		sla.setSize(30);
 		
 		ServiceLevelAgreement sla2 = new ServiceLevelAgreement();
-		sla2.setBandwith(50);
+		sla2.setBandwidth(50);
 		sla2.setCpus(4);
 		sla2.setMaxDowntime(1.0);
 		sla2.setMemory(5);
@@ -351,7 +351,7 @@ public class LowerPriorityAlgorithm {
 		sla2.setSize(30);
 		
 		ServiceLevelAgreement sla3 = new ServiceLevelAgreement();
-		sla3.setBandwith(50);
+		sla3.setBandwidth(50);
 		sla3.setCpus(4);
 		sla3.setMaxDowntime(1.0);
 		sla3.setMemory(5);

@@ -56,8 +56,21 @@ public class PhysicalMachine implements Serializable {
 			if (vm.isOnline()) {
 				vm.updateLoad(minute);
 			}
+			else {
+				vm.incrementDownTimeCounter();
+			}
 		}
 	}
+	
+	public void setRunning(boolean value) {
+		if (value == false) {
+			for (VirtualMachine vm : virtualMachines) {
+				vm.setOnline(false);
+			}
+		}
+		this.running = value;
+	}
+	
 	
 	/* Used resources */
 
@@ -120,4 +133,17 @@ public class PhysicalMachine implements Serializable {
 		return tmp;
 	}
 	
+	/**
+	 * Returns a list of all VMs with state Online
+	 * @return
+	 */
+	public ArrayList<VirtualMachine> getOfflineVMs() {
+		ArrayList<VirtualMachine> tmp = new ArrayList<VirtualMachine>(virtualMachines.size());
+		for (VirtualMachine vm : virtualMachines) {
+			if (!vm.isOnline()) {
+				tmp.add(vm);
+			}
+		}
+		return tmp;
+	}	
 }
