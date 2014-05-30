@@ -2,6 +2,7 @@ package algorithms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import lombok.Data;
 
@@ -34,11 +35,15 @@ public class SLAViolationAlgorithm {
 	 * @return Returns the number of total SLA violations in all datacenters given by @datacenterList
 	 * 		   If > 0, we have violations
 	 */
-	
-	private int violations = 0;
+		
+	private ArrayList<Integer> priorityViolationList = new ArrayList<Integer>();
 
+	public int getViolations() {
+		return this.priorityViolationList.size();
+	}
+	
 	public void reset() {
-		this.violations = 0;
+		this.priorityViolationList.clear();
 	}
 	
 	public void updateSLAViolsations(int minute, ArrayList<DataCenter> datacenterList) {
@@ -69,7 +74,7 @@ public class SLAViolationAlgorithm {
 			double downtime = sla.getDownTimeInPercent(minute);
 			// Downtime is violated
 			if (downtime > sla.getMaxDowntime()) {
-				violations++;
+				priorityViolationList.add(sla.getPriority());
 				continue;
 			}
 
@@ -90,7 +95,7 @@ public class SLAViolationAlgorithm {
 	
 			if (allVMsHaveFullMemoryLoad && assignedUsedMemory < sla.getMemory()) {
 				// Memory of sla is violated because the load of all vms is 100% and the memory of the vms assigned < SLA
-				violations++;
+				priorityViolationList.add(sla.getPriority());
 				continue;
 			}
 			else if (allVMsHaveFullMemoryLoad) {
@@ -102,7 +107,7 @@ public class SLAViolationAlgorithm {
 				}
 				// This SLA is violated in memory
 				if (isViolated) {
-					violations++;
+					priorityViolationList.add(sla.getPriority());
 					continue;
 				}
 			}
@@ -113,7 +118,7 @@ public class SLAViolationAlgorithm {
 					allPMsOverloaded = allPMsOverloaded && violationMapMemory.get(vm.getPm().getId());
 				}
 				if (allPMsOverloaded) {
-					violations++;
+					priorityViolationList.add(sla.getPriority());
 					continue;
 				}
 			}
@@ -130,7 +135,7 @@ public class SLAViolationAlgorithm {
 	
 			if (allVMsHaveFullCPULoad && assignedUsedCPUs < sla.getCpus()) {
 				// CPUs of sla is violated because the load of all vms is 100% and the cpus of the vms assigned < SLA
-				violations++;
+				priorityViolationList.add(sla.getPriority());
 				continue;
 			}
 			else if (allVMsHaveFullCPULoad) {
@@ -142,7 +147,7 @@ public class SLAViolationAlgorithm {
 				}
 				// This SLA is violated in cpus
 				if (isViolated) {
-					violations++;
+					priorityViolationList.add(sla.getPriority());
 					continue;
 				}
 			}
@@ -153,7 +158,7 @@ public class SLAViolationAlgorithm {
 					allPMsOverloaded = allPMsOverloaded && violationMapCPUs.get(vm.getPm().getId());
 				}
 				if (allPMsOverloaded) {
-					violations++;
+					priorityViolationList.add(sla.getPriority());
 					continue;
 				}
 			}			
@@ -170,7 +175,7 @@ public class SLAViolationAlgorithm {
 	
 			if (allVMsHaveFullBandwidthLoad && assignedUsedBandwidth < sla.getBandwidth()) {
 				// CPUs of sla is violated because the load of all vms is 100% and the bandwidth of the vms assigned < SLA
-				violations++;
+				priorityViolationList.add(sla.getPriority());
 				continue;
 			}
 			else if (allVMsHaveFullBandwidthLoad) {
@@ -182,7 +187,7 @@ public class SLAViolationAlgorithm {
 				}
 				// This SLA is violated in networkbandwidth
 				if (isViolated) {
-					violations++;
+					priorityViolationList.add(sla.getPriority());
 					continue;
 				}
 			}
@@ -193,7 +198,7 @@ public class SLAViolationAlgorithm {
 					allPMsOverloaded = allPMsOverloaded && violationMapNetwork.get(vm.getPm().getId());
 				}
 				if (allPMsOverloaded) {
-					violations++;
+					priorityViolationList.add(sla.getPriority());
 					continue;
 				}
 			}			

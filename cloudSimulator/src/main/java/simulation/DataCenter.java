@@ -22,7 +22,6 @@ import org.springframework.data.annotation.Transient;
 
 import utils.Utils;
 import algorithms.DataCenterManagement;
-import cloudSimulator.algorihms.DataCentertBestFit;
 import cloudSimulator.weather.Forecast;
 import cloudSimulator.weather.Location;
 import cloudSimulator.weather.Weather;
@@ -40,6 +39,8 @@ public class DataCenter implements Serializable {
 	
 	private String name;
     private List<PhysicalMachine> physicalMachines = new ArrayList<PhysicalMachine>();
+    
+    private boolean isOverloaded = false;
     
     @Transient
     private DataCenterManagement algorithm;
