@@ -15,11 +15,14 @@ import model.PhysicalMachine;
 import model.ServiceLevelAgreement;
 import model.VirtualMachine;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
 import utils.Utils;
 import algorithms.DataCenterManagement;
+import cloudSimulator.algorihms.DataCentertBestFit;
 import cloudSimulator.weather.Forecast;
 import cloudSimulator.weather.Location;
 import cloudSimulator.weather.Weather;
@@ -54,6 +57,9 @@ public class DataCenter implements Serializable {
 
     @Transient
     private Forecast forecastService;
+    
+    @Transient
+    static Logger logger = LoggerFactory.getLogger(DataCenter.class);
     
     int currentTime = 0;
     
@@ -102,6 +108,7 @@ public class DataCenter implements Serializable {
 			PhysicalMachine pm = algorithm.findPMForMigration(this, vm);
 			pm.setRunning(true);
 			pm.getVirtualMachines().add(vm);
+			vm.setPm(pm);
 			vm.setOnline(true);
 		}
 		else if (!migrationQueue.containsKey(vm.getId())) {
@@ -127,7 +134,9 @@ public class DataCenter implements Serializable {
 				migrationQueue.remove(vm.getId());
 				pm.setRunning(true);
 				pm.getVirtualMachines().add(vm);
+				vm.setPm(pm);
 				vm.setOnline(true);
+				//System.out.printf("VM[%s] at time (%d) arrived at DC : [%s]\n", vm.getId(), minute, vm.getPm().getDataCenter().getName());
 			}
 		}
 	}
