@@ -166,7 +166,12 @@ public class DataCenter implements Serializable {
 	public double getCurrentEnergyCosts(int minute) {
 		Date currentTime = Utils.getCurrentTime(minute);
 		Weather currentWeather = forecastService.getForecast(currentTime, location, true);
-		return Utils.getCoolingEnergyFactor(currentWeather.getCurrentTemperature()) * getCurrentEneryPrice(currentTime);
+		double powerConsumption = 0.;
+		for (PhysicalMachine pm : getOnlinePMs()) {
+			powerConsumption += pm.getPowerConsumption();
+		}
+		powerConsumption /= 1000; // convert to kw
+		return Utils.getCoolingEnergyFactor(currentWeather.getCurrentTemperature()) * powerConsumption * getCurrentEneryPrice(currentTime);
 	}
 	
 	/**
