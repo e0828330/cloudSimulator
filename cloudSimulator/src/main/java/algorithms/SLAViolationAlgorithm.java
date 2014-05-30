@@ -64,8 +64,7 @@ public class SLAViolationAlgorithm {
 				}				
 			}
 		}
-		
-		int i = 1;
+
 		for (ServiceLevelAgreement sla : slaList) {
 			double downtime = sla.getDownTimeInPercent(minute);
 			// Downtime is violated
@@ -151,7 +150,6 @@ public class SLAViolationAlgorithm {
 				// all vms running on pms which are  overloaded
 				boolean allPMsOverloaded = true;
 				for (VirtualMachine vm : tmpVMList) {
-					System.out.println("PMID = " + vm.getPm().getId());
 					allPMsOverloaded = allPMsOverloaded && violationMapCPUs.get(vm.getPm().getId());
 				}
 				if (allPMsOverloaded) {
