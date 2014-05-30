@@ -74,7 +74,11 @@ public class ElasticityManager {
 			for (DataCenter dc : dataCenters) {
 				energyCosts += dc.getCurrentEnergyCosts(minute);
 			}
-			double slaCosts = (double)slaViolations.getViolations() * costsPerViolation;
+			/* Compute SLA costs based on priority */
+			double slaCosts = 0.;
+			for (Integer violatedPrio : slaViolations.getPriorityViolationList()) {
+				slaCosts += (double)((costsPerViolation * Math.max(1, 10 - (10 / violatedPrio))) / 10) * 0.1;
+			}
 			energyCostList.add(new DataPoint(hour, energyCosts));
 			slaCostList.add(new DataPoint(hour, slaCosts));
 			hour++;

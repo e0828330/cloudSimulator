@@ -102,7 +102,7 @@ public class ConfigParser {
 			sla.setMemory((int) slaMemory.sample());
 			sla.setSize((int) slaSize.sample() + 2);
 			sla.setMaxDowntime(slaMaxDowntime.sample());
-			int priority = (int) slaPriority.sample();
+			int priority = Math.max(1,(int) slaPriority.sample());
 			sla.setPriority(priority < 0 ? 0 : priority);
 			slaList.add(sla);
 		}
