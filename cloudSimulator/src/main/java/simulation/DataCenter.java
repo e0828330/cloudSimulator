@@ -40,7 +40,14 @@ public class DataCenter implements Serializable {
 	private String name;
     private List<PhysicalMachine> physicalMachines = new ArrayList<PhysicalMachine>();
     
+    @Transient
     private boolean isOverloaded = false;
+    
+    /**
+     * The threshold for dc overload
+     */
+    @Transient
+    private double threshold = 0.9;
     
     @Transient
     private DataCenterManagement algorithm;
@@ -78,6 +85,8 @@ public class DataCenter implements Serializable {
         }
         algorithm.scaleVirtualMachines(this);
         
+        this.checkIfOverloaded();
+        
         // Check if a sla is down
         ArrayList<ServiceLevelAgreement> slaList = getSLAs();
         for (ServiceLevelAgreement sla : slaList) {
@@ -96,6 +105,7 @@ public class DataCenter implements Serializable {
         
 		// System.out.printf("[%s] - Simulated times is %s\n", name,
 		// Utils.getCurrentTime(minute));
+        
 	}
 
 	/**
@@ -387,6 +397,19 @@ public class DataCenter implements Serializable {
 			}
 		}
 		return slaList;
+	}
+	
+	private void checkIfOverloaded() {
+		this.isOverloaded = true;
+		for (PhysicalMachine pm : this.getOnlinePMs()) {
+			if (pm.getBandwidthUtilization() <= threshold ||
+					pm.getCPULoad() <= threshold ||
+					pm.getMemoryUsage() <= threshold ||
+					pm.getSizeUsage() <= threshold) {
+				this.isOverloaded = false;
+				break;
+			}
+		}
 	}
 	
 	
