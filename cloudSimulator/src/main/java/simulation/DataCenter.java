@@ -395,6 +395,7 @@ public class DataCenter implements Serializable {
 	}
 	
 	private void checkIfOverloaded() {
+		this.isOverloaded = true;
 		for (PhysicalMachine pm : this.getOnlinePMs()) {
 			if (pm.getBandwidthUtilization() <= threshold ||
 					pm.getCPULoad() <= threshold ||
@@ -402,9 +403,6 @@ public class DataCenter implements Serializable {
 					pm.getSizeUsage() <= threshold) {
 				this.isOverloaded = false;
 				break;
-			}
-			else {
-				this.isOverloaded = true;
 			}
 		}
 	}
