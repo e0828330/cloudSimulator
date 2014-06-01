@@ -9,6 +9,7 @@ import java.util.List;
 
 import model.PhysicalMachine;
 import model.ServiceLevelAgreement;
+import model.VMType;
 import model.VirtualMachine;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -115,11 +116,68 @@ public class ConfigParser {
 	 * 
 	 * @param numVMs
 	 */
-	private void initVMs(int numVMs) {
+	private void initVMs(int web, int hpc, int mixed) {
 		// VMS
 		Iterator<ServiceLevelAgreement> iter = slaList.iterator();
-		for (int i = 0; i < numVMs; i++) {
+		for (int i = 0; i < web; i++) {
 			VirtualMachine vm = new VirtualMachine();
+			vm.setType(VMType.WEB);
+
+			if (!iter.hasNext()) {
+				iter = slaList.iterator();
+			}
+
+			// if (iter.hasNext()) {
+			ServiceLevelAgreement sla = iter.next();
+			// iter.remove();
+			sla.getVms().add(vm);
+			vm.setSla(sla);
+
+			vm.setBandwidth((int) (sla.getBandwidth()));
+			int initCPUS = (int) (sla.getCpus());
+			vm.setCpus(initCPUS < 1 ? 1 : initCPUS);
+			int initMemory = (int) (sla.getMemory());
+			vm.setMemory(initMemory < 1 ? 1 : initMemory);
+			vm.setOnline(true);
+			vm.setSize((int) (sla.getSize()));
+			/*
+			 * } else { vm.setOnline(false); }
+			 */
+			vm.buildLoadMaps();
+			vmList.add(vm);
+		}
+
+		for (int i = 0; i < hpc; i++) {
+			VirtualMachine vm = new VirtualMachine();
+			vm.setType(VMType.HPC);
+
+			if (!iter.hasNext()) {
+				iter = slaList.iterator();
+			}
+
+			// if (iter.hasNext()) {
+			ServiceLevelAgreement sla = iter.next();
+			// iter.remove();
+			sla.getVms().add(vm);
+			vm.setSla(sla);
+
+			vm.setBandwidth((int) (sla.getBandwidth()));
+			int initCPUS = (int) (sla.getCpus());
+			vm.setCpus(initCPUS < 1 ? 1 : initCPUS);
+			int initMemory = (int) (sla.getMemory());
+			vm.setMemory(initMemory < 1 ? 1 : initMemory);
+			vm.setOnline(true);
+			vm.setSize((int) (sla.getSize()));
+			/*
+			 * } else { vm.setOnline(false); }
+			 */
+			vm.buildLoadMaps();
+			vmList.add(vm);
+		}
+
+		for (int i = 0; i < hpc; i++) {
+			VirtualMachine vm = new VirtualMachine();
+			vm.setType(VMType.MIXED);
 
 			if (!iter.hasNext()) {
 				iter = slaList.iterator();
@@ -241,7 +299,13 @@ public class ConfigParser {
 		int numSLAs = (int) slaND.sample();
 		int numVMs = (int) vmND.sample();
 
-		// System.out.println("NUM VMS: " + numVMs);
+		int webVMPercent = Integer.parseInt(ini.get("VMTypes", "web"));
+		int hpcPercent = Integer.parseInt(ini.get("VMTypes", "hpc"));
+		
+		System.out.println(webVMPercent);
+		int webVmNum = (int)(numVMs * (double)(webVMPercent / 100.));
+		int hpcVmNum = (int)(numVMs * (double)(hpcPercent) / 100.);
+		int mixedVms = numVMs - webVmNum - hpcVmNum;
 
 		// If generated data generates more SLAs than VMs, set max to VMs
 		if (numSLAs > numVMs) {
@@ -255,7 +319,7 @@ public class ConfigParser {
 		this.initSLAs(numSLAs);
 
 		// VMs
-		this.initVMs(numVMs);
+		this.initVMs(webVmNum, hpcVmNum, mixedVms);
 
 		// PMS
 		this.initPMs();

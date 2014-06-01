@@ -46,6 +46,8 @@ public class VirtualMachine implements Serializable {
 	private HashMap<Integer, Double> memLoadMap;
 	private HashMap<Integer, Double> bwLoadMap;
 	
+	private VMType type;
+	
 	/**
 	 * Builds and stores load maps, used for non DB runs
 	 * 
@@ -55,30 +57,42 @@ public class VirtualMachine implements Serializable {
 		memLoadMap = new HashMap<Integer, Double>();
 		bwLoadMap = new HashMap<Integer, Double>();
 		
+		
+		
 		/* Build it for one day we cycle through those values */
 		for (int i = 0; i < 1440; i++) {
-			cpuLoadMap.put(i, Utils.getRandomValue(0, cpus) / cpus);
-			memLoadMap.put(i, Utils.getRandomValue(0, memory) / memory);
-			bwLoadMap.put(i, Utils.getRandomValue(0, bandwidth) / bandwidth);
+			// HPC means higher cpu load
+			if (type.equals(VMType.HPC) || type.equals(VMType.MIXED)) {
+				cpuLoadMap.put(i, Utils.getRandomValue(cpus * 0.75, cpus) / cpus);
+			}
+			else {
+				cpuLoadMap.put(i, Utils.getRandomValue(0, cpus) / cpus);
+			}
+			
+			// Mixed means higher memory use
+			if ( type.equals(VMType.MIXED)) {
+				memLoadMap.put(i, Utils.getRandomValue(memory * 0.6, memory) / memory);
+			}
+			else {
+				memLoadMap.put(i, Utils.getRandomValue(0, memory) / memory);
+			}
+			
+			// Web means higher bandwidth use
+			if (type.equals(VMType.WEB) || type.equals(VMType.MIXED)) {
+				bwLoadMap.put(i, Utils.getRandomValue(bandwidth * 0.5, bandwidth) / bandwidth);
+			}
+			else {
+				bwLoadMap.put(i, Utils.getRandomValue(0, bandwidth) / bandwidth);
+			}
 		}
 
 		updateLoad(0);
 	}
 	
 	/**
-	 * Returns the page dirty rate in pages / second
-	 * @return
-	 */
-	public int getPageDirtyRate() {
-		/* TODO: Implement */
-		return 0;
-	}
-	
-	/**
 	 * Updates the current load, called periodically by the simulator
 	 */
 	public void updateLoad(int minute) {
-		// TODO: Type + OS
 		usedCPUs = cpuLoadMap.get(minute % 1440);
 		usedMemory = memLoadMap.get(minute % 1440);
 		usedBandwidth = bwLoadMap.get(minute % 1440);
