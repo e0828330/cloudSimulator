@@ -2,14 +2,12 @@ package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 @Data
 @EqualsAndHashCode(exclude={"vms"})
