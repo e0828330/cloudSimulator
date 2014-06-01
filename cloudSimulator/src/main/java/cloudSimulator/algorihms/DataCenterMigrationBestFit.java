@@ -68,7 +68,7 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
             for (PhysicalMachine pm : dc.getPhysicalMachines()) {
                 for (VirtualMachine vm : pm.getOnlineVMs()) {
                     double bandwidth = pm.getBandwidth() * (1 - pm.getBandwidthUtilization());
-                    if (vmMin == null || Utils.getMigrationTime(bandwidth, (vm.getMemory()) * vm.getUsedMemory() + vm.getSize()) < Utils.getMigrationTime(bandwidth, currentMigrationSize)) {
+                    if (vmMin == null || dc.isOverloaded() || Utils.getMigrationTime(bandwidth, (vm.getMemory()) * vm.getUsedMemory() + vm.getSize()) < Utils.getMigrationTime(bandwidth, currentMigrationSize)) {
                         vmMin = vm;
                         currentMigrationSize = vmMin.getMemory() * vmMin.getUsedMemory() + vmMin.getSize();
                     }
@@ -92,6 +92,9 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
         DataCenter dc = null;
         
         for (Map.Entry<Double, DataCenter> entry : map.entrySet()) {
+        	if (entry.getValue().isOverloaded()) {
+        		continue;
+        	}
             if(!entry.getValue().equals(vm.getPm().getDataCenter()) &&  entry.getValue().getHighestAvailableFreeMemory() > vm.getMemory() * vm.getUsedMemory() && (dc == null || entry.getValue().getHighestAvailableFreeMemory() < dc.getHighestAvailableFreeMemory())){
                 dc = entry.getValue();
                 break;
@@ -115,7 +118,7 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
         DataCenter sourceDC = sourceVM.getPm().getDataCenter();
         double targetForecastPrice = targetDC.getCurrentEneryPrice(Utils.getCurrentTime(minute)) * Utils.getCoolingEnergyFactor(targetWeather.getForecast() * targetWeather.getCurrentTemperature());
         double sourceForecastPrice = sourceDC.getCurrentEneryPrice(Utils.getCurrentTime(minute)) * Utils.getCoolingEnergyFactor(sourceWeather.getForecast() * sourceWeather.getCurrentTemperature());
-        return targetForecastPrice < sourceForecastPrice;
+        return !targetDC.isOverloaded() && targetForecastPrice < sourceForecastPrice;
     }
     
     

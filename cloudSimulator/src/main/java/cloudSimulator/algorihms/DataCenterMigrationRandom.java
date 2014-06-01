@@ -124,7 +124,7 @@ public class DataCenterMigrationRandom implements DataCenterMigration {
    * @return
    */
   public boolean isMigrationValuable(VirtualMachine sourceVM, DataCenter targetDC, int minute) {
-    return true; //(0 + (int) (Math.random() * (10))) % 2 == 0;
+    return !targetDC.isOverloaded();
   }
 
 }
