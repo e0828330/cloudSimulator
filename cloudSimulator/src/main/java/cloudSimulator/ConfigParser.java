@@ -336,7 +336,7 @@ public class ConfigParser {
 		}
 
 		saveToDB();
-
+		
 		// printInitialAllocation();
 	}
 
@@ -394,12 +394,12 @@ public class ConfigParser {
 		System.out.println("NR VMs " + vmList.size());
 		Collections.shuffle(totalPMs);
 
-		Iterator<PhysicalMachine> PMiter = totalPMs.iterator();
+		//Iterator<PhysicalMachine> PMiter = totalPMs.iterator();
 		Iterator<VirtualMachine> VMiter = vmList.iterator();
 
 		VirtualMachine nextVM = null;
 
-		while (PMiter.hasNext()) {
+		/*while (PMiter.hasNext()) {
 			PhysicalMachine pm = PMiter.next();
 			while (nextVM != null || VMiter.hasNext()) {
 				if (nextVM == null) {
@@ -417,6 +417,37 @@ public class ConfigParser {
 					break;
 				}
 			}
+		}*/
+		int i = 0;
+		int mod = totalPMs.size();
+		boolean pmFound = false;
+		while (VMiter.hasNext()) {
+			if (nextVM == null) {
+				nextVM = VMiter.next();
+			}
+			pmFound = false;
+			for (PhysicalMachine pm : totalPMs) {
+				if (Utils.VMfitsOnPM(pm, nextVM)) {
+					if (pm.getVirtualMachines().size() == 0 && nextVM.isOnline()) {
+						pm.setRunning(true);
+					}
+					nextVM.setPm(pm);
+					pm.getVirtualMachines().add(nextVM);
+					VMiter.remove();
+					nextVM = null;
+					pmFound = true;
+					break;
+				}
+			}
+			if (pmFound) {
+				continue;
+			}
+			// no pm found
+			PhysicalMachine tmpPM = totalPMs.get(i % mod);
+			nextVM.setPm(tmpPM);
+			tmpPM.getVirtualMachines().add(nextVM);
+			nextVM.setOnline(false);			
+			i++;
 		}
 	}
 
