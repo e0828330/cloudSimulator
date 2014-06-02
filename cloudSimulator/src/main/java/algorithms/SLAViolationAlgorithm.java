@@ -58,15 +58,9 @@ public class SLAViolationAlgorithm {
 		for (DataCenter dc : datacenterList) {
 			slaList = dc.getSLAs();
 			for (PhysicalMachine pm : dc.getPhysicalMachines()) {
-				if (!violationMapMemory.containsKey(pm.getId())) {
-					violationMapMemory.put(pm.getId(), Utils.PMMemoryIsViolated(pm, threshold));
-				}
-				if (!violationMapCPUs.containsKey(pm.getId())) {
-					violationMapCPUs.put(pm.getId(), Utils.PMCPUsIsViolated(pm, threshold));
-				}
-				if (!violationMapNetwork.containsKey(pm.getId())) {
-					violationMapNetwork.put(pm.getId(), Utils.PMBandwidthIsViolated(pm, threshold));
-				}				
+				violationMapMemory.put(pm.getId(), Utils.PMMemoryIsViolated(pm, threshold));
+				violationMapCPUs.put(pm.getId(), Utils.PMCPUsIsViolated(pm, threshold));
+				violationMapNetwork.put(pm.getId(), Utils.PMBandwidthIsViolated(pm, threshold));
 			}
 		}
 
