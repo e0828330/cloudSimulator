@@ -106,7 +106,7 @@ public class DataCenterMigrationRandom implements DataCenterMigration {
     
     for (Double o : keys) {
       DataCenter randomDC = map.get(o);
-      if (!randomDC.equals(vm.getPm().getDataCenter()) && randomDC.getHighestAvailableFreeMemory() > vm.getMemory() * vm.getUsedMemory() && (dc == null || randomDC.getHighestAvailableFreeMemory() < dc.getHighestAvailableFreeMemory())) {
+      if (!randomDC.equals(vm.getPm().getDataCenter()) && !randomDC.isOverloaded() && randomDC.getHighestAvailableFreeMemory() > vm.getMemory() * vm.getUsedMemory() && (dc == null || randomDC.getHighestAvailableFreeMemory() < dc.getHighestAvailableFreeMemory())) {
         dc = randomDC;
         break;
       }
