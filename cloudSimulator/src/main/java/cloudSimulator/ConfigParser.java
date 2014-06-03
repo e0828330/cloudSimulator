@@ -302,7 +302,6 @@ public class ConfigParser {
 		int webVMPercent = Integer.parseInt(ini.get("VMTypes", "web"));
 		int hpcPercent = Integer.parseInt(ini.get("VMTypes", "hpc"));
 		
-		System.out.println(webVMPercent);
 		int webVmNum = (int)(numVMs * (double)(webVMPercent / 100.));
 		int hpcVmNum = (int)(numVMs * (double)(hpcPercent) / 100.);
 		int mixedVms = numVMs - webVmNum - hpcVmNum;
@@ -390,8 +389,8 @@ public class ConfigParser {
 		// Set VM -> PM
 		// Shuffle PMs to avoid clustered allocation
 
-		System.out.println("NR PMS " + totalPMs.size());
-		System.out.println("NR VMs " + vmList.size());
+		logger.info("NR PMS " + totalPMs.size());
+		logger.info("NR VMs " + vmList.size());
 		Collections.shuffle(totalPMs);
 
 		//Iterator<PhysicalMachine> PMiter = totalPMs.iterator();
@@ -399,25 +398,6 @@ public class ConfigParser {
 
 		VirtualMachine nextVM = null;
 
-		/*while (PMiter.hasNext()) {
-			PhysicalMachine pm = PMiter.next();
-			while (nextVM != null || VMiter.hasNext()) {
-				if (nextVM == null) {
-					nextVM = VMiter.next();
-				}
-				if (Utils.VMfitsOnPM(pm, nextVM)) {
-					if (pm.getVirtualMachines().size() == 0 && nextVM.isOnline()) {
-						pm.setRunning(true);
-					}
-					nextVM.setPm(pm);
-					pm.getVirtualMachines().add(nextVM);
-					VMiter.remove();
-					nextVM = null;
-				} else {
-					break;
-				}
-			}
-		}*/
 		int i = 0;
 		int mod = totalPMs.size();
 		boolean pmFound = false;
@@ -446,7 +426,9 @@ public class ConfigParser {
 			PhysicalMachine tmpPM = totalPMs.get(i % mod);
 			nextVM.setPm(tmpPM);
 			tmpPM.getVirtualMachines().add(nextVM);
-			nextVM.setOnline(false);			
+			nextVM.setOnline(false);	
+			VMiter.remove();
+			nextVM = null;
 			i++;
 		}
 	}
