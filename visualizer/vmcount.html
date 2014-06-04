@@ -1,0 +1,84 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Simulation Data Visualizer</title>
+    <script type="text/javascript" src="canvasjs.min.js"></script>
+<body>
+<h1>Simulation Data Visualizer</h1><br />
+<div style="margin: auto; width: 600px; border: 2px solid darkgrey; text-align:center">
+    <form>
+        <p>Please select the result file and click <strong>Visualize</strong></p>
+        <label>Data File <input type="file" id="data" name="data" /></label><br />
+        <br />
+        <input type="button" onclick="render()" value="Visualize" />
+        <br /><br />
+    </form>
+</div>
+<br />
+<div id="chartContainer" style="height: 100%; width: 98%; margin: auto"></div>
+<script type="text/javascript">
+function Renderer() {
+
+}
+
+Renderer.prototype.render = function (input) {
+    var data = [];
+    this._data = JSON.parse(input);
+    for (var dc in this._data) {
+        data.push({
+            type: "line",
+            lineThickness: 1,
+            markerSize: 0,
+            axisYType: "secondary",
+            showInLegend: true,
+            name: dc,
+            dataPoints: this._data[dc]
+        });
+    }
+
+    var chart = new CanvasJS.Chart("chartContainer", {
+        zoomEnabled: true,
+        title: {
+            text: "Simulation Results"
+        },
+        axisY2: {
+            interlacedColor: "#F5F5F5",
+            gridColor: "#D7D7D7",
+            tickColor: "#D7D7D7"
+        },
+        theme: "theme2",
+        toolTip: {
+            shared: true
+        },
+        legend: {
+            verticalAlign: "bottom",
+            horizontalAlign: "center",
+            fontSize: 15,
+            fontFamily: "Lucida Sans Unicode"
+
+        },
+        data: data
+    });
+
+    chart.render();
+};
+
+function render() {
+    var renderer = new Renderer();
+    var dataFile = document.getElementById("data").files[0];
+
+    if (!dataFile) {
+        alert("Please select a file!");
+        return;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function (e) {
+        renderer.render(reader.result);
+    }
+    reader.readAsText(dataFile);
+}
+</script>
+</body>
+</html>
+

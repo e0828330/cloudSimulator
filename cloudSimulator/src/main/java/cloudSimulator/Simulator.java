@@ -64,7 +64,7 @@ public class Simulator implements CommandLineRunner {
 
 		Gson gson = new Gson();
 		/* Dump energy cost json to temp file */
-		File temp = File.createTempFile("energy-costs", ".json");
+		File temp = File.createTempFile("energy-costs-", ".json");
 		FileWriter fw = new FileWriter(temp.getAbsoluteFile());
 		BufferedWriter bw = new BufferedWriter(fw);
 		bw.write(gson.toJson(elasticityManager.getEnergyCostList()));
@@ -72,10 +72,18 @@ public class Simulator implements CommandLineRunner {
 		System.out.println("Wrote energy-costs data to " + temp.getAbsolutePath());
 
 		/* Dump sla cost json to temp file */
-		temp = File.createTempFile("sla-costs", ".json");
+		temp = File.createTempFile("sla-costs-", ".json");
 		fw = new FileWriter(temp.getAbsoluteFile());
 		bw = new BufferedWriter(fw);
 		bw.write(gson.toJson(elasticityManager.getSlaCostList()));
+		bw.close();
+		System.out.println("Wrote sla-costs data to " + temp.getAbsolutePath());
+		
+		/* Dump vm counts json to temp file */
+		temp = File.createTempFile("vm-counts-", ".json");
+		fw = new FileWriter(temp.getAbsoluteFile());
+		bw = new BufferedWriter(fw);
+		bw.write(gson.toJson(elasticityManager.getVmCounts()));
 		bw.close();
 		System.out.println("Wrote sla-costs data to " + temp.getAbsolutePath());
 		logger.info("Simulation ended!");

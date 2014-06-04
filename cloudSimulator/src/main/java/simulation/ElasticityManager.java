@@ -1,6 +1,7 @@
 package simulation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import lombok.Data;
@@ -30,6 +31,7 @@ public class ElasticityManager {
 
 	private ArrayList<DataPoint> energyCostList = new ArrayList<DataPoint>(8760);
 	private ArrayList<DataPoint> slaCostList = new ArrayList<DataPoint>(8760);
+	private HashMap<String, ArrayList<DataPoint>> vmCounts = new HashMap<String, ArrayList<DataPoint>>();
 	
 	private int hour = 0;
 	
@@ -70,8 +72,19 @@ public class ElasticityManager {
 		/* Run the algorithm once per hour */
 		if ((minute % 60) == 0) {
 			algorithm.manageVirtualMachines(this, minute);
+
+			if (hour == 0) {
+				for (DataCenter dc : dataCenters) {
+					vmCounts.put(dc.getName(), new ArrayList<DataPoint>(8760));
+				}
+			}
+			
+			/* Compute energy costs */
 			double energyCosts = 0.;
 			for (DataCenter dc : dataCenters) {
+				/* Record vm counts per dc */
+				vmCounts.get(dc.getName()).add(new DataPoint(hour, dc.getVirtualMachineCount()));
+				/* Compute energy costs */
 				energyCosts += dc.getCurrentEnergyCosts(minute);
 			}
 			/* Compute SLA costs based on priority */
@@ -85,4 +98,5 @@ public class ElasticityManager {
 			slaViolations.reset();
 		}
 	}
+
 }
