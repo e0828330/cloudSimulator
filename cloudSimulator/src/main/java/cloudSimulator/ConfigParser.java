@@ -359,7 +359,7 @@ public class ConfigParser {
 			}
 		}
 
-		logger.info("Loaded data to database.");
+		logger.info("Loaded data from database.");
 	}
 
 	/**

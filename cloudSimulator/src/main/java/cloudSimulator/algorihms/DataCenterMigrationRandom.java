@@ -1,9 +1,5 @@
 package cloudSimulator.algorihms;
 
-import algorithms.DataCenterMigration;
-import cloudSimulator.ConfigParser;
-import cloudSimulator.weather.Forecast;
-import cloudSimulator.weather.Weather;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -11,15 +7,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
+
 import model.PhysicalMachine;
 import model.VirtualMachine;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import simulation.DataCenter;
 import simulation.ElasticityManager;
 import utils.Utils;
+import algorithms.DataCenterMigration;
+import cloudSimulator.ConfigParser;
+import cloudSimulator.weather.Forecast;
 
 @Service(value = "migrationRandom")
 public class DataCenterMigrationRandom implements DataCenterMigration {
@@ -41,16 +43,10 @@ public class DataCenterMigrationRandom implements DataCenterMigration {
     
     currentEnergyPrices = new TreeMap<Double, DataCenter>();
     Date currentTime = Utils.getCurrentTime(minute);
-    double costs = 0.;
     logger.trace("--- " + currentTime + " ----");
     for (DataCenter dc : em.getDataCenters()) {
-      Weather currentWeather = forecastService.getForecast(currentTime, dc.getLocation(), true);
-      Double cPrice = Utils.getCoolingEnergyFactor(currentWeather.getCurrentTemperature()) * dc.getCurrentEneryPrice(Utils.getCurrentTime(minute));
-      currentEnergyPrices.put(cPrice, dc);
-      costs += cPrice;
+      currentEnergyPrices.put(dc.getCurrentEnergyCosts(minute), dc);
     }
-
-    logger.trace("Total energy costs: " + costs);
 
     VirtualMachine vm = findVMToMigrate(currentEnergyPrices);
     if (null != vm) {
@@ -116,7 +112,7 @@ public class DataCenterMigrationRandom implements DataCenterMigration {
   }
 
   /**
-   * Decides wether a migration is valuable
+   * Decides whether a migration is valuable
    *
    * @param sourceVM
    * @param targetDC

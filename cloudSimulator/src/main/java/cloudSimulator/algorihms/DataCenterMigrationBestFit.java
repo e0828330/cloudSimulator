@@ -9,14 +9,12 @@ import model.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import simulation.DataCenter;
 import simulation.ElasticityManager;
 import utils.Utils;
 import algorithms.DataCenterMigration;
-import cloudSimulator.weather.Forecast;
 import cloudSimulator.weather.Weather;
 
 @Service(value = "migrationBestFit")
@@ -25,10 +23,7 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
 	static Logger logger = LoggerFactory.getLogger(DataCenterMigrationBestFit.class);
 	
     private TreeMap<Double, DataCenter> currentEnergyPrices;
-
-    @Autowired
-    private Forecast forecastService;
-
+ 
     public void manageVirtualMachines(ElasticityManager em, int minute) {
         currentEnergyPrices = new TreeMap<Double, DataCenter>();
         Date currentTime = Utils.getCurrentTime(minute);
@@ -113,8 +108,8 @@ public class DataCenterMigrationBestFit implements DataCenterMigration {
      * @return 
      */
     public boolean isMigrationValuable(VirtualMachine sourceVM, DataCenter targetDC, int minute){
-        Weather sourceWeather = forecastService.getForecast(Utils.getCurrentTime(minute), sourceVM.getPm().getDataCenter().getLocation(), true);
-        Weather targetWeather = forecastService.getForecast(Utils.getCurrentTime(minute), targetDC.getLocation(), true);
+        Weather sourceWeather = sourceVM.getPm().getDataCenter().currentWeather();
+        Weather targetWeather = targetDC.currentWeather();
         DataCenter sourceDC = sourceVM.getPm().getDataCenter();
         double targetForecastPrice = targetDC.getCurrentEneryPrice(Utils.getCurrentTime(minute)) * Utils.getCoolingEnergyFactor(targetWeather.getForecast() * targetWeather.getCurrentTemperature());
         double sourceForecastPrice = sourceDC.getCurrentEneryPrice(Utils.getCurrentTime(minute)) * Utils.getCoolingEnergyFactor(sourceWeather.getForecast() * sourceWeather.getCurrentTemperature());

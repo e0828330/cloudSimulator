@@ -64,12 +64,32 @@ public class DataCenter implements Serializable {
     private HashMap<String, Integer> migrationQueue = new HashMap<String, Integer>();
 
     @Transient
-    private Forecast forecastService;
-    
-    @Transient
     static Logger logger = LoggerFactory.getLogger(DataCenter.class);
     
-    int currentTime = 0;
+    @Transient
+    private Forecast forecastService;
+
+    @Transient
+    private Weather currentWeather;
+    
+    private int currentTime = 0;
+    
+    private int lastWeatherUpdate = -1;
+    
+    /**
+     * Returns the current weather at the datacenter's location
+     * 
+     * 
+     * @return
+     */
+    public Weather currentWeather() {
+    	if (lastWeatherUpdate < currentTime) {
+    		lastWeatherUpdate = currentTime;
+    		currentWeather = forecastService.getForecast(Utils.getCurrentTime(currentTime), location, true);
+    		
+    	}
+    	return currentWeather;
+    }
     
     /**
      * Gets called on every simulated minute. Here VM allocation and load
@@ -175,7 +195,7 @@ public class DataCenter implements Serializable {
 	 */
 	public double getCurrentEnergyCosts(int minute) {
 		Date currentTime = Utils.getCurrentTime(minute);
-		Weather currentWeather = forecastService.getForecast(currentTime, location, true);
+		Weather currentWeather = currentWeather();
 		double powerConsumption = 0.;
 		for (PhysicalMachine pm : getOnlinePMs()) {
 			powerConsumption += pm.getPowerConsumption();

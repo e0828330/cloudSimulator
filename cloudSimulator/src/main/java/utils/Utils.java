@@ -100,19 +100,6 @@ public class Utils {
 	}
 
 	/**
-	 * Migrates @vm to @pm
-	 * 
-	 * @param pm
-	 *            The physical machine
-	 * @param vm
-	 *            The virtual machine
-	 */
-	public static void migrateVM2PM(PhysicalMachine pm, VirtualMachine vm) {
-        vm.setPm(pm);
-		pm.getVirtualMachines().add(vm);
-	}
-
-	/**
 	 * Generates a random value betweet min and max
 	 * 
 	 * @return
