@@ -14,11 +14,11 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import com.google.gson.Gson;
-
 import simulation.ElasticityManager;
 import utils.Utils;
 import cloudSimulator.weather.Forecast;
+
+import com.google.gson.Gson;
 
 @Configuration
 @ComponentScan({"cloudSimulator", "simulation", "algorithms"})
@@ -42,11 +42,20 @@ public class Simulator implements CommandLineRunner {
 	@Autowired
 	private ElasticityManager elasticityManager;
 	
-	public void run(String... arg0) throws Exception {
+	public void run(String... args) throws Exception {
 		logger.info("Simulator started");
 
-		URL resource = Simulator.class.getResource("/config.ini");
-		parser.doParse(resource.getPath());
+		String configFile = null;
+		for (String arg : args) {
+			configFile = arg;
+		}
+		if (configFile == null) {
+			URL resource = Simulator.class.getResource("/config.ini");
+			parser.doParse(resource.getPath());
+		}
+		else {
+			parser.doParse(configFile);
+		}
 
 		elasticityManager.setAlgorithm(parser.getMigrationAlgorithm());
 		elasticityManager.setDataCenters(parser.getDataCenters());
