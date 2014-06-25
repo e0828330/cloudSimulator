@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import lombok.Data;
 import model.PhysicalMachine;
 import model.ServiceLevelAgreement;
 import model.VMType;
@@ -32,6 +33,7 @@ import cloudSimulator.weather.Forecast;
 import cloudSimulator.weather.Location;
 
 @Service
+@Data
 public class ConfigParser {
 
 	static Logger logger = LoggerFactory.getLogger(ConfigParser.class);
@@ -58,6 +60,8 @@ public class ConfigParser {
 
 	@Autowired
 	private Forecast forecastService;
+	
+	private String algorithmName;
 
 	/* Resulting datacenters */
 	private List<DataCenter> dataCenters = new ArrayList<DataCenter>();
@@ -279,6 +283,7 @@ public class ConfigParser {
 
 		// Migration algorithm
 		migrationAlgorithm = (DataCenterMigration) appContext.getBean("migration" + ini.get("Algorithms", "dataCenterMigration"));
+		algorithmName = ini.get("Algorithms", "dataCenterMigration");
 
 		if (Long.parseLong(ini.get("Random", "seed")) > 0) {
 			randomSeed = Long.parseLong(ini.get("Random", "seed"));
