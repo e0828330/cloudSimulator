@@ -179,7 +179,7 @@ public class ConfigParser {
 			vmList.add(vm);
 		}
 
-		for (int i = 0; i < hpc; i++) {
+		for (int i = 0; i < mixed; i++) {
 			VirtualMachine vm = new VirtualMachine();
 			vm.setType(VMType.MIXED);
 
@@ -206,6 +206,7 @@ public class ConfigParser {
 			vm.buildLoadMaps();
 			vmList.add(vm);
 		}
+
 	}
 
 	/**
