@@ -25,6 +25,8 @@ java -jar target/cloudSimulator-0.0.1-SNAPSHOT.jar src/main/resources/config.ini
 
 You can either edit the config file in place or pass a different config file as parameter.
 
+The comments in the config file explain the meaning of the parameters.
+
 
 Viewing the results
 --------------
